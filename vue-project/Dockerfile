@@ -24,7 +24,7 @@ FROM nginx:stable-alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Nginx가 80번 포트를 사용하도록 설정
-EXPOSE 80
+EXPOSE 8081
 
 # Nginx 서버 실행
 CMD ["nginx", "-g", "daemon off;"]
