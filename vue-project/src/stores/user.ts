@@ -23,7 +23,7 @@ export const useAccountStore = defineStore('account', () => {
       })
   }
 
-  const login = async (userData: { username: string; password: string }) => {
+  const login = async (userData: { email: string; password: string }) => {
     try {
       const res = await axios.post(`${BASE_API}/login/`, userData)
       console.log('로그인 되었습니다')

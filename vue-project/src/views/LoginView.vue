@@ -42,7 +42,7 @@ const logInMember = () => {
     email: email.value,
     password: password.value,
   }
-  store.login(userData) // store 메서드 이름 확인 필요
+  store.login(userData) 
 }
 </script>
 
