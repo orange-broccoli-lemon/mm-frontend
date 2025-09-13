@@ -54,5 +54,6 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
+
   return { signUp, login, getUserInfo, token, user }
 })

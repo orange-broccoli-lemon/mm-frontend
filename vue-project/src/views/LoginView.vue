@@ -1,14 +1,75 @@
 <template>
-<h1>login</h1>
+  <main class="login">
+    <h1>Login</h1>
+    <form @submit.prevent="logInMember">
+      <div class="form-group">
+        <label for="email">이메일</label>
+        <input
+          id="email"
+          v-model="email"
+          type="text"
+          placeholder="이메일 입력"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input
+          id="password"
+          v-model="password"
+          type="password"
+          placeholder="비밀번호 입력"
+          required
+        />
+      </div>
+
+      <button type="submit">로그인</button>
+    </form>
+  </main>
 </template>
 
 <script setup lang="ts">
-    import { ref } from 'vue'
-    import { useAccountStore } from '../stores/user'
-    const store = useAccountStore()
-    const username = ref('')
-    const password = ref('')
+import { ref } from 'vue'
+import { useAccountStore } from '../stores/user'
+
+const store = useAccountStore()
+const email = ref('')
+const password = ref('')
+
+const logInMember = () => {
+  const userData = {
+    email: email.value,
+    password: password.value,
+  }
+  store.login(userData) // store 메서드 이름 확인 필요
+}
 </script>
 
 <style scoped>
+.login {
+  max-width: 400px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+input {
+  width: 100%;
+  padding: 0.5rem;
+  box-sizing: border-box;
+}
+
+button {
+  padding: 0.7rem;
+  width: 100%;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
 </style>

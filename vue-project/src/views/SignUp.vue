@@ -12,7 +12,16 @@
           required
         />
       </div>
-
+      <div class="form-group">
+      <label for="email">이메일</label>
+        <input
+          id="email"
+          v-model="email"
+          type="text"
+          placeholder="이메일 입력"
+          required
+        />
+      </div>
       <div class="form-group">
         <label for="password1">비밀번호</label>
         <input
@@ -49,14 +58,21 @@ const store = useAccountStore()
 const username = ref("")
 const password1 = ref("")
 const password2 = ref("")
+const email = ref("")
 
 const signUpMember = function () {
   const userData = new FormData()
   userData.append("username", username.value)
   userData.append("password1", password1.value)
   userData.append("password2", password2.value)
+  userData.append("email", email.value)
   store.signUp(userData)
+
 }
+
+
+// 유저 이름 중복 방지를 위해 중복확인 API 요청 응답 값 BOOL front에서하면 부하 
+
 </script>
 
 <style scoped>
@@ -65,7 +81,7 @@ const signUpMember = function () {
   margin: 2rem auto;
   padding: 1rem;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 8pxa;
 }
 
 .form-group {
