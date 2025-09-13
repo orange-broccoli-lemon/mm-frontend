@@ -23,8 +23,8 @@ FROM nginx:stable-alpine
 # 빌드 단계(builder)에서 생성된 결과물(dist 폴더)을 Nginx 의 기본 웹 폴더로 복사
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Nginx가 8081번 포트를 사용하도록 설정
-EXPOSE 8081
+# Nginx가 80번 포트를 사용하도록 설정
+EXPOSE 80
 
 # Nginx 서버 실행
 CMD ["nginx", "-g", "daemon off;"]
