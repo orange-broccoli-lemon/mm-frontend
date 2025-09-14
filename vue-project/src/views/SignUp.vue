@@ -3,7 +3,7 @@
     <h1>회원가입</h1>
     <form @submit.prevent="signUpMember">
       <div class="form-group">
-        <label for="username">아이디</label>
+        <label for="username">닉네임</label>
         <input
           id="username"
           v-model="username"

@@ -3,12 +3,12 @@
     <h1>Login</h1>
     <form @submit.prevent="logInMember">
       <div class="form-group">
-        <label for="email">이메일</label>
+        <label for="username">ID</label>
         <input
-          id="email"
-          v-model="email"
+          id="username"
+          v-model="username"
           type="text"
-          placeholder="이메일 입력"
+          placeholder="ID 입력"
           required
         />
       </div>
@@ -34,12 +34,12 @@ import { ref } from 'vue'
 import { useAccountStore } from '../stores/user'
 
 const store = useAccountStore()
-const email = ref('')
+const username = ref('')
 const password = ref('')
 
 const logInMember = () => {
   const userData = {
-    email: email.value,
+    username: username.value,
     password: password.value,
   }
   store.login(userData) 

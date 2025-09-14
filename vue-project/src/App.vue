@@ -1,15 +1,29 @@
 <script setup lang="ts">
 import { RouterView, RouterLink } from 'vue-router'
+import { useAccountStore } from './stores/user'
+import { computed } from 'vue'
+
+const accountStore = useAccountStore()
+
+const isLoggedIn = computed(() => !!accountStore.user) 
 </script>
 
 <template>
-    <nav class="navbar">
-      <div class="login-a">
-        <RouterLink to="/">메인</RouterLink>
+  <nav class="navbar">
+    <div class="login-a">
+      <RouterLink to="/">메인</RouterLink>
+
+      <template v-if="!isLoggedIn">
         <RouterLink to="/signup">회원가입</RouterLink>
         <RouterLink to="/login">로그인</RouterLink>
-      </div>
-    </nav>
+      </template>
+
+      <template v-else>
+        <RouterLink to="/mypage">마이페이지</RouterLink>
+      </template>
+    </div>
+  </nav>
+
   <div class="page-content">
     <RouterView />
   </div>
@@ -34,10 +48,11 @@ import { RouterView, RouterLink } from 'vue-router'
   text-decoration: none;
   color: #333;
   font-weight: 500;
+  display: flex;
+  gap: 1rem;
 }
 
 .page-content {
   padding-top: 4rem;
 }
-
 </style>
