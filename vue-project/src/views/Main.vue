@@ -2,6 +2,7 @@
 import { onMounted } from "vue"
 import { useMovieStore } from "../stores/movie"
 import MovieCard from "../components/MovieCard.vue"
+import { RouterLink } from "vue-router"
 
 const movieStore = useMovieStore()
 
@@ -14,12 +15,16 @@ onMounted(() => {
   <main>
     <h1>🔥 인기 영화</h1>
     <div class="cardgrid">
-      <MovieCard
+      <RouterLink
         v-for="(movie, index) in movieStore.movieList"
         :key="index"
-        :title="movie.title"
-        :image="movie.image"
-      />
+        :to="{ name: 'CreateThread', params: { id: index } }"
+      >
+        <MovieCard
+          :title="movie.title"
+          :image="movie.image"
+        />
+      </RouterLink>
     </div>
   </main>
 </template>
@@ -29,5 +34,8 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem; 
+}
+a {
+  text-decoration: none;
 }
 </style>
