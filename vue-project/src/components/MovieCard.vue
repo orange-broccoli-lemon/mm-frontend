@@ -6,6 +6,7 @@ defineProps<{
 </script>
 
 <template>
+  
   <div class="movie-card">
     <img :src="image" :alt="title" class="image" />
     <div class="title-text">

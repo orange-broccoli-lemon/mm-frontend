@@ -6,6 +6,7 @@ import { RouterView, RouterLink } from 'vue-router'
     <nav class="navbar">
       <div class="login-a">
         <RouterLink to="/">메인</RouterLink>
+        <RouterLink to="/community">커뮤니티</RouterLink>
         <RouterLink to="/signup">회원가입</RouterLink>
         <RouterLink to="/login">로그인</RouterLink>
       </div>
