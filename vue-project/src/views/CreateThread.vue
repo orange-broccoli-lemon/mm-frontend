@@ -10,10 +10,7 @@
         <label for="content">내용</label>
         <textarea id="content" v-model="content" placeholder="내용을 입력하세요"></textarea>
       </div>
-      <div class="form-group">
-        <label for="hashtags">해시태그</label>
-        <input id="hashtags" v-model="hashtags" placeholder="#해시태그" />
-      </div>
+      
       <button type="submit" class="submit-btn">생성</button>
     </form>
   </div>
@@ -30,8 +27,8 @@ const threadStore = useThreadStore()
 
 const title = ref('')
 const content = ref('')
-const hashtags = ref('')
-const bookId = Number(route.params.id)
+
+const bookId = 1 // 임시로 1로 설정
 
 const handleCreateThread = async () => {
   if (!title.value.trim() || !content.value.trim()) {
@@ -39,7 +36,7 @@ const handleCreateThread = async () => {
     return
   }
 
-  const threadData = { title: title.value, content: content.value, hashtags: hashtags.value }
+  const threadData = { title: title.value, content: content.value }
   await threadStore.createThread(bookId, threadData)
   alert('쓰레드 생성 완료!')
   router.push({ name: 'CommunityView' })
