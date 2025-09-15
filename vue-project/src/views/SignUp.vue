@@ -3,17 +3,18 @@
     <h1>회원가입</h1>
     <form @submit.prevent="signUpMember">
       <div class="form-group">
-        <label for="username">닉네임</label>
+        <label for="name">이름</label>
         <input
-          id="username"
-          v-model="username"
+          id="name"
+          v-model="name"
           type="text"
-          placeholder="아이디 입력"
+          placeholder="이름 입력"
           required
         />
       </div>
+
       <div class="form-group">
-      <label for="email">이메일</label>
+        <label for="email">이메일</label>
         <input
           id="email"
           v-model="email"
@@ -22,6 +23,7 @@
           required
         />
       </div>
+
       <div class="form-group">
         <label for="password1">비밀번호</label>
         <input
@@ -44,6 +46,17 @@
         />
       </div>
 
+      <div class="form-group">
+        <label for="image">이미지 URL</label>
+        <input
+          id="image"
+          v-model="image"
+          type="text"
+          placeholder="이미지 URL 입력"
+          required
+        />
+      </div>
+
       <button type="submit">회원가입</button>
     </form>
   </main>
@@ -55,24 +68,26 @@ import { useAccountStore } from "../stores/user"
 
 const store = useAccountStore()
 
-const username = ref("")
+const name = ref("")
 const password1 = ref("")
 const password2 = ref("")
 const email = ref("")
+const image = ref("")
 
 const signUpMember = function () {
-  const userData = new FormData()
-  userData.append("username", username.value)
-  userData.append("password1", password1.value)
-  userData.append("password2", password2.value)
-  userData.append("email", email.value)
+  if (password1.value !== password2.value) {
+    alert("비밀번호가 일치하지 않습니다.")
+    return
+  }
+  const userData = {
+    name: name.value,
+    password: password1.value,
+    email: email.value,
+    profile_image_url: image.value
+  }
+
   store.signUp(userData)
-
 }
-
-
-// 유저 이름 중복 방지를 위해 중복확인 API 요청 응답 값 BOOL front에서하면 부하 
-
 </script>
 
 <style scoped>
@@ -81,7 +96,7 @@ const signUpMember = function () {
   margin: 2rem auto;
   padding: 1rem;
   border: 1px solid #ccc;
-  border-radius: 8pxa;
+  border-radius: 8px;
 }
 
 .form-group {

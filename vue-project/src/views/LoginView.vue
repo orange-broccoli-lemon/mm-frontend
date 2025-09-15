@@ -39,7 +39,7 @@ const password = ref('')
 
 const logInMember = () => {
   const userData = {
-    username: username.value,
+    email: username.value,
     password: password.value,
   }
   store.login(userData) 
