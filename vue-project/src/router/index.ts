@@ -46,6 +46,12 @@ const router = createRouter({
       component: () => import('@/views/AllActorsView.vue'),
     },
     {
+      path: '/person/:id',
+      name: 'ActorDetail',
+      component: () => import('@/views/ActorDetailView.vue'),
+    },
+
+    {
       path: '/community',
       children: [
         {

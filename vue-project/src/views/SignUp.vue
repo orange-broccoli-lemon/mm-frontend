@@ -53,7 +53,6 @@
           v-model="image"
           type="text"
           placeholder="이미지 URL 입력"
-          required
         />
       </div>
 
@@ -83,7 +82,7 @@ const signUpMember = function () {
     name: name.value,
     password: password1.value,
     email: email.value,
-    profile_image_url: image.value
+    profile_image_url: image.value || 'https://i.imgur.com/a/AD32f2h.png'
   }
 
   store.signUp(userData)
