@@ -1,8 +1,9 @@
 <template>
-  <main>
-    <h1>🔥 인기 영화</h1>
-    <h1><RouterLink to="HotMovieDetailView">+</RouterLink></h1>
-    <div class="cardgrid">
+  <h1>🔥 인기 영화 목록</h1>
+ <div class="cardgrid">
+  <h1>캐루셀</h1> <hr>
+  <h1>캐루셀 아래부분 동글뱅이</h1><hr>
+
       <RouterLink
         v-for="(movie, index) in movieStore.movieList"
         :key="index"
@@ -14,16 +15,13 @@
           :movie_id = "movie.movie_id"
         />
       </RouterLink>
-    </div>
-  </main>
+      </div>
 </template>
 
 <script setup lang="ts">
 import { onMounted } from "vue"
 import { useMovieStore } from "../stores/movie"
 import MovieCard from "../components/MovieCard.vue"
-import { RouterLink } from "vue-router"
-
 const movieStore = useMovieStore()
 
 onMounted(() => {

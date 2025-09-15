@@ -5,6 +5,7 @@ import HomeView from '@/views/Main.vue'
 import LoginView from '@/views/LoginView.vue'
 import SignUpView from '@/views/SignUp.vue'
 import MyPage from '@/views/MyPage.vue'
+import HotMovieDetailView from '@/views/HotMovieDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,6 +29,11 @@ const router = createRouter({
       path: '/mypage',
       name: 'mypage',
       component: MyPage,
+    },
+    {
+      path: '/HotMovieDetailView',
+      name: 'HotMovieDetailView',
+      component: HotMovieDetailView,
     },
     {
       path: '/movie/movieDetail/:id',
