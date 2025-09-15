@@ -11,6 +11,8 @@
       <div class="info">
         <h1>{{ movieDetail.title }}</h1>
         <p>{{ movieDetail.overview }}</p>
+        
+       <!--
         <div class="rating">
           <span>{{ movieDetail.average_rating.toFixed(1) }}</span>
           <span v-for="n in 5" :key="n">
@@ -19,6 +21,7 @@
             <template v-else>☆</template>
           </span>
         </div>
+        --> 
       </div>
       <div class="actions">
         <button class="save" @click = "saevMovie">저장</button>
@@ -38,13 +41,13 @@ import { useRoute, useRouter } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
-
+const id = Number(route.params.id)
 
 const userMovie = useMovieStore()
 const movieDetail = ref<DetailMovie | null>(null)
 
 onMounted(async () => {
-  const res = await userMovie.detailMovie(1)
+  const res = await userMovie.detailMovie(id)
   movieDetail.value = res
 })
 
@@ -53,7 +56,7 @@ const goCreate = () => {
 }
 
 const saevMovie = () => {
-  const id = route.params.id  
+   
   // store.SaveMovie(id)          
   }
 </script>

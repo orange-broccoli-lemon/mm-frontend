@@ -5,11 +5,12 @@
       <RouterLink
         v-for="(movie, index) in movieStore.movieList"
         :key="index"
-        :to="{ name: 'BookDetail', params: { id: index } }"
+        :to="{ name: 'BookDetail', params: { id: movie.movie_id } }"
       >
         <MovieCard
           :title="movie.title"
-          :image="movie.image"
+          :image="movie.poster_url"
+          :movie_id = "movie.movie_id"
         />
       </RouterLink>
     </div>

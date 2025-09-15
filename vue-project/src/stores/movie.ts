@@ -5,7 +5,8 @@ import axios, { AxiosError } from 'axios'
 
 export interface MovieList {
   title: string
-  image: string
+  poster_url: string
+  movie_id: number
 }
 
 export interface DetailMovie{ 
@@ -25,14 +26,14 @@ export interface DetailMovie{
 }
 
 export const useMovieStore = defineStore('counter', () => {
-    const BASE_API = `https://71db5011-85c7-41e0-ae29-b76270496dd7.mock.pstmn.io/movie/hot`
+    const BASE_API = `https://i13m105.p.ssafy.io/api/`
     const movieList = ref<MovieList[]>([])
 
     const detailMovie = async (moviePk: number) => {
     
       try
       {
-        const res = await axios.get<DetailMovie>(`${BASE_API}/${moviePk}`)
+        const res = await axios.get<DetailMovie>(`${BASE_API}/v1/movies/${moviePk}`)
         console.log(res.data)
         return res.data ?? null
       }
@@ -48,7 +49,7 @@ export const useMovieStore = defineStore('counter', () => {
 
     const allMovies = function(){
     axios({
-      url:`${BASE_API}`,
+      url:`${BASE_API}/v1/movies/`,
       method:`GET`,
     })
       .then(res => {
