@@ -30,7 +30,11 @@ const router = createRouter({
       name: 'mypage',
       component: MyPage,
     },
-
+    {
+      path: '/actors',
+      name: 'AllActors',
+      component: () => import('@/views/AllActorsView.vue'),
+    },
     {
       path: '/community',
       children: [

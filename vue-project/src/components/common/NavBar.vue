@@ -19,7 +19,6 @@
 
 import { useAccountStore } from '@/stores/user';
 import { computed } from 'vue';
-import { RouterView, RouterLink } from 'vue-router'
 
 const accountStore = useAccountStore()
 const isLoggedIn = computed(() => !!accountStore.user) 

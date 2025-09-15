@@ -8,7 +8,7 @@ export interface Movie {
   image: string
 }
 
-export const useMovieStore = defineStore('counter', () => {
+export const useMovieStore = defineStore('movie', () => {
     const BASE_API = `https://71db5011-85c7-41e0-ae29-b76270496dd7.mock.pstmn.io/movie/hot`
     const movieList = ref<Movie[]>([])
     const allMovies = function(){
@@ -18,6 +18,7 @@ export const useMovieStore = defineStore('counter', () => {
     })
       .then(res => {
         movieList.value = res.data
+        console.log('API 응답 데이터:', res.data) // 데이터 확인을 위한 console.log
       })
       .catch(err => {
         console.log(err)

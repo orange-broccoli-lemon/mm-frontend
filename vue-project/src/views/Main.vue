@@ -6,8 +6,8 @@
 </template>
 
 <script setup lang="ts">
-import HotMovie from '@/components/HotMovie.vue';
-import Actor from '@/components/Actor.vue';
+import HotMovie from '@/views/HotMovie.vue';
+import Actor from '@/views/Actor.vue';
 </script>
 
 <style scoped>
