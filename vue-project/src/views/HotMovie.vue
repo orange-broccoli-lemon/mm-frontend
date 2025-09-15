@@ -5,7 +5,7 @@
       <RouterLink
         v-for="(movie, index) in movieStore.movieList"
         :key="index"
-        :to="{ name: 'CreateThread', params: { id: index } }"
+        :to="{ name: 'BookDetail', params: { id: index } }"
       >
         <MovieCard
           :title="movie.title"

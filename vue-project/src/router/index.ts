@@ -6,7 +6,6 @@ import LoginView from '@/views/LoginView.vue'
 import SignUpView from '@/views/SignUp.vue'
 import MyPage from '@/views/MyPage.vue'
 
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -31,6 +30,11 @@ const router = createRouter({
       component: MyPage,
     },
     {
+      path: '/movie/movieDetail/:id',
+      name: 'BookDetail',
+      component: () => import('@/views/DetailMovie.vue'),
+    },
+    {
       path: '/actors',
       name: 'AllActors',
       component: () => import('@/views/AllActorsView.vue'),
@@ -49,12 +53,14 @@ const router = createRouter({
           name: 'ThreadDetail',
           // 동적 import
           component: () => import('@/components/ThreadDetail.vue'),
+          props: true
         },
         {
           path: 'create_thread/:id',
           name: 'CreateThread',
           // 동적 import
           component: () => import('@/views/CreateThread.vue'),
+          props: true
         },
       ],
     },
