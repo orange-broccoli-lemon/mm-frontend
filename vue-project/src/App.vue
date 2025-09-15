@@ -4,23 +4,16 @@ import { useAccountStore } from './stores/user'
 import { computed } from 'vue'
 
 const accountStore = useAccountStore()
-
-const isLoggedIn = computed(() => !!accountStore.user) 
+const isLoggedIn = computed(() => !!accountStore.user)
 </script>
 
 <template>
-<<<<<<< HEAD
   <nav class="navbar">
     <div class="login-a">
       <RouterLink to="/">메인</RouterLink>
 
       <template v-if="!isLoggedIn">
-=======
-    <nav class="navbar">
-      <div class="login-a">
-        <RouterLink to="/">메인</RouterLink>
         <RouterLink to="/community">커뮤니티</RouterLink>
->>>>>>> sangrae
         <RouterLink to="/signup">회원가입</RouterLink>
         <RouterLink to="/login">로그인</RouterLink>
       </template>

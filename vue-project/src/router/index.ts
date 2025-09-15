@@ -1,13 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-// 정적 import
 import HomeView from '@/views/Main.vue'
 import LoginView from '@/views/LoginView.vue'
 import SignUpView from '@/views/SignUp.vue'
-<<<<<<< HEAD
 import MyPage from '@/views/MyPage.vue'
-=======
->>>>>>> sangrae
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -28,11 +24,11 @@ const router = createRouter({
       component: SignUpView,
     },
     {
-<<<<<<< HEAD
       path: '/myPage',
       name: 'myPage',
       component: MyPage,
-=======
+    },
+    {
       path: '/community',
       children: [
         {
@@ -54,7 +50,6 @@ const router = createRouter({
           component: () => import('@/views/CreateThread.vue'),
         },
       ],
->>>>>>> sangrae
     },
   ],
 })
