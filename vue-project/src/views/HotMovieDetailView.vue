@@ -2,7 +2,7 @@
   <h1>🔥 인기 영화 목록</h1>
  <div class="cardgrid">
   <h1>캐루셀</h1> <hr>
-  <h1>캐루셀 아래부분 동글뱅이</h1><hr>
+  <h1>캐루셀 아래부분 동글뱅이 아하</h1><hr>
 
       <RouterLink
         v-for="(movie, index) in movieStore.movieList"
