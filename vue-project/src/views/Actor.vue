@@ -1,21 +1,19 @@
 <template>
-    <div>
-        <h1>ACtor!!!!!!!!!</h1>
-        <div class="actor-list-container">
-          <div
-            v-for="actor in actorStore.actorList.slice(0, 5)"
-            :key="actor.id"
-          >
-              :id="actor.id"
-              :name="actor.name"
-              :image="actor.profile_url"
-            />
-          </div>
-        </div>
-        <div class="show-more-container" v-if="actorStore.actorList.length > 5">
-            <RouterLink :to="{ name: 'AllActors' }" class="more-link">더보기</RouterLink>
-        </div>
+  <div>
+    <h1>Actor!!!!!!!!!</h1>
+    <div class="actor-list-container">
+      <ActorCard
+        v-for="actor in actorStore.actorList.slice(0, 5)"
+        :key="actor.id"
+        :id="actor.id"
+        :name="actor.name"
+        :image="actor.profile_url"
+      />
     </div>
+    <div class="show-more-container" v-if="actorStore.actorList.length > 5">
+      <RouterLink :to="{ name: 'AllActors' }" class="more-link">더보기</RouterLink>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -34,7 +32,7 @@ onMounted(() => {
 <style scoped>
 .actor-list-container {
   display: flex;
-  overflow-x: auto; 
+  overflow-x: auto;
   gap: 20px;
   padding: 20px;
 
@@ -66,7 +64,7 @@ onMounted(() => {
 }
 
 .more-link:hover {
-    background-color: #f0f0f0;
-    transform: translateY(-2px);
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
 }
 </style>
