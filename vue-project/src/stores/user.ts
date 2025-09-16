@@ -40,42 +40,38 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
- async function login(userData: { email: string; password: string }) {
-  try {
-    const res = await axios.post(`${AUTH_API}/login/email`, userData, {
-      headers: { 'Content-Type': 'application/json' },
-      validateStatus: () => true,
-    })
-    console.log('로그인 응답 전체:', res)
-    console.log('상태코드:', res.status)
-    console.log('응답본문:', res.data)
+  async function login(userData: { email: string; password: string }) {
+    try {
+      const res = await axios.post(`${AUTH_API}/login/email`, userData, {
+        headers: { "Content-Type": "application/json" }
+      })
+      console.log('로그인 응답 데이터:', res.data);
+      console.log('로그인 되었습니다')
+      const receivedToken = res.data?.access_token
+      const receivedUserId = res.data?.user?.user_id
 
-    const receivedToken = res.data?.access_token
-    const receivedUserId = res.data?.user?.user_id
+      if (!receivedToken || !receivedUserId) {
+        throw new Error('응답에 토큰 또는 사용자 ID가 없습니다.');
+      }
+      token.value = receivedToken;
+      userId.value = receivedUserId;
+      localStorage.setItem('token', receivedToken);
+      localStorage.setItem('userId', JSON.stringify(receivedUserId));
 
-  
-  if (!receivedToken || !receivedUserId) {
-      console.error('응답에 토큰 또는 사용자 ID가 없습니다.')
-      return
+      const result = await getUserInfo(receivedUserId);
+      if (result.success) {
+        console.log('유저 정보:', user.value);
+        router.push('/');
+      } else {
+        logOut();
+        throw new Error('유저 정보 가져오기 실패');
+      }
+    } catch (err: unknown) {
+      const error = err as AxiosError;
+      console.error('로그인 실패', error.response?.data || error.message);
+      logOut(); // Ensure cleanup on failure
     }
-
-    token.value = receivedToken
-    userId.value = receivedUserId
-    localStorage.setItem('token', receivedToken)
-    localStorage.setItem('userId', JSON.stringify(receivedUserId))
-
-    const result = await getUserInfo(receivedUserId)
-    if (result.success) {
-      console.log('유저 정보:', user.value)
-      router.push('/')
-    } else {
-      logOut()
-      console.error('유저 정보 가져오기 실패')
-    }
-  } catch (err: any) {
-    console.error('로그인 요청 자체 실패', err)
   }
-}
 
   async function signUp(userData: {
     name: string
