@@ -4,10 +4,10 @@
     <div class="actor-grid-container">
       <ActorCard
         v-for="actor in actorStore.actorList"
-        :key="actor.id"
-        :id="actor.id"
+                :key="actor.person_id"
+        :id="actor.person_id"
         :name="actor.name"
-        :image="actor.profile_url"
+        :image="actor.profile_image_url"
       />
     </div>
   </div>

@@ -4,10 +4,10 @@
     <div class="actor-list-container">
       <ActorCard
         v-for="actor in actorStore.actorList.slice(0, 5)"
-        :key="actor.id"
-        :id="actor.id"
+        :key="actor.person_id"
+        :id="actor.person_id"
         :name="actor.name"
-        :image="actor.profile_url"
+        :image="actor.profile_image_url"
       />
     </div>
     <div class="show-more-container" v-if="actorStore.actorList.length > 5">

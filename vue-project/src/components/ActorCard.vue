@@ -1,14 +1,17 @@
 <template>
-  <div class="actor-card">
+  <RouterLink :to="{ name: 'ActorDetail', params: { id: id } }" class="actor-card">
     <img :src="image || 'https://placehold.co/150x150'" :alt="name" class="image" />
     <div class="title-text">
       <h2>{{ name }}</h2>
     </div>
-  </div>
+  </RouterLink>
+
 </template>
 
 
 <script setup lang="ts">
+import { RouterLink } from 'vue-router';
+
 defineProps<{
   id: number;
   name: string;

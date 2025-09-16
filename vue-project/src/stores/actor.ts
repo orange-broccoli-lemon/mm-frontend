@@ -1,41 +1,65 @@
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 
 
-export interface Actor {
-  id: number
+export interface ActorSummary {
+  person_id: number
   name: string
-  profile_url? : string
+  profile_image_url: string
 
 }
 
-export const useActorStore = defineStore('actor', () => {
-    const BASE_API = `https://71db5011-85c7-41e0-ae29-b76270496dd7.mock.pstmn.io/person`
-    const actorList = ref<Actor[]>([])
-    const allActors = async function(){
-    // axios({
-    //   url:`${BASE_API}`,
-    //   method:`GET`,
-    // })
-    //   .then(res => {
-    //     console.log('API 응답 데이터:', res.data) // 데이터 확인을 위한 console.log
-    //     actorList.value = res.data
-    //   })
-    //   .catch(err => {
-    //     console.error('API 오류:', err) // 에러 확인을 위한 console.error
-    //   })
-    try {
-      const res = await axios({
-        url: `${BASE_API}`,
-        method: 'GET',
-      });
-      console.log('API 응답 데이터:', res.data);
-      actorList.value = res.data;
-    } catch (err) {
-      console.error('API 오류:', err);
-    }
-  }
 
-    return { allActors , actorList }
+export interface DetailActor {
+  person_id: number;
+  name: string;
+  original_name: string;
+  biography: string;
+  birthday: string;
+  deathday: string;
+  place_of_birth: string;
+  profile_image_url?: string;
+  gender: number;
+  known_for_department: string;
+  popularity: number;
+  is_adult: boolean;
+  is_following: boolean;
+  followers_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export const useActorStore = defineStore('actor', () => {
+    const BASE_API = `https://i13m105.p.ssafy.io/api/v1/persons`
+    
+    const actorDetails = ref<DetailActor | null>(null);
+
+    const getActorDetail = async (person_id : number) => {
+      try {
+        const res = await axios.get<DetailActor>(`${BASE_API}/${person_id}`)
+        actorDetails.value = res.data;
+        return res.data;
+      } catch(err) {
+        const error = err as AxiosError
+        console.error('상세페이지 불러오기 실패', error.response?.data || error.message) 
+        actorDetails.value = null;
+        return null   
+      }
+    }
+
+    
+    const actorList = ref<ActorSummary[]>([])
+    const allActors = async function(){
+      try {
+        const res = await axios.get('https://i13m105.p.ssafy.io/api/v1/persons/');
+        actorList.value = res.data;
+      } catch (error) {
+        console.error('Error fetching actors:', error);
+      
+      
+      }
+    }
+
+    return { actorDetails, getActorDetail, allActors, actorList }
 })
