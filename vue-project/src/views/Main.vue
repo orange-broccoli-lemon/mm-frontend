@@ -1,8 +1,8 @@
 <template>
-  <HotMovie>
-  </HotMovie>
-  <Actor>
-  </Actor> 
+  <div class="main-container bg-white dark:bg-gray-900 transition-colors duration-300">
+    <HotMovie />
+    <Actor />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -11,5 +11,8 @@ import Actor from '@/views/Actor.vue';
 </script>
 
 <style scoped>
-
+/* HotMovie와 Actor 섹션 간 간격 줄이기 */
+.main-container > * + * {
+  margin-top: 0;
+}
 </style>

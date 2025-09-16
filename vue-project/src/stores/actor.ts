@@ -75,6 +75,30 @@ export const useActorStore = defineStore('actor', () => {
     }
   }
 
+  // 배우 검색 함수
+  const searchActors = async (query: string) => {
+    try {
+      console.log('배우 검색 시작:', query)
+      const res = await axios.get(`${BASE_API}/search?q=${encodeURIComponent(query)}`);
+      console.log('배우 검색 결과:', res.data)
+      return res.data || [];
+    } catch (error) {
+      console.error('배우 검색 실패:', error);
+      // 검색 API가 없다면 전체 배우 목록에서 필터링
+      try {
+        await allActors();
+        const filtered = actorList.value.filter(actor =>
+          actor.name.toLowerCase().includes(query.toLowerCase())
+        );
+        console.log('로컬 필터링 결과:', filtered)
+        return filtered;
+      } catch (fallbackError) {
+        console.error('배우 목록 로드 실패:', fallbackError);
+        return [];
+      }
+    }
+  }
+
   return { 
     actorDetails, 
     getActorDetail, 
@@ -82,6 +106,7 @@ export const useActorStore = defineStore('actor', () => {
     actorList, 
     loading, 
     currentActorId,
-    clearActorDetails 
+    clearActorDetails,
+    searchActors
   }
 })

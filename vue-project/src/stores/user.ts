@@ -4,34 +4,37 @@ import axios, { AxiosError } from 'axios'
 import router from '@/router'
 
 export interface User {
-  user_id:number
+  user_id: number
   username: string
   email: string
 }
+
 interface Follower {
   user_id: number
   name: string
   profile_image_url?: string
 }
-export interface RecentComments{
-  comment_id:number
-  movie_id:number
-  user_id:number
-  content:string
-  rating:number
-  watched_date:string
-  is_spoiler:boolean
+
+export interface RecentComments {
+  comment_id: number
+  movie_id: number
+  user_id: number
+  content: string
+  rating: number
+  watched_date: string
+  is_spoiler: boolean
   spoiler_confidence: string
-  is_public:boolean
-  likes_count:number
-  is_liked:boolean
-  create_at:string
-  update_at:string
-  user_name:string
-  user_profile_image:string
+  is_public: boolean
+  likes_count: number
+  is_liked: boolean
+  create_at: string
+  update_at: string
+  user_name: string
+  user_profile_image: string
 }
+
 export interface UserProfile {
-  user_id:number
+  user_id: number
   email: string
   password?: string
   name?: string
@@ -43,7 +46,7 @@ export interface UserProfile {
   followers: Follower[]
   following: Follower[]
   following_persons: []
-  recent_comments: [RecentComments]
+  recent_comments: RecentComments[]
 }
 
 export const useAccountStore = defineStore('account', () => {
@@ -54,6 +57,23 @@ export const useAccountStore = defineStore('account', () => {
   const userId = ref<number | null>(JSON.parse(localStorage.getItem('userId') || 'null'))
   const user = ref<UserProfile | null>(null)
 
+  // 페이지 로드 시 저장된 사용자 정보 복원
+  const initializeAuth = async () => {
+    if (token.value && userId.value) {
+      console.log('저장된 인증 정보 발견, 사용자 정보 복원 중...')
+      try {
+        await getUserInfo()
+        console.log('사용자 정보 복원 완료')
+      } catch (error) {
+        console.error('사용자 정보 복원 실패:', error)
+        // 토큰이 유효하지 않으면 로그아웃 처리
+        logOut()
+      }
+    } else {
+      console.log('저장된 인증 정보 없음')
+    }
+  }
+
   // ✅ 유저 정보 조회: /users/{id} 사용
   async function getUserInfo() {
     if (!token.value || !userId.value) {
@@ -61,13 +81,17 @@ export const useAccountStore = defineStore('account', () => {
       return { success: false, error: '토큰 또는 유저 ID 없음' }
     }
     try {
+      console.log('사용자 정보 요청 중...', { userId: userId.value, token: token.value?.substring(0, 20) + '...' })
       const res = await axios.get(`${USERS_API}/${userId.value}`, {
         headers: {
           Authorization: `Bearer ${token.value}`,
           Accept: "application/json"
         }
       })
+      console.log('사용자 정보 API 응답:', res.data)
       user.value = res.data as UserProfile
+      console.log('사용자 정보 저장 완료:', user.value)
+      console.log('recent_comments 상세:', user.value?.recent_comments)
       return { success: true, data: res.data }
     } catch (err: unknown) {
       const error = err as AxiosError
@@ -228,5 +252,5 @@ export const useAccountStore = defineStore('account', () => {
 
  
 
-  return { signUp, login, googleLogin, getUserInfo, token, userId, user, logOut, followUser}
+  return { signUp, login, googleLogin, getUserInfo, token, userId, user, logOut, followUser, initializeAuth}
 })

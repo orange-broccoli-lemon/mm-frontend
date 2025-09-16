@@ -1,8 +1,7 @@
 <template>
-  <div class="app-wrapper">
-  <NavBar>
-  </NavBar>
-  <RouterView />
+  <div class="app-wrapper bg-white dark:bg-gray-900 min-h-screen transition-colors duration-300">
+    <NavBar />
+    <RouterView />
   </div>
 </template>
 
@@ -14,7 +13,7 @@ import { RouterView } from 'vue-router';
 
 <style scoped>
 .app-wrapper {
-  padding-top: 59px;
+  padding-top: 4rem; /* 64px - 네비게이션 바 높이 (h-16) */
 }
 .container {
   margin-top: 1rem;

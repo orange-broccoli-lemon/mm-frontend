@@ -64,6 +64,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { useAccountStore } from "../stores/user"
+import spottiImage from '@/assets/spotti.png'
 
 const store = useAccountStore()
 
@@ -82,7 +83,7 @@ const signUpMember = function () {
     name: name.value,
     password: password1.value,
     email: email.value,
-    profile_image_url: image.value || 'https://i.imgur.com/a/AD32f2h.png'
+    profile_image_url: image.value || spottiImage
   }
 
   store.signUp(userData)

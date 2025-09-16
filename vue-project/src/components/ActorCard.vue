@@ -1,16 +1,25 @@
 <template>
-  <RouterLink :to="{ name: 'ActorDetail', params: { id: id } }" class="actor-card">
-    <img :src="image || 'https://placehold.co/150x150'" :alt="name" class="image" />
-    <div class="title-text">
-      <h2>{{ name }}</h2>
-    </div>
+  <RouterLink 
+    :to="{ name: 'ActorDetail', params: { id: id } }" 
+    class="flex flex-col items-center cursor-pointer group"
+  >
+    <!-- Actor Image -->
+    <img 
+      :src="image || spottiImage" 
+      :alt="name" 
+      class="w-30 h-30 rounded-full object-cover transition-transform duration-300 group-hover:scale-105" 
+    />
+    
+    <!-- Actor Name -->
+    <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 mt-2 truncate max-w-30 text-center" :title="name">
+      {{ name }}
+    </h3>
   </RouterLink>
-
 </template>
-
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
+import spottiImage from '@/assets/spotti.png';
 
 defineProps<{
   id: number;
@@ -18,32 +27,3 @@ defineProps<{
   image?: string;
 }>();
 </script>
-
-
-<style scoped>
-.actor-card {
-  margin: 10px;
-  text-align: center;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.actor-card:hover {
-  transform: scale(1.05);
-}
-
-.image {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #eee;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.title-text h2 {
-  margin-top: 10px;
-  font-size: 1.2em;
-  color: #333;
-}
-</style>

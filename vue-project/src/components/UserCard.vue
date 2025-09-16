@@ -1,6 +1,6 @@
 <template>
   <RouterLink :to="{ name: '', params: { id: id } }" class="actor-card">
-    <img :src="image || 'https://placehold.co/150x150'" :alt="name" class="image" />
+    <img :src="image || spottiImage" :alt="name" class="image" />
     <div class="title-text">
       <h2>{{ name }}</h2>
     </div>
@@ -11,6 +11,7 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';
+import spottiImage from '@/assets/spotti.png';
 
 defineProps<{
   id: number;

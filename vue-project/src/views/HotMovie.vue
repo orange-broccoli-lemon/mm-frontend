@@ -1,18 +1,40 @@
 <template>
-  <main>
-    <h1>🔥 인기 영화 <RouterLink class="plus" to="HotMovieDetailView">+</RouterLink></h1>
-    <div class="cardgrid">
-      <RouterLink
-        v-for="(movie, index) in movieStore.popularMovies.slice(0,5)"
-        :key="index"
-        :to="{ name: 'BookDetail', params: { id: movie.movie_id } }"
-      >
-        <MovieCard
-          :title="movie.title"
-          :image="movie.poster_url"
-          :movie_id = "movie.movie_id"
-        />
-      </RouterLink>
+  <main class="bg-white dark:bg-gray-900 transition-colors duration-300">
+    <!-- Movies Section -->
+    <div class="py-4 px-4">
+      <div class="max-w-7xl mx-auto">
+        <!-- Section Header -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🔥</span>
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+              인기 영화
+            </h1>
+          </div>
+          <RouterLink 
+            to="HotMovieDetailView"
+            class="w-8 h-8 bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white rounded-full flex items-center justify-center transition-colors duration-200"
+          >
+            <span class="text-lg font-medium">+</span>
+          </RouterLink>
+        </div>
+        
+        <!-- Movies Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <RouterLink
+            v-for="(movie, index) in movieStore.popularMovies.slice(0,5)"
+            :key="index"
+            :to="{ name: 'BookDetail', params: { id: movie.movie_id } }"
+            class="group transition-transform duration-200 hover:-translate-y-1"
+          >
+            <MovieCard
+              :title="movie.title"
+              :image="movie.poster_url"
+              :movie_id="movie.movie_id"
+            />
+          </RouterLink>
+        </div>
+      </div>
     </div>
   </main>
 </template>
@@ -30,15 +52,3 @@ onMounted(() => {
 })
 
 </script>
-
-<style scoped>
-.cardgrid {
-  display: flex;
-  gap: 1.5rem;
-  justify-content: center;
-}
-a {
-  text-decoration: none;
-}
-
-</style>

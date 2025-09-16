@@ -2,57 +2,69 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import axios, { AxiosError } from 'axios'
 
-
 export interface MovieList {
   title: string
   poster_url: string
   movie_id: number
-  backdrop_url:string
+  backdrop_url: string
 }
 
-export interface DetailMovie{ 
-  movie_id: number 
-  title: string 
-  original_title:string 
-  overview:string
-  release_date:string
-  runtime:number 
-  poster_url:string 
-  backdrop_url:string
-  average_rating:number
-  is_adult:boolean
-  trailer_url:string
-  create_at:string
-  update_at:string
+export interface DetailMovie {
+  movie_id: number
+  title: string
+  original_title: string
+  overview: string
+  release_date: string
+  runtime: number
+  poster_url: string
+  backdrop_url: string
+  average_rating: number
+  is_adult: boolean
+  trailer_url: string
+  create_at: string
+  update_at: string
+}
+
+export interface MovieComment {
+  comment_id: number
+  movie_id: number
+  user_id: number
+  content: string
+  rating: number // 1-9점 만점
+  watched_date: string
+  is_spoiler: boolean
+  spoiler_confidence: string
+  is_public: boolean
+  likes_count: number
+  is_liked: boolean
+  create_at: string
+  update_at: string
+  user_name: string
+  user_profile_image: string
 }
 
 export const useMovieStore = defineStore('counter', () => {
-    const BASE_API = `https://i13m105.p.ssafy.io/api/`
+  const BASE_API = `https://i13m105.p.ssafy.io/api/`
   const movieList = ref<MovieList[]>([])
   const popularMovies = ref<MovieList[]>([])
 
-    const detailMovie = async (moviePk: number) => {
-    
-      try
-      {
-        const res = await axios.get<DetailMovie>(`${BASE_API}/v1/movies/${moviePk}`)
-        console.log(res.data)
-        return res.data ?? null
-      }
-      catch(err)
-      {
-        const error = err as AxiosError
-        console.error('상세페이지 불러오기 실패', error.response?.data || error.message) 
-        return null   
-      }
-
+  const detailMovie = async (moviePk: number) => {
+    try {
+      const res = await axios.get<DetailMovie>(`${BASE_API}/v1/movies/${moviePk}`)
+      console.log(res.data)
+      return res.data ?? null
+    } catch (err) {
+      const error = err as AxiosError
+      console.error('상세페이지 불러오기 실패', error.response?.data || error.message)
+      return null
     }
+  }
 
 
-    const allMovies = function(){
+  const allMovies = function() {
     axios({
-      url:`${BASE_API}/v1/movies/`,
-      method:`GET`,
+      url: `${BASE_API}/v1/movies/`,
+      method: `GET`,
     })
       .then(res => {
         movieList.value = res.data
@@ -61,19 +73,66 @@ export const useMovieStore = defineStore('counter', () => {
       .catch(err => {
         console.log(err)
       })
-
   }
 
-    const fetchPopularMovies = async function(){
-      try{
-        const res = await axios.get<MovieList[]>(`${BASE_API}/v1/movies/popular`)
-        popularMovies.value = res.data ?? []
-        console.log('popular movies:', res.data)
+  const fetchPopularMovies = async function() {
+    try {
+      const res = await axios.get<MovieList[]>(`${BASE_API}/v1/movies/popular`)
+      popularMovies.value = res.data ?? []
+      console.log('popular movies:', res.data)
+      
+      // 포스터 URL 디버깅
+      if (res.data && res.data.length > 0) {
+        console.log('=== API 응답 디버깅 ===')
+        console.log('전체 응답 데이터:', res.data)
+        console.log('첫 번째 영화 데이터:', res.data[0])
+        console.log('첫 번째 영화 포스터 URL:', res.data[0].poster_url)
+        console.log('포스터 URL 타입:', typeof res.data[0].poster_url)
+        console.log('포스터 URL 길이:', res.data[0].poster_url?.length)
+        console.log('첫 번째 영화의 모든 키:', Object.keys(res.data[0]))
+        
+        // 처음 3개 영화의 포스터 URL 확인
+        res.data.slice(0, 3).forEach((movie, index) => {
+          console.log(`영화 ${index + 1} 포스터 URL:`, movie.poster_url)
+        })
+        console.log('=======================')
       }
-      catch(err){
-        console.error('인기영화 불러오기 실패', err)
-      }
+    } catch (err) {
+      console.error('인기영화 불러오기 실패', err)
     }
+  }
 
-    return { allMovies , movieList, detailMovie, popularMovies, fetchPopularMovies }
+  // 영화 댓글 가져오기 함수
+  const fetchMovieComments = async (movieId: number) => {
+    try {
+      console.log('영화 댓글 요청:', movieId)
+      
+      // 인증 토큰이 있으면 헤더에 포함
+      const headers: any = {
+        'Accept': 'application/json'
+      }
+      
+      // localStorage에서 토큰 가져오기 (userStore가 없을 수도 있음)
+      const token = localStorage.getItem('token')
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`
+        console.log('토큰 포함하여 요청')
+      } else {
+        console.log('토큰 없이 요청')
+      }
+      
+      const res = await axios.get<MovieComment[]>(`${BASE_API}/v1/comments/movie/${movieId}`, {
+        headers
+      })
+      console.log('영화 댓글 응답:', res.data)
+      return res.data ?? []
+    } catch (err) {
+      const error = err as AxiosError
+      console.error('영화 댓글 불러오기 실패', error.response?.data || error.message)
+      console.error('상세 오류:', error.response?.status, error.response?.statusText)
+      return []
+    }
+  }
+
+  return { allMovies, movieList, detailMovie, popularMovies, fetchPopularMovies, fetchMovieComments }
 })

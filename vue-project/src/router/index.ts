@@ -38,6 +38,21 @@ const router = createRouter({
       component: HotMovieDetailView,
     },
     {
+      path: '/select-movie',
+      name: 'SelectMovie',
+      component: () => import('@/views/SelectMovie.vue'),
+    },
+    {
+      path: '/create-review',
+      name: 'CreateReview',
+      component: () => import('@/views/CreateThread.vue'),
+    },
+    {
+      path: '/search',
+      name: 'SearchResults',
+      component: () => import('@/views/SearchResults.vue'),
+    },
+    {
       path: '/movie/movieDetail/:id',
       name: 'BookDetail',
       component: () => import('@/views/DetailMovie.vue'),

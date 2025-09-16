@@ -1,6 +1,14 @@
+<template>
+  <div class="comment-card">
+    <img :src="profileImage || spottiImage" alt="프로필 이미지" class="profile-img" />
+    <p class="comment-content" ref="contentRef">{{ content }}</p>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import fitty from 'fitty'
+import spottiImage from '@/assets/spotti.png'
 
 const props = defineProps<{
   profileImage: string
@@ -23,12 +31,6 @@ onMounted(applyFitty)
 watch(() => props.content, applyFitty)
 </script>
 
-<template>
-  <div class="comment-card">
-    <img :src="profileImage" alt="프로필 이미지" class="profile-img" />
-    <p class="comment-content" ref="contentRef">{{ content }}</p>
-  </div>
-</template>
 
 <style scoped>
 .comment-card {
@@ -61,5 +63,8 @@ watch(() => props.content, applyFitty)
   color: #333;
   word-break: break-word;
   line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

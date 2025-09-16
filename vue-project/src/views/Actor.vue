@@ -1,19 +1,38 @@
 <template>
-  <div>
-    <h1>Actor!!!!!!!!!</h1>
-    <div class="actor-list-container">
-      <ActorCard
-        v-for="actor in actorStore.actorList.slice(0, 5)"
-        :key="actor.person_id"
-        :id="actor.person_id"
-        :name="actor.name"
-        :image="actor.profile_image_url"
-      />
+  <main class="bg-white dark:bg-gray-900 transition-colors duration-300">
+    <!-- Actors Section -->
+    <div class="py-4 px-4">
+      <div class="max-w-7xl mx-auto">
+        <!-- Section Header -->
+        <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center gap-2">
+            <span class="text-2xl">🎭</span>
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+              인기 배우
+            </h1>
+          </div>
+          <RouterLink
+            v-if="actorStore.actorList.length > 5"
+            :to="{ name: 'AllActors' }"
+            class="w-8 h-8 bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white rounded-full flex items-center justify-center transition-colors duration-200"
+          >
+            <span class="text-lg font-medium">+</span>
+          </RouterLink>
+        </div>
+        
+        <!-- Actors Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+          <ActorCard
+            v-for="actor in actorStore.actorList.slice(0, 6)"
+            :key="actor.person_id"
+            :id="actor.person_id"
+            :name="actor.name"
+            :image="actor.profile_image_url"
+          />
+        </div>
+      </div>
     </div>
-    <div class="show-more-container" v-if="actorStore.actorList.length > 5">
-      <RouterLink :to="{ name: 'AllActors' }" class="more-link">더보기</RouterLink>
-    </div>
-  </div>
+  </main>
 </template>
 
 <script setup lang="ts">
@@ -29,42 +48,3 @@ onMounted(async () => {
 })
 </script>
 
-<style scoped>
-.actor-list-container {
-  display: flex;
-  overflow-x: auto;
-  gap: 20px;
-  padding: 20px;
-
-  -ms-overflow-style: none;  
-  scrollbar-width: none; 
-}
-
-.actor-list-container::-webkit-scrollbar {
-  display: none; 
-}
-
-.show-more-container {
-  text-align: center;
-  margin: 20px 0;
-}
-
-.more-link {
-  display: inline-block;
-  padding: 10px 25px;
-  font-size: 1rem;
-  font-weight: bold;
-  text-decoration: none;
-  color: #333;
-  cursor: pointer;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  background-color: #fff;
-  transition: all 0.2s ease-in-out;
-}
-
-.more-link:hover {
-  background-color: #f0f0f0;
-  transform: translateY(-2px);
-}
-</style>
