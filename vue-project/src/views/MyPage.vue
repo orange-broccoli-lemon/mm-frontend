@@ -1,18 +1,18 @@
 <template>
-  <div class="mypage-container" v-if="user">
-    <h1 class="mypage-title">{{ user.nickName }}의 Memory</h1>
+  <div class="mypage-container" v-if="accountStore.user">
+    <h1 class="mypage-title">{{ accountStore.user.name }}의 Memory</h1>
 
     <div class="profile-image-container">
-      <img :src="user.profile || defaultProfileImage" alt="프로필 이미지" class="profile-image" />
+      <img :src="accountStore.user.profile_image_url || defaultProfileImage" alt="프로필 이미지" class="profile-image" />
     </div>
 
-    <h2 class="nickname">{{ user.nickName }}</h2>
+    <h2 class="nickname">{{ accountStore.user.name }}</h2>
 
     <div class="follow-row">
-      <span class="follow-item"> 팔로워 {{ user.followers?.length || 0 }}</span>
-      <span class="follow-item"> 팔로잉 {{ user.followings?.length || 0 }}</span>
+      <span class="follow-item"> 팔로워 {{ accountStore.user.followers_count || 0 }}</span>
+      <span class="follow-item"> 팔로잉 {{ accountStore.user.following_count || 0 }}</span>
     </div>
-
+     <button class="bot-button" @click="">스포띠빠이와 함께리뷰쓰러가기</button>
     <button class="logout-button" @click="logout">로그아웃</button>
   </div>
 </template>
@@ -21,41 +21,22 @@
 import { onMounted, ref } from 'vue'
 import { useAccountStore } from '../stores/user'
 import { useRouter } from 'vue-router'
-
-interface UserProfile {
-  nickName: string
-  profile?: string
-  followers?: any[]
-  followings?: any[]
-}
-
 const accountStore = useAccountStore()
 const router = useRouter()
-
-const user = ref<UserProfile | null>(null)
 const defaultProfileImage = '' 
-
-const getUserInfo = async () => {
-  if (!accountStore.token) return
-  try {
-    const result = await accountStore.getUserInfo()
-    if (result.success) {
-      // accountStore.user가 UserProfile 타입이면 바로 할당
-      user.value = result.data as UserProfile
-    }
-  } catch (error) {
-    console.error('사용자 정보 가져오기 실패:', error)
-  }
-}
 
 const logout = async () => {
   accountStore.logOut()
   router.replace('/') // 뒤로가기 방지
 }
 
+
 onMounted(() => {
-  getUserInfo()
+  if (accountStore.token) {
+    accountStore.getUserInfo()  
+  }
 })
+
 </script>
 
 <style scoped>
@@ -110,11 +91,24 @@ onMounted(() => {
   padding: 10px 20px;
   font-size: 1.1rem;
   font-weight: 600;
-  color: #fff;
+  color: #000000;
   background-color: #e2703a;
   border: none;
   border-radius: 8px;
   cursor: pointer;
+  transition: background 0.3s;
+}
+
+.bot-button {
+  margin-top: 2rem;
+  padding: 10px 480px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #000000;
+  background-color: #e89b77;
+  border: none;
+  border-radius: 26px;
+  cursor: pointer;  
   transition: background 0.3s;
 }
 

@@ -24,6 +24,7 @@
         <div class="header">
           <h1>{{ movieDetail.title }}</h1>
           <div class="actions">
+            <button class="like" @click="likeMovie">좋아요</button>
             <button class="save" @click="saveMovie">저장</button>
             <button class="comment" @click="goCreate">코멘트</button>
           </div>
@@ -60,6 +61,10 @@ const goCreate = () => {
 const saveMovie = () => {
   console.log("저장 버튼 클릭");
 };
+
+const likeMovie = () => {
+  console.log("좋아요 버튼 클릭")
+}
 </script>
 
 <style scoped>
