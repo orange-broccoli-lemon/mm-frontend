@@ -13,6 +13,14 @@ export interface UserProfile {
   password?: string
   name?: string
   profile_image_url?: string
+  followers_count: number
+  following_count: number
+  following_persons_count: number
+  comments_count: number
+  followers: []
+  following: []
+  following_persons: []
+  recent_comments: []
 }
 
 export const useAccountStore = defineStore('account', () => {
@@ -22,14 +30,18 @@ export const useAccountStore = defineStore('account', () => {
   const userId = ref<number | null>(JSON.parse(localStorage.getItem('userId') || 'null'))
   const user = ref<UserProfile | null>(null)
 
-  async function getUserInfo(id: number) {
-    if (!token.value) {
-      console.warn('토큰 없음, 사용자 정보 요청 생략')
-      return { success: false, error: '토큰 없음' }
+  // ✅ 유저 정보 조회: /users/{id} 사용
+  async function getUserInfo() {
+    if (!token.value || !userId.value) {
+      console.warn('토큰 또는 유저 ID 없음, 사용자 정보 요청 생략')
+      return { success: false, error: '토큰 또는 유저 ID 없음' }
     }
     try {
-      const res = await axios.get(`${USERS_API}/${id}`, {
-        headers: { Authorization: `Token ${token.value}` },
+      const res = await axios.get(`${USERS_API}/${userId.value}`, {
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+          Accept: "application/json"
+        }
       })
       user.value = res.data as UserProfile
       return { success: true, data: res.data }
@@ -45,31 +57,33 @@ export const useAccountStore = defineStore('account', () => {
       const res = await axios.post(`${AUTH_API}/login/email`, userData, {
         headers: { "Content-Type": "application/json" }
       })
-      console.log('로그인 응답 데이터:', res.data);
+      console.log('로그인 응답 데이터:', res.data)
       console.log('로그인 되었습니다')
+
       const receivedToken = res.data?.access_token
       const receivedUserId = res.data?.user?.user_id
 
       if (!receivedToken || !receivedUserId) {
-        throw new Error('응답에 토큰 또는 사용자 ID가 없습니다.');
+        throw new Error('응답에 토큰 또는 사용자 ID가 없습니다.')
       }
-      token.value = receivedToken;
-      userId.value = receivedUserId;
-      localStorage.setItem('token', receivedToken);
-      localStorage.setItem('userId', JSON.stringify(receivedUserId));
 
-      const result = await getUserInfo(receivedUserId);
+      token.value = receivedToken
+      userId.value = receivedUserId
+      localStorage.setItem('token', receivedToken)
+      localStorage.setItem('userId', JSON.stringify(receivedUserId))
+
+      const result = await getUserInfo()
       if (result.success) {
-        console.log('유저 정보:', user.value);
-        router.push('/');
+        console.log('유저 정보:', user.value)
+        router.push('/')
       } else {
-        logOut();
-        throw new Error('유저 정보 가져오기 실패');
+        logOut()
+        throw new Error('유저 정보 가져오기 실패')
       }
     } catch (err: unknown) {
-      const error = err as AxiosError;
-      console.error('로그인 실패', error.response?.data || error.message);
-      logOut(); // Ensure cleanup on failure
+      const error = err as AxiosError
+      console.error('로그인 실패', error.response?.data || error.message)
+      logOut() // 실패 시 정리
     }
   }
 
