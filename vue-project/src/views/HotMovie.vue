@@ -1,10 +1,9 @@
 <template>
   <main>
-    <h1>🔥 인기 영화</h1>
-    <h1><RouterLink to="HotMovieDetailView">+</RouterLink></h1>
+    <h1>🔥 인기 영화 <RouterLink class="plus" to="HotMovieDetailView">+</RouterLink></h1>
     <div class="cardgrid">
       <RouterLink
-        v-for="(movie, index) in movieStore.movieList"
+        v-for="(movie, index) in movieStore.popularMovies.slice(0,5)"
         :key="index"
         :to="{ name: 'BookDetail', params: { id: movie.movie_id } }"
       >
@@ -27,18 +26,19 @@ import { RouterLink } from "vue-router"
 const movieStore = useMovieStore()
 
 onMounted(() => {
-  movieStore.allMovies()
+  movieStore.fetchPopularMovies()
 })
 
 </script>
 
 <style scoped>
 .cardgrid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem; 
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
 }
 a {
   text-decoration: none;
 }
+
 </style>

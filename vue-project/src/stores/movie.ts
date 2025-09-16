@@ -7,6 +7,7 @@ export interface MovieList {
   title: string
   poster_url: string
   movie_id: number
+  backdrop_url:string
 }
 
 export interface DetailMovie{ 
@@ -27,7 +28,8 @@ export interface DetailMovie{
 
 export const useMovieStore = defineStore('counter', () => {
     const BASE_API = `https://i13m105.p.ssafy.io/api/`
-    const movieList = ref<MovieList[]>([])
+  const movieList = ref<MovieList[]>([])
+  const popularMovies = ref<MovieList[]>([])
 
     const detailMovie = async (moviePk: number) => {
     
@@ -62,5 +64,16 @@ export const useMovieStore = defineStore('counter', () => {
 
   }
 
-    return { allMovies , movieList, detailMovie }
+    const fetchPopularMovies = async function(){
+      try{
+        const res = await axios.get<MovieList[]>(`${BASE_API}/v1/movies/popular`)
+        popularMovies.value = res.data ?? []
+        console.log('popular movies:', res.data)
+      }
+      catch(err){
+        console.error('인기영화 불러오기 실패', err)
+      }
+    }
+
+    return { allMovies , movieList, detailMovie, popularMovies, fetchPopularMovies }
 })

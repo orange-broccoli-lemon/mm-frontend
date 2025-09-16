@@ -3,11 +3,6 @@ import { defineStore } from 'pinia'
 import axios, { AxiosError } from 'axios'
 import router from '@/router'
 
-export interface User {
-  username: string
-  email: string
-}
-
 export interface UserProfile {
   email: string
   password?: string
@@ -87,6 +82,89 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
+  // 구글 로그인 함수 추가
+  async function googleLogin(credential: string) {
+    try {
+      const res = await axios.post(`${AUTH_API}/login/google`, 
+        { credential }, // Google ID Token을 credential로 전송
+        {
+          headers: { "Content-Type": "application/json" }
+        }
+      )
+      
+      console.log('구글 로그인 응답 데이터:', res.data)
+      console.log('구글 로그인 되었습니다')
+
+      const receivedToken = res.data?.access_token
+      const receivedUserId = res.data?.user?.user_id
+
+      if (!receivedToken || !receivedUserId) {
+        throw new Error('응답에 토큰 또는 사용자 ID가 없습니다.')
+      }
+
+      token.value = receivedToken
+      userId.value = receivedUserId
+      localStorage.setItem('token', receivedToken)
+      localStorage.setItem('userId', JSON.stringify(receivedUserId))
+
+      const result = await getUserInfo()
+      if (result.success) {
+        console.log('유저 정보:', user.value)
+        router.push('/')
+        return { success: true }
+      } else {
+        logOut()
+        throw new Error('유저 정보 가져오기 실패')
+      }
+    } catch (err: unknown) {
+      const error = err as AxiosError
+      console.error('구글 로그인 실패:', error.response?.data || error.message)
+      logOut() // 실패 시 정리
+      return { success: false, error: error.response?.data || error.message }
+    }
+  }
+  async function processGoogleCallback(authCode: string, state?: string) {
+  try {
+    const res = await axios.post(`${AUTH_API}/google/callback`, 
+      { 
+        code: authCode,
+        state: state 
+      },
+      {
+        headers: { "Content-Type": "application/json" }
+      }
+    )
+    
+    console.log('구글 로그인 콜백 응답:', res.data)
+
+    const receivedToken = res.data?.access_token
+    const receivedUserId = res.data?.user?.user_id
+
+    if (!receivedToken || !receivedUserId) {
+      throw new Error('응답에 토큰 또는 사용자 ID가 없습니다.')
+    }
+
+    token.value = receivedToken
+    userId.value = receivedUserId
+    localStorage.setItem('token', receivedToken)
+    localStorage.setItem('userId', JSON.stringify(receivedUserId))
+
+    const result = await getUserInfo()
+    if (result.success) {
+      console.log('구글 로그인 성공, 유저 정보:', user.value)
+      return { success: true }
+    } else {
+      logOut()
+      throw new Error('유저 정보 가져오기 실패')
+    }
+  } catch (err: unknown) {
+    const error = err as AxiosError
+    console.error('구글 로그인 콜백 처리 실패:', error.response?.data || error.message)
+    logOut() // 실패 시 정리
+    return { success: false, error: error.response?.data || error.message }
+  }
+}
+
   async function signUp(userData: {
     name: string
     password: string
@@ -109,6 +187,8 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
+  
+
   function logOut() {
     token.value = null
     userId.value = null
@@ -119,5 +199,5 @@ export const useAccountStore = defineStore('account', () => {
     router.push('/')
   }
 
-  return { signUp, login, getUserInfo, token, userId, user, logOut }
+  return { signUp, login, processGoogleCallback, getUserInfo, token, userId, user, logOut }
 })
