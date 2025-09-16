@@ -1,9 +1,9 @@
 <template>
-  <h1>🔥 인기 영화 목록</h1>
- <div class="cardgrid">
-  <h1>캐루셀</h1> <hr>
-  <h1>캐루셀 아래부분 동글뱅이 아하</h1><hr>
-
+  <h1>🔥 인기 영화 TOP 10</h1>
+    <PopularMovieCarousel :movies="movieStore.popularMovies" />
+    <hr>
+    <h1>추천 영화</h1>
+    <div class="cardgrid">
       <RouterLink
         v-for="(movie, index) in movieStore.movieList"
         :key="index"
@@ -15,17 +15,22 @@
           :movie_id = "movie.movie_id"
         />
       </RouterLink>
-      </div>
+  </div>
+  <!-- 인기 영화 캐루셀 -->
+
 </template>
 
 <script setup lang="ts">
 import { onMounted } from "vue"
 import { useMovieStore } from "../stores/movie"
 import MovieCard from "../components/MovieCard.vue"
+import PopularMovieCarousel from "../components/PopularMovieCarousel.vue"
 const movieStore = useMovieStore()
+
 
 onMounted(() => {
   movieStore.allMovies()
+  movieStore.fetchPopularMovies()
 })
 
 </script>
@@ -33,8 +38,8 @@ onMounted(() => {
 <style scoped>
 .cardgrid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem; 
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
 }
 a {
   text-decoration: none;
