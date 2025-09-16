@@ -19,21 +19,27 @@
 
     <div class="divider"><span>또는</span></div>
 
-    <!-- 구글 로그인 버튼 렌더링 영역 -->
-    <div class="google-login"></div>
+    <!-- 구글 로그인 버튼 -->
+    
+      <button class="google-login-btn" @click="redirectToGoogle">
+      <img src="https://developers.google.com/identity/images/g-logo.png" alt="G" width="20" />
+      Google 계정으로 로그인
+    </button>
+
+
+    
   </main>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import axios from 'axios'
 import { useAccountStore } from '../stores/user'
 
 const store = useAccountStore()
 const username = ref('')
 const password = ref('')
-
-// 환경변수에서 Google Client ID 가져오기
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+const googleLoginUrl = ref('')
 
 // 일반 로그인 처리
 const logInMember = () => {
@@ -44,95 +50,103 @@ const logInMember = () => {
   store.login(userData)
 }
 
-// 구글 로그인 콜백 함수
-declare global {
-  interface Window {
-    handleCredentialResponse: (response: any) => void
-    google: any
-  }
-}
-
-window.handleCredentialResponse = async (response: any) => {
-  console.log('구글 로그인 응답:', response)
-  if (response.credential) {
-    const result = await store.googleLogin(response.credential)
-    if (!result?.success) {
-      alert('구글 로그인에 실패했습니다. 다시 시도해주세요.')
+// 구글 로그인 URL 요청
+const fetchGoogleLoginUrl = async () => {
+  try {
+    const res = await axios.get('https://i13m105.p.ssafy.io/api/v1/auth/google/login')
+    if (res.data && res.data.url) {
+      googleLoginUrl.value = res.data.url
+    } else {
+      console.error('서버에서 유효한 URL을 반환하지 않았습니다.')
     }
+  } catch (err) {
+    console.error('Google 로그인 URL 요청 실패', err)
   }
 }
 
-// 구글 로그인 버튼 렌더링
-onMounted(() => {
-  const script = document.createElement('script')
-  script.src = 'https://accounts.google.com/gsi/client'
-  script.async = true
-  script.defer = true
-  document.head.appendChild(script)
-
-  script.onload = () => {
-    console.log('Google Identity Services 스크립트 로드 완료')
-
-    // 초기화
-    window.google.accounts.id.initialize({
-      client_id: googleClientId,
-      callback: window.handleCredentialResponse,
-    })
-
-    // 버튼 렌더링
-    window.google.accounts.id.renderButton(
-      document.querySelector('.google-login'),
-      {
-        theme: 'outline',
-        size: 'large',
-        text: 'signin_with',
-        shape: 'rectangular',
-      }
-    )
-
-    // 자동 팝업 해제 (선택)
-    window.google.accounts.id.prompt()
+// 버튼 클릭 시 리디렉션
+const redirectToGoogle = () => {
+  if (googleLoginUrl.value) {
+    window.location.href = googleLoginUrl.value
   }
+}
+
+onMounted(() => {
+  fetchGoogleLoginUrl()
 })
 </script>
 
 <style scoped>
 .login {
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 1rem;
+  max-width: 420px;
+  margin: 4rem auto;
+  padding: 2rem 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #2c3e50;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #34495e;
+  font-weight: 500;
 }
 
 input {
   width: 100%;
-  padding: 0.5rem;
+  padding: 0.75rem 1rem;
   box-sizing: border-box;
-  border: 1px solid #ddd;
+  border: 1px solid #dcdfe6;
   border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
 }
 
+input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Base button style */
 button {
-  padding: 0.7rem;
   width: 100%;
+  padding: 0.8rem;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Login button specific style */
+button[type="submit"] {
   background-color: #007bff;
   color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
 }
 
-button:hover {
+button[type="submit"]:hover {
   background-color: #0056b3;
 }
 
 .divider {
   text-align: center;
-  margin: 2rem 0;
+  margin: 2.5rem 0;
   position: relative;
 }
 
@@ -143,18 +157,32 @@ button:hover {
   left: 0;
   right: 0;
   height: 1px;
-  background-color: #ddd;
+  background-color: #e0e0e0;
+  z-index: 0;
 }
 
 .divider span {
   background-color: white;
   padding: 0 1rem;
-  color: #666;
+  color: #7f8c8d;
+  position: relative;
+  z-index: 1;
 }
 
-.google-login {
-  display: flex;
-  justify-content: center;
-  margin-top: 1rem;
+/* Google login button specific style */
+.google-login-btn {
+  background-color: #ffffff;
+  color: #333;
+  border: 1px solid #dcdfe6;
+}
+
+.google-login-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #c0c4cc;
+}
+
+.google-login-btn img {
+  width: 20px;
+  height: 20px;
 }
 </style>

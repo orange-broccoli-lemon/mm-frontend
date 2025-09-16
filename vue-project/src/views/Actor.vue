@@ -24,9 +24,9 @@ import ActorCard from '../components/ActorCard.vue';
 
 const actorStore = useActorStore();
 
-onMounted(() => {
-  actorStore.allActors();
-});
+onMounted(async () => {
+  await actorStore.allActors()
+})
 </script>
 
 <style scoped>

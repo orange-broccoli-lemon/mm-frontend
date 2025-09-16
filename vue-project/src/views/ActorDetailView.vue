@@ -1,5 +1,9 @@
 <template>
-  <div v-if="store.actorDetails" class="actor-detail-container">
+  <div v-if="loading" class="loading">
+    <p>Loading actor details...</p>
+  </div>
+
+  <div v-else-if="store.actorDetails" class="actor-detail-container">
     <div class="main-content">
       <div class="actor-image">
         <img :src="store.actorDetails.profile_image_url" :alt="store.actorDetails.name" />
@@ -20,18 +24,16 @@
         </div>
       </div>
     </div>
+
     <div class="biography-section">
       <h2>Biography</h2>
       <p>{{ store.actorDetails.biography }}</p>
     </div>
   </div>
-  <div v-else class="loading">
-    <p>Loading actor details...</p>
-  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useActorStore } from '@/stores/actor'
 
@@ -40,17 +42,30 @@ const store = useActorStore()
 
 const isFollowing = ref(false)
 const followersCount = ref(0)
+const loading = ref(true)
 
-onMounted(async () => {
-  const personId = Number(route.params.id)
-  if (personId) {
-    await store.getActorDetail(personId)
-    if (store.actorDetails) {
-      isFollowing.value = store.actorDetails.is_following
-      followersCount.value = store.actorDetails.followers_count
-    }
+const fetchActorDetail = async (id: number) => {
+  loading.value = true
+  store.actorDetails = null   // 🔥 이전 배우 데이터 초기화
+  await store.getActorDetail(id)
+  if (store.actorDetails) {
+    isFollowing.value = store.actorDetails.is_following
+    followersCount.value = store.actorDetails.followers_count
   }
+  loading.value = false
+}
+
+onMounted(() => {
+  const personId = Number(route.params.id)
+  if (personId) fetchActorDetail(personId)
 })
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    if (newId) fetchActorDetail(Number(newId))
+  }
+)
 
 const toggleFollow = () => {
   isFollowing.value = !isFollowing.value
@@ -59,7 +74,7 @@ const toggleFollow = () => {
   } else {
     followersCount.value--
   }
-  // Here you would also make an API call to update the follow status on the backend
+  // TODO: API 호출해서 팔로우 상태 동기화
 }
 </script>
 
