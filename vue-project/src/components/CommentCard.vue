@@ -1,22 +1,32 @@
 <script setup lang="ts">
+import { onMounted, ref, watch } from 'vue'
+import fitty from 'fitty'
+
 const props = defineProps<{
   profileImage: string
-  user_name: string
   content: string
 }>()
 
-console.log('profileImage:', props.profileImage)
-console.log('user_name:', props.user_name)
-console.log('content:', props.content)
+const contentRef = ref<HTMLElement>()
+
+const applyFitty = () => {
+  if (contentRef.value) {
+    fitty(contentRef.value, {
+      minSize: 10,
+      maxSize: 18,
+      multiLine: true 
+    })
+  }
+}
+
+onMounted(applyFitty)
+watch(() => props.content, applyFitty)
 </script>
 
 <template>
   <div class="comment-card">
-    <div class="profile-row">
-      <img :src="profileImage" alt="프로필" class="profile-img" />
-      <span class="user-name">{{ user_name }}</span>
-    </div>
-    <p class="comment-content">{{ content }}</p>
+    <img :src="profileImage" alt="프로필 이미지" class="profile-img" />
+    <p class="comment-content" ref="contentRef">{{ content }}</p>
   </div>
 </template>
 
@@ -25,41 +35,29 @@ console.log('content:', props.content)
   background: white;
   border-radius: 1rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 1rem;
+  padding: 2rem;
 
   width: 12rem;
   height: 16rem;
 
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
+  align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  overflow: visible; 
-}
-
-.profile-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem; 
+  overflow: hidden; 
 }
 
 .profile-img {
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   object-fit: cover;
 }
 
-.user-name {
-  font-weight: bold;
-  color: #333;
-  font-size: 1rem;
-}
-
 .comment-content {
   width: 100%;
-  text-align: start;
+  text-align: center;
   color: #333;
   word-break: break-word;
   line-height: 1.2;
