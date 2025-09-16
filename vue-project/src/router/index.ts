@@ -25,6 +25,8 @@ const router = createRouter({
       name: 'signup',
       component: SignUpView,
     },
+    
+
     {
       path: '/auth/google/callback',
       name: 'google-callback',
@@ -45,6 +47,7 @@ const router = createRouter({
       name: 'BookDetail',
       component: () => import('@/views/DetailMovie.vue'),
     },
+     
     {
       path: '/actors',
       name: 'AllActors',

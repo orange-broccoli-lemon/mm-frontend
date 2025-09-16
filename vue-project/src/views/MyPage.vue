@@ -1,4 +1,4 @@
-<template>
+68<template>
   <div class="mypage-container" v-if="accountStore.user">
     <h1 class="mypage-title">{{ accountStore.user.name }}의 Memory</h1>
 
@@ -10,10 +10,11 @@
 
     <div class="follow-row">
       <span class="follow-item"> 팔로워 {{ accountStore.user.followers_count || 0 }}</span>
-      <span class="follow-item"> 팔로잉 {{ accountStore.user.following_count || 0 }}</span>
+      <span class="follow-item" @click="goFollowing">팔로잉 {{ accountStore.user.following_count || 0 }}</span>
     </div>
      <button class="bot-button" @click="">스포띠빠이와 함께리뷰쓰러가기</button>
     <button class="logout-button" @click="logout">로그아웃</button>
+    <button class="logout-button" @click="userFollow">FollowTest</button>
   </div>
 </template>
 
@@ -30,12 +31,22 @@ const logout = async () => {
   router.replace('/') // 뒤로가기 방지
 }
 
+const goFollowing = () => {
+  if (accountStore.user?.user_id) { 
+    router.push(`/following/${accountStore.user.user_id}`)
+  }
+}
+
+const userFollow = () =>{ 
+  accountStore.followUser(1)
+}
 
 onMounted(() => {
   if (accountStore.token) {
     accountStore.getUserInfo()  
   }
 })
+
 
 </script>
 

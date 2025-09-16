@@ -3,7 +3,19 @@ import { defineStore } from 'pinia'
 import axios, { AxiosError } from 'axios'
 import router from '@/router'
 
+export interface User {
+  user_id:number
+  username: string
+  email: string
+}
+interface Follower {
+  user_id: number
+  name: string
+  profile_image_url?: string
+}
+
 export interface UserProfile {
+  user_id:number
   email: string
   password?: string
   name?: string
@@ -12,8 +24,8 @@ export interface UserProfile {
   following_count: number
   following_persons_count: number
   comments_count: number
-  followers: []
-  following: []
+  followers: Follower[]
+  following: Follower[]
   following_persons: []
   recent_comments: []
 }
@@ -21,6 +33,7 @@ export interface UserProfile {
 export const useAccountStore = defineStore('account', () => {
   const AUTH_API = `https://i13m105.p.ssafy.io/api/v1/auth`
   const USERS_API = `https://i13m105.p.ssafy.io/api/v1/users`
+  const FOLLOWS_API = `https://i13m105.p.ssafy.io/api/v1/follows/`
   const token = ref<string | null>(localStorage.getItem('token'))
   const userId = ref<number | null>(JSON.parse(localStorage.getItem('userId') || 'null'))
   const user = ref<UserProfile | null>(null)
@@ -199,5 +212,33 @@ export const useAccountStore = defineStore('account', () => {
     router.push('/')
   }
 
-  return { signUp, login, processGoogleCallback, getUserInfo, token, userId, user, logOut }
+  async function followUser(targetUserId: number) {
+    if (!token.value) {
+      console.warn('토큰 없음, 팔로우 요청 불가')
+      return { success: false, error: '토큰 없음' }
+    }
+    console.log("follow")
+    try {
+      const res = await axios.post(
+        FOLLOWS_API,
+        { following_id: targetUserId },
+        {
+          headers: {
+            Authorization: `Bearer ${token.value}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      )
+      console.log('팔로우 성공:', res.data)
+      return { success: true, data: res.data }
+    } catch (err: unknown) {
+      const error = err as AxiosError
+      console.error('팔로우 실패:', error.response?.data || error.message)
+      return { success: false, error: error.response?.data || error.message }
+    }
+  }
+
+ 
+
+  return { signUp, login, getUserInfo, token, userId, user, logOut, followUser}
 })
