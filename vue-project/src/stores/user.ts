@@ -13,7 +13,23 @@ interface Follower {
   name: string
   profile_image_url?: string
 }
-
+export interface RecentComments{
+  comment_id:number
+  movie_id:number
+  user_id:number
+  content:string
+  rating:number
+  watched_date:string
+  is_spoiler:boolean
+  spoiler_confidence: string
+  is_public:boolean
+  likes_count:number
+  is_liked:boolean
+  create_at:string
+  update_at:string
+  user_name:string
+  user_profile_image:string
+}
 export interface UserProfile {
   user_id:number
   email: string
@@ -27,7 +43,7 @@ export interface UserProfile {
   followers: Follower[]
   following: Follower[]
   following_persons: []
-  recent_comments: []
+  recent_comments: [RecentComments]
 }
 
 export const useAccountStore = defineStore('account', () => {

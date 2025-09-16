@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="thread-detail-container" v-if="thread">
     <h2>{{ thread.title }}</h2>
     <p>{{ thread.content }}</p>
@@ -38,4 +38,4 @@ const deleteThread = async () => {
   await threadStore.deleteThread(threadId)
   router.push({ name: 'CommunityView' })
 }
-</script>
+</script> -->
