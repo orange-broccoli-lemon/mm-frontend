@@ -8,4 +8,4 @@ services:
       - "8081:80"
     restart: unless-stopped
     env_file:
-      - /var/lib/jenkins/workspace/Front_end_Pipeline/.env
+      - /var/lib/jenkins/workspace/Front_end_Pipeline/vue-project/.env
