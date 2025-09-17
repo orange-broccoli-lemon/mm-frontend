@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import axios, { AxiosError } from 'axios'
+import { useAccountStore } from '@/stores/user'
 
 export interface MovieList {
   title: string
@@ -23,6 +24,8 @@ export interface DetailMovie {
   trailer_url: string
   create_at: string
   update_at: string
+  is_liked: boolean
+  is_in_watchlist: boolean
 }
 
 export interface MovieComment {
@@ -49,18 +52,25 @@ export const useMovieStore = defineStore('counter', () => {
   const popularMovies = ref<MovieList[]>([])
   const isPopularMoviesLoaded = ref(false)
 
+  const movie = ref<DetailMovie | null>(null)
+
+  const userStore = useAccountStore()
   const detailMovie = async (moviePk: number) => {
     try {
-      const res = await axios.get<DetailMovie>(`${BASE_API}/v1/movies/${moviePk}`)
+      const res = await axios.get<DetailMovie>(`${BASE_API}/v1/movies/${moviePk}`,{
+        headers: { Authorization: `Bearer ${userStore.token}`, Accept: "application/json" }
+      })
       console.log(res.data)
+      
+      movie.value = res.data as DetailMovie
       return res.data ?? null
+
     } catch (err) {
       const error = err as AxiosError
       console.error('상세페이지 불러오기 실패', error.response?.data || error.message)
       return null
     }
   }
-
 
   const allMovies = function() {
     axios({
@@ -133,9 +143,7 @@ export const useMovieStore = defineStore('counter', () => {
       // 올바른 엔드포인트 사용
       const url = `${BASE_API}v1/movies/${movieId}/comments`
       console.log('API 요청 URL:', url)
-      const res = await axios.get<MovieComment[]>(url, {
-        headers
-      })
+      const res = await axios.get<MovieComment[]>(url, { headers })
       console.log('영화 댓글 응답:', res.data)
       return res.data ?? []
     } catch (err) {
