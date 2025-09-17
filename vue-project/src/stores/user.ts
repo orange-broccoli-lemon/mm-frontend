@@ -95,10 +95,10 @@ export interface Watch{
   added_at:string
 }
 export const useAccountStore = defineStore('account', () => {
-  const AUTH_API = `https://i13m105.p.ssafy.io/api/v1/auth`
-  const USERS_API = `https://i13m105.p.ssafy.io/api/v1/users`
-  const FOLLOWS_API = `https://i13m105.p.ssafy.io/api/v1/persons`
-  const MOVIE_API = `https://i13m105.p.ssafy.io/api/v1/movies`
+  const AUTH_API = `/api/v1/auth`
+  const USERS_API = `/api/v1/users`
+  const FOLLOWS_API = `/api/v1/persons`
+  const MOVIE_API = `/api/v1/movies`
 
 
   const token = ref<string | null>(localStorage.getItem('token'))
@@ -217,30 +217,40 @@ export const useAccountStore = defineStore('account', () => {
   }
 
   function logOut() {
+    console.log('로그아웃 처리 중...')
     token.value = null
     userId.value = null
     user.value = null
+    commentList.value = null
+    watch_list.value = null
+    like_list.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('userId')
+    console.log('로그아웃 완료')
     router.push('/')
   }
 
   // 토큰 유효성 검사
   const validateToken = async () => {
     if (!token.value || !userId.value) {
+      console.log('토큰 또는 사용자 ID가 없습니다')
       return false
     }
 
     try {
+      console.log('토큰 유효성 검사 중...')
       const res = await axios.get(`${USERS_API}/${userId.value}`, {
         headers: {
           Authorization: `Bearer ${token.value}`,
           Accept: "application/json"
         }
       })
+      console.log('토큰 유효성 검사 성공')
       return res.status === 200
     } catch (error) {
       console.error('토큰 유효성 검사 실패:', error)
+      // 토큰이 유효하지 않으면 로그아웃
+      logOut()
       return false
     }
   }
@@ -357,6 +367,13 @@ export const useAccountStore = defineStore('account', () => {
     } catch (err: unknown) {
       const error = err as AxiosError
       console.error('좋아요 실패:', error.response?.data || error.message)
+      
+      // 401 에러 시 자동 로그아웃
+      if (error.response?.status === 401) {
+        console.log('토큰이 만료되었습니다. 자동 로그아웃합니다.')
+        logOut()
+        window.location.href = '/login'
+      }
     }
   }
 
@@ -385,6 +402,13 @@ export const useAccountStore = defineStore('account', () => {
     } catch (err: unknown) {
       const error = err as AxiosError
       console.error('저장 실패:', error.response?.data || error.message)
+      
+      // 401 에러 시 자동 로그아웃
+      if (error.response?.status === 401) {
+        console.log('토큰이 만료되었습니다. 자동 로그아웃합니다.')
+        logOut()
+        window.location.href = '/login'
+      }
     }
   }
 
@@ -403,30 +427,56 @@ export const useAccountStore = defineStore('account', () => {
 
 
   const watchList = async (user_id:number) => {
-  if (!token.value) return
+  if (!token.value) {
+    console.log('토큰이 없어서 저장 목록을 가져올 수 없습니다')
+    return
+  }
   try {
+    console.log('저장 목록 API 호출:', `${USERS_API}/${user_id}/watchlist`)
     const res = await axios.get(`${USERS_API}/${user_id}/watchlist`, {
       headers: { Authorization: `Bearer ${token.value}` }
     })
+    console.log('저장 목록 API 응답:', res.data)
     watch_list.value = res.data
     return res.data
   } catch (err: unknown) {
     const error = err as AxiosError
     console.error('저장 목록 가져오기 실패:', error.response?.data || error.message)
+    console.error('에러 상태:', error.response?.status)
+    
+    // 401 에러 시 자동 로그아웃
+    if (error.response?.status === 401) {
+      console.log('토큰이 만료되었습니다. 자동 로그아웃합니다.')
+      logOut()
+      window.location.href = '/login'
+    }
   }
 }
 
 const likeList = async (user_id:number) => {
-  if (!token.value) return
+  if (!token.value) {
+    console.log('토큰이 없어서 좋아요 목록을 가져올 수 없습니다')
+    return
+  }
   try {
+    console.log('좋아요 목록 API 호출:', `${USERS_API}/${user_id}/liked-movies`)
     const res = await axios.get(`${USERS_API}/${user_id}/liked-movies`, {
       headers: { Authorization: `Bearer ${token.value}` }
     })
+    console.log('좋아요 목록 API 응답:', res.data)
     like_list.value = res.data
     return res.data
   } catch (err: unknown) {
     const error = err as AxiosError
     console.error('좋아요 목록 가져오기 실패:', error.response?.data || error.message)
+    console.error('에러 상태:', error.response?.status)
+    
+    // 401 에러 시 자동 로그아웃
+    if (error.response?.status === 401) {
+      console.log('토큰이 만료되었습니다. 자동 로그아웃합니다.')
+      logOut()
+      window.location.href = '/login'
+    }
   }
 }
 

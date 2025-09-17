@@ -31,12 +31,27 @@ const handleCommentDeleted = async (commentId: number) => {
 
 onMounted(async () => {
   console.log('MyPage 마운트됨, 사용자 정보 로드 중...')
+  
+  // 토큰 유효성 검사 먼저 수행
+  const isValidToken = await accountStore.validateToken()
+  if (!isValidToken) {
+    console.log('토큰이 유효하지 않습니다. 로그인 페이지로 이동합니다.')
+    return
+  }
+  
   await accountStore.getUserInfo()
 
   if (accountStore.user?.user_id != null) {
+    console.log('사용자 ID:', accountStore.user.user_id)
+    
     await accountStore.userComment(accountStore.user.user_id)
+    console.log('댓글 목록:', accountStore.commentList)
+    
     await accountStore.watchList(accountStore.user.user_id)
+    console.log('저장한 영화 목록:', accountStore.watch_list)
+    
     await accountStore.likeList(accountStore.user.user_id)
+    console.log('좋아요한 영화 목록:', accountStore.like_list)
   }
 })
 </script>
