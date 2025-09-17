@@ -92,7 +92,8 @@
 
           <div class="comment-footer border-gray-200 dark:border-gray-600">
             <div class="comment-stats">
-              <span class="likes text-red-500 dark:text-red-400">❤️ {{ comment.likes_count }}</span>
+              <span class="likes text-red-500 dark:text-red-400" @click="commentLikeToggle(comment)">  ❤️ {{ comment.likes_count }} </span>
+
             </div>
           </div>
         </div>
@@ -106,6 +107,7 @@
 import { ref, onMounted, onActivated, watch } from "vue"
 import { useMovieStore } from "@/stores/movie"
 import { useAccountStore } from "@/stores/user"
+import { useThreadStore } from "@/stores/thread"
 import type { DetailMovie, MovieComment } from "@/stores/movie"
 import { useRoute, useRouter } from "vue-router"
 import spottiImage from '@/assets/spotti.png'
@@ -116,6 +118,8 @@ const id = Number(route.params.id)
 
 const userMovie = useMovieStore()
 const useUser = useAccountStore()
+const useThread = useThreadStore()
+
 
 const movieDetail = ref<DetailMovie | null>(null)
 const movieComments = ref<MovieComment[]>([])
@@ -199,6 +203,29 @@ const loadMovieComments = async () => {
     console.error('댓글 로드 실패:', error)
   } finally {
     isLoadingComments.value = false
+  }
+}
+
+
+const commentLikeToggle = async (comment: MovieComment) => {
+  if (!useUser.token) {
+    alert('로그인이 필요합니다.')
+    return
+  }
+
+  try {
+    if (comment.is_liked) {
+      await useThread.unLikeComment(comment.comment_id)
+      comment.is_liked = false
+      comment.likes_count = Math.max(comment.likes_count - 1, 0)
+    } else {
+      const updatedComment = await useThread.likeComment(comment.comment_id)
+      comment.is_liked = true
+      comment.likes_count = updatedComment?.likes_count ?? comment.likes_count + 1
+    }
+  } catch (error) {
+    console.error('댓글 좋아요 토글 실패', error)
+    alert('좋아요 처리 실패!')
   }
 }
 

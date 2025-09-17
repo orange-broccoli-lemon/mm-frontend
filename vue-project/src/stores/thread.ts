@@ -43,7 +43,7 @@ export const useThreadStore = defineStore('thread', () => {
   const BASE_API = 'https://i13m105.p.ssafy.io/api/v1/comments/' 
   const commentList = ref<Comment[]>([])
   const accountStore = useAccountStore()
-
+  const comment = ref<Comment | null>(null)
   const createComment = async (commentData: CreateCommentData) => {
     try {
       console.log('댓글 작성 시도:', commentData)
@@ -103,9 +103,68 @@ export const useThreadStore = defineStore('thread', () => {
     }
   }
 
+  const detailComment = async (comment_id: number) => {
+    try {
+      const res = await axios.get<Comment>(`${BASE_API}/${comment_id}`,{
+        headers: { Authorization: `Bearer ${accountStore.token}`, Accept: "application/json" }
+      })
+      console.log(res.data)
+      
+      comment.value = res.data as Comment
+      return res.data ?? null
+
+    } catch (err) {
+      const error = err as AxiosError
+      console.error('상세페이지 불러오기 실패', error.response?.data || error.message)
+      return null
+    }
+  }
+
+const likeComment = async (comment_id: number) => {
+  try {
+    const res = await axios.post<Comment>(
+      `${BASE_API}/${comment_id}/like`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${accountStore.token}`,
+          Accept: "application/json",
+        },
+      }
+    )
+    
+    console.log('좋아요 응답:', res.data)
+    return res.data ?? null
+
+  } catch (err) {
+    const error = err as AxiosError
+    console.error('댓글 좋아요 실패', error.response?.data || error.message)
+    return null
+  }
+}
+
+
+  const unLikeComment = async (comment_id: number) => {
+    if (!accountStore.token) return
+    try {
+      await axios.delete(`${BASE_API}/${comment_id}/like`, {
+        headers: { Authorization: `Bearer ${accountStore.token}` }
+      })
+      console.log(`${comment_id} 좋아요 취소 성공`, comment_id)
+    } catch (err: unknown) {
+      const error = err as AxiosError
+      console.error(`${comment_id} 좋아요 취소 실패`, error.response?.data || error.message)
+    }
+  }
+
+
+
   return {
     commentList,
     createComment,
     updateComment,
+    detailComment ,
+    likeComment,
+    unLikeComment
   }
 })
