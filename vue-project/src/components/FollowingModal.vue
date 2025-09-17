@@ -7,11 +7,14 @@
   >
     <!-- 모달 컨텐츠 -->
     <div 
-      class="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 w-[800px] h-[700px] mx-4 overflow-hidden"
+      ref="modalRef"
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 w-[800px] h-[700px] mx-4 overflow-hidden cursor-move"
       @click.stop
+      @mousedown="startDrag"
+      :style="{ transform: `translate(${position.x}px, ${position.y}px)` }"
     >
       <!-- 모달 헤더 -->
-      <div class="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+      <div class="modal-header flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 cursor-move">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
           팔로워 & 팔로잉
         </h3>
@@ -38,7 +41,7 @@
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
               ]"
             >
-              팔로워 ({{ accountStore.user?.followers_count || followers.length }})
+              팔로워 ({{ followers.length }})
             </button>
             <button
               @click="activeTab = 'following'"
@@ -49,7 +52,7 @@
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
               ]"
             >
-              팔로잉 ({{ accountStore.user?.following_count || following.length }})
+              팔로잉 ({{ following.length }})
             </button>
           </nav>
         </div>
@@ -162,7 +165,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAccountStore } from '@/stores/user'
 import defaultProfileImage from '@/assets/spotti.png'
@@ -178,6 +181,7 @@ interface User {
 
 const props = defineProps<{
   isOpen: boolean
+  targetUserId?: number // 특정 유저의 팔로워/팔로잉을 보여줄 때 사용
 }>()
 
 const emit = defineEmits<{
@@ -192,9 +196,57 @@ const following = ref<User[]>([])
 const loading = ref(false)
 const currentUserId = ref(accountStore.userId)
 
-// 모달이 열릴 때 데이터 로드
+// 드래그 관련 상태
+const modalRef = ref<HTMLElement>()
+const position = ref({ x: 0, y: 0 })
+const isDragging = ref(false)
+const dragStart = ref({ x: 0, y: 0 })
+
+// 드래그 시작
+const startDrag = (e: MouseEvent) => {
+  // 헤더 영역에서만 드래그 가능
+  const target = e.target as HTMLElement
+  if (!target.closest('.modal-header')) return
+  
+  isDragging.value = true
+  dragStart.value = {
+    x: e.clientX - position.value.x,
+    y: e.clientY - position.value.y
+  }
+  
+  document.addEventListener('mousemove', onDrag)
+  document.addEventListener('mouseup', stopDrag)
+  e.preventDefault()
+}
+
+// 드래그 중
+const onDrag = (e: MouseEvent) => {
+  if (!isDragging.value) return
+  
+  position.value = {
+    x: e.clientX - dragStart.value.x,
+    y: e.clientY - dragStart.value.y
+  }
+}
+
+// 드래그 종료
+const stopDrag = () => {
+  isDragging.value = false
+  document.removeEventListener('mousemove', onDrag)
+  document.removeEventListener('mouseup', stopDrag)
+}
+
+// 컴포넌트 언마운트 시 이벤트 리스너 정리
+onUnmounted(() => {
+  document.removeEventListener('mousemove', onDrag)
+  document.removeEventListener('mouseup', stopDrag)
+})
+
+// 모달이 열릴 때 데이터 로드 및 위치 초기화
 watch(() => props.isOpen, async (isOpen) => {
   if (isOpen) {
+    // 위치 초기화
+    position.value = { x: 0, y: 0 }
     // 먼저 사용자 정보를 새로고침하여 최신 팔로워/팔로잉 수를 가져옴
     await accountStore.getUserInfo()
     await loadData()
@@ -202,7 +254,9 @@ watch(() => props.isOpen, async (isOpen) => {
 })
 
 const loadData = async () => {
-  if (!accountStore.user?.user_id) {
+  // targetUserId가 있으면 해당 유저의 데이터를, 없으면 현재 사용자의 데이터를 로드
+  const userId = props.targetUserId || accountStore.user?.user_id
+  if (!userId) {
     return
   }
   
@@ -210,17 +264,17 @@ const loadData = async () => {
   try {
     // 팔로워와 팔로잉 데이터를 병렬로 로드
     await Promise.all([
-      loadFollowers(),
-      loadFollowing()
+      loadFollowers(userId),
+      loadFollowing(userId)
     ])
   } finally {
     loading.value = false
   }
 }
 
-const loadFollowers = async () => {
+const loadFollowers = async (userId: number) => {
   try {
-    const data = await accountStore.getFollowers(accountStore.user!.user_id)
+    const data = await accountStore.getFollowers(userId)
     
     // 데이터가 배열인지 확인하고 처리
     if (Array.isArray(data)) {
@@ -245,10 +299,10 @@ const loadFollowers = async () => {
   }
 }
 
-const loadFollowing = async () => {
+const loadFollowing = async (userId: number) => {
   try {
     // 팔로잉 목록을 API에서 직접 가져오기
-    const data = await accountStore.getFollowing(accountStore.user!.user_id)
+    const data = await accountStore.getFollowing(userId)
     
     // 데이터가 배열인지 확인하고 처리
     if (Array.isArray(data)) {
@@ -300,7 +354,10 @@ const toggleFollow = async (targetUserId: number) => {
       
       // 팔로우/언팔로우 후 사용자 정보 새로고침
       await accountStore.getUserInfo()
-      await loadFollowing()
+      const userId = props.targetUserId || accountStore.user?.user_id
+      if (userId) {
+        await loadFollowing(userId)
+      }
     } else {
       // 팔로잉 탭에서는 언팔로우만 가능
       await accountStore.unFollowUser(targetUserId)

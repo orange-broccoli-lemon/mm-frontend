@@ -15,198 +15,164 @@
       </div>
       <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">사용자를 찾을 수 없습니다</h3>
       <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ error }}</p>
-      <button @click="goBack" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200">
-        돌아가기
-      </button>
+     
     </div>
 
     <!-- 사용자 정보 -->
-    <div v-else-if="userProfile" class="max-w-4xl mx-auto px-4 py-8">
+    <div v-else-if="userProfile">
       <!-- 헤더 섹션 -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
-        <div class="flex items-center gap-6">
-          <!-- 프로필 이미지 -->
-          <div class="relative">
-            <img
-              :src="userProfile.profile_image_url || defaultProfileImage"
-              :alt="userProfile.name"
-              class="w-24 h-24 object-cover rounded-full border-4 border-gray-200 dark:border-gray-600"
-            />
-            <div v-if="userProfile.is_active" class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>
-          </div>
-
-          <!-- 사용자 정보 -->
-          <div class="flex-1">
-            <div class="flex items-center gap-3 mb-2">
-              <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ userProfile.name }}</h1>
-              <span v-if="!userProfile.is_active" class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded-full">
-                비활성
-              </span>
-            </div>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">{{ userProfile.email }}</p>
-            
-            <!-- 통계 정보 -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div class="text-center">
-                <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">{{ userProfile.followers_count || 0 }}</div>
-                <div class="text-sm text-gray-600 dark:text-gray-400">팔로워</div>
+      <div class="bg-gray-50 dark:bg-gray-800 py-8 px-4">
+        <div class="max-w-4xl mx-auto">
+          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="flex items-center gap-4">
+              <div class="relative">
+                <img
+                  :src="userProfile.profile_image_url || defaultProfileImage"
+                  :alt="userProfile.name"
+                  class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                />
+                <div
+                  class="absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white"
+                  :class="{
+                    'bg-green-500': userProfile.is_active,
+                    'bg-gray-400': !userProfile.is_active
+                  }"
+                ></div>
               </div>
-              <div class="text-center">
-                <div class="text-2xl font-bold text-green-600 dark:text-green-400">{{ userProfile.following_count || 0 }}</div>
-                <div class="text-sm text-gray-600 dark:text-gray-400">팔로잉</div>
-              </div>
-              <div class="text-center">
-                <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">{{ userProfile.comments_count || 0 }}</div>
-                <div class="text-sm text-gray-600 dark:text-gray-400">리뷰</div>
-              </div>
-              <div class="text-center">
-                <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">{{ userProfile.watchlist_count || 0 }}</div>
-                <div class="text-sm text-gray-600 dark:text-gray-400">왓치리스트</div>
+              <div>
+                <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                  {{ userProfile.name }}
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400">영화 리뷰어</p>
               </div>
             </div>
           </div>
+        </div>
+      </div>
 
-          <!-- 액션 버튼 -->
-          <div class="flex flex-col gap-2">
+      <!-- 통계 카드 섹션 -->
+      <div class="py-6 px-4">
+        <div class="max-w-4xl mx-auto">
+          <div class="grid grid-cols-3 gap-4">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center">
+              <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {{ userProfile.comments_count || 0 }}
+              </div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">리뷰</div>
+            </div>
+            <div 
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+              @click="showFollowingModal = true"
+            >
+              <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {{ userProfile.followers_count || 0 }}
+              </div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">팔로워</div>
+            </div>
+            <div 
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+              @click="showFollowingModal = true"
+            >
+              <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                {{ userProfile.following_count || 0 }}
+              </div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">팔로잉</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 액션 버튼 섹션 -->
+      <div class="py-6 px-4">
+        <div class="max-w-4xl mx-auto">
+          <div class="flex gap-4">
             <button 
               v-if="!isOwnProfile"
               @click="toggleFollow"
               :disabled="isFollowLoading"
               :class="[
-                'px-6 py-2 rounded-lg font-medium transition-colors duration-200',
+                'flex-1 py-3 px-4 rounded-md font-medium transition-colors duration-200 flex items-center justify-center',
                 isFollowing ? 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300' : 'bg-blue-600 text-white hover:bg-blue-700'
               ]"
             >
               {{ isFollowLoading ? '처리 중...' : (isFollowing ? '팔로우 취소' : '팔로우') }}
             </button>
-            <button 
-              @click="goBack"
-              class="px-6 py-2 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
-            >
-              돌아가기
-            </button>
           </div>
         </div>
       </div>
 
-      <!-- 탭 섹션 -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <!-- 탭 헤더 -->
-        <div class="border-b border-gray-200 dark:border-gray-700">
-          <nav class="flex space-x-8 px-6">
-            <button
-              v-for="tab in tabs"
-              :key="tab.id"
-              @click="activeTab = tab.id"
-              :class="[
-                'py-4 px-1 border-b-2 font-medium text-sm transition-colors duration-200',
-                activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-              ]"
-            >
-              {{ tab.name }}
+      <!-- 최근 리뷰 섹션 -->
+      <div class="py-6 px-4">
+        <div class="max-w-4xl mx-auto">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              리뷰 {{ userComments.length }}개
+            </h2>
+            <button class="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded" @click="showAllComments = !showAllComments">
+              {{ showAllComments ? '접기' : '더보기' }}
             </button>
-          </nav>
-        </div>
+          </div>
 
-        <!-- 탭 내용 -->
-        <div class="p-6">
-          <!-- 최근 리뷰 탭 -->
-          <div v-if="activeTab === 'reviews'" class="space-y-4">
-            <div v-if="userComments.length === 0" class="text-center py-8">
-              <div class="text-gray-400 dark:text-gray-500 mb-3">
-                <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-                </svg>
-              </div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">아직 작성한 리뷰가 없습니다</p>
-            </div>
-            <div v-else class="space-y-4">
-              <div
-                v-for="comment in userComments"
+          <div v-if="userComments.length > 0">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <CommentCard
+                v-for="comment in (showAllComments ? userComments : userComments.slice(0, 4))"
                 :key="comment.comment_id"
-                class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-              >
-                <div class="flex items-start gap-4">
-                  <img
-                    :src="comment.movie_poster_url || '/src/assets/spotti.png'"
-                    :alt="comment.movie_title"
-                    class="w-16 h-24 object-cover rounded"
-                  />
-                  <div class="flex-1">
-                    <h3 class="font-semibold text-gray-900 dark:text-gray-100 mb-1">{{ comment.movie_title }}</h3>
-                    <div class="flex items-center gap-2 mb-2">
-                      <span class="text-orange-500">⭐ {{ comment.rating }}/9</span>
-                      <span class="text-gray-500 dark:text-gray-400 text-sm">{{ formatDate(comment.create_at) }}</span>
-                    </div>
-                    <p class="text-gray-700 dark:text-gray-300 text-sm line-clamp-3">{{ comment.content }}</p>
-                  </div>
-                </div>
-              </div>
+                :comment_id="comment.comment_id"
+                :profileImage="userProfile.profile_image_url || defaultProfileImage"
+                :content="comment.content"
+                :name="userProfile?.name || '이름 없음'"
+                :movietitle="comment.movie_title"
+                :movie_poster_url="comment.movie_poster_url"
+                :movie_id="comment.movie_id"
+                :rating="Number(comment.rating) || 0"
+              />
             </div>
           </div>
-
-          <!-- 팔로워 탭 -->
-          <div v-else-if="activeTab === 'followers'" class="space-y-4">
-            <div v-if="followers.length === 0" class="text-center py-8">
-              <div class="text-gray-400 dark:text-gray-500 mb-3">
-                <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-              </div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">팔로워가 없습니다</p>
-            </div>
-            <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div
-                v-for="follower in followers"
-                :key="follower.user_id"
-                class="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-              >
-                <img
-                  :src="follower.profile_image_url || defaultProfileImage"
-                  :alt="follower.name"
-                  class="w-10 h-10 object-cover rounded-full"
-                />
-                <div class="flex-1">
-                  <h4 class="font-medium text-gray-900 dark:text-gray-100">{{ follower.name }}</h4>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">{{ follower.email }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 팔로잉 탭 -->
-          <div v-else-if="activeTab === 'following'" class="space-y-4">
-            <div v-if="following.length === 0" class="text-center py-8">
-              <div class="text-gray-400 dark:text-gray-500 mb-3">
-                <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                </svg>
-              </div>
-              <p class="text-sm text-gray-600 dark:text-gray-400">팔로잉하는 사용자가 없습니다</p>
-            </div>
-            <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div
-                v-for="user in following"
-                :key="user.user_id"
-                class="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
-              >
-                <img
-                  :src="user.profile_image_url || defaultProfileImage"
-                  :alt="user.name"
-                  class="w-10 h-10 object-cover rounded-full"
-                />
-                <div class="flex-1">
-                  <h4 class="font-medium text-gray-900 dark:text-gray-100">{{ user.name }}</h4>
-                  <p class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</p>
-                </div>
-              </div>
-            </div>
+          <div v-else class="text-center py-12 text-gray-600 dark:text-gray-400">
+            <div class="text-4xl mb-4">📝</div>
+            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">아직 작성한 리뷰가 없어요</h3>
+            <p>첫 번째 영화 리뷰를 작성해보세요!</p>
           </div>
         </div>
       </div>
+
+      <!-- 좋아요한 영화 섹션 -->
+      <div class="py-6 px-4">
+        <div class="max-w-4xl mx-auto">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              좋아요한 영화 {{ userLikes.length }}개
+            </h2>
+            <button class="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded" @click="showAllLikes = !showAllLikes">
+              {{ showAllLikes ? '접기' : '더보기' }}
+            </button>
+          </div>
+
+          <div v-if="userLikes.length > 0">
+            <div class="grid grid-cols-4 gap-4">
+              <MovieCard
+                v-for="movie in showAllLikes ? userLikes : userLikes.slice(0, 4)"
+                :key="movie.movie_id"
+                :image="movie.poster_url || '/no-image.png'"
+                :title="movie.title"
+              />
+            </div>
+          </div>
+          <div v-else class="text-center py-8 text-gray-600 dark:text-gray-400">
+            좋아요한 영화가 없어요
+          </div>
+        </div>
+      </div>
+
     </div>
+
+    <!-- 팔로워/팔로잉 모달 -->
+    <FollowingModal
+      :is-open="showFollowingModal"
+      :target-user-id="userId"
+      @close="showFollowingModal = false"
+    />
   </div>
 </template>
 
@@ -214,6 +180,9 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAccountStore } from '@/stores/user'
+import FollowingModal from '@/components/FollowingModal.vue'
+import MovieCard from '@/components/MovieCard.vue'
+import CommentCard from '@/components/CommentCard.vue'
 import axios from 'axios'
 
 const route = useRoute()
@@ -228,21 +197,15 @@ const isLoading = ref(true)
 const error = ref('')
 const userProfile = ref<any>(null)
 const userComments = ref<any[]>([])
-const followers = ref<any[]>([])
-const following = ref<any[]>([])
+const userLikes = ref<any[]>([])
 const isFollowLoading = ref(false)
-const activeTab = ref('reviews')
 const isFollowing = ref(false)
+const showFollowingModal = ref(false)
+const showAllLikes = ref(false)
+const showAllComments = ref(false)
 
 // 사용자 ID
 const userId = Number(route.params.userId)
-
-// 탭 목록
-const tabs = [
-  { id: 'reviews', name: '최근 리뷰' },
-  { id: 'followers', name: '팔로워' },
-  { id: 'following', name: '팔로잉' }
-]
 
 // 현재 사용자의 프로필인지 확인
 const isOwnProfile = computed(() => {
@@ -315,32 +278,39 @@ const loadUserProfile = async () => {
 // 사용자 댓글 로드
 const loadUserComments = async () => {
   try {
-    // TODO: 사용자 댓글 API 호출
-    userComments.value = []
+    // 직접 API 호출 (토큰 없이도 접근 가능하도록)
+    const response = await axios.get(`https://i13m105.p.ssafy.io/api/v1/users/${userId}/comments`, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    userComments.value = response.data || []
+    console.log('사용자 댓글 로드 성공:', response.data)
   } catch (err) {
     console.error('사용자 댓글 로드 실패:', err)
+    userComments.value = []
   }
 }
 
-// 팔로워 목록 로드
-const loadFollowers = async () => {
+// 사용자 좋아요 목록 로드
+const loadUserLikes = async () => {
   try {
-    // TODO: 팔로워 목록 API 호출
-    followers.value = []
+    // 직접 API 호출 (토큰 없이도 접근 가능하도록)
+    const response = await axios.get(`https://i13m105.p.ssafy.io/api/v1/users/${userId}/liked-movies`, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    userLikes.value = response.data || []
+    console.log('사용자 좋아요 목록 로드 성공:', response.data)
   } catch (err) {
-    console.error('팔로워 목록 로드 실패:', err)
+    console.error('사용자 좋아요 목록 로드 실패:', err)
+    userLikes.value = []
   }
 }
 
-// 팔로잉 목록 로드
-const loadFollowing = async () => {
-  try {
-    // TODO: 팔로잉 목록 API 호출
-    following.value = []
-  } catch (err) {
-    console.error('팔로잉 목록 로드 실패:', err)
-  }
-}
 
 // 팔로우 토글
 const toggleFollow = async () => {
@@ -394,10 +364,6 @@ const formatDate = (dateString: string) => {
   })
 }
 
-// 뒤로가기
-const goBack = () => {
-  router.back()
-}
 
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(async () => {
@@ -408,8 +374,7 @@ onMounted(async () => {
   await loadUserProfile()
   await checkFollowStatus() // 팔로우 상태 확인
   await loadUserComments()
-  await loadFollowers()
-  await loadFollowing()
+  await loadUserLikes()
 })
 </script>
 
@@ -417,6 +382,7 @@ onMounted(async () => {
 .line-clamp-3 {
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
