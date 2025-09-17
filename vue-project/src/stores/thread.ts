@@ -29,7 +29,6 @@ export interface CreateCommentData {
   is_spoiler: boolean
   spoiler_confidence: number
   is_public: boolean
-  user_id: number
 }
 
 export interface UpdateCommentData {
@@ -62,7 +61,8 @@ export const useThreadStore = defineStore('thread', () => {
         }
       })
       console.log('댓글 작성 성공', res.data)
-      commentList.value.push(res.data)
+      // commentList.value.push(res.data)
+       commentList.value = [...commentList.value, res.data]
       return res.data
     } catch (err) {
       const error = err as AxiosError
