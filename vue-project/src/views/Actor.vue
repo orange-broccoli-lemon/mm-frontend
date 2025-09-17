@@ -6,7 +6,7 @@
         <!-- Section Header -->
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-2">
-            <span class="text-2xl">🎭</span>
+            <!-- <span class="text-2xl">🎭</span> -->
             <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
               인기 배우
             </h1>
@@ -14,7 +14,7 @@
           <RouterLink
             v-if="actorStore.actorList.length > 5"
             :to="{ name: 'AllActors' }"
-            class="w-8 h-8 bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white rounded-full flex items-center justify-center transition-colors duration-200"
+            class="text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
           >
             <span class="text-lg font-medium">+</span>
           </RouterLink>
