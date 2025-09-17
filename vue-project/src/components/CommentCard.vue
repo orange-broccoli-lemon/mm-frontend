@@ -5,13 +5,12 @@
   >
     <!-- ⋯ 버튼 -->
     <div class="absolute top-2 right-2 z-20">
-      <button
-        @click.stop="toggleMenu"
-        class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
-      >
-        ⋯
-      </button>
-
+     <button
+  @click.stop="toggleMenu"
+  class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+>
+  ⋯
+</button>
       <!-- 드롭다운 메뉴 -->
       <div
         v-if="showMenu"
