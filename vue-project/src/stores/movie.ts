@@ -130,7 +130,10 @@ export const useMovieStore = defineStore('counter', () => {
         console.log('토큰 없이 요청')
       }
       
-      const res = await axios.get<MovieComment[]>(`${BASE_API}/v1/comments/movie/${movieId}`, {
+      // 올바른 엔드포인트 사용
+      const url = `${BASE_API}v1/movies/${movieId}/comments`
+      console.log('API 요청 URL:', url)
+      const res = await axios.get<MovieComment[]>(url, {
         headers
       })
       console.log('영화 댓글 응답:', res.data)
