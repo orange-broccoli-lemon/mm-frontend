@@ -105,7 +105,7 @@ onMounted(async () => {
         </div>
 
         <div v-if="(accountStore.commentList ?? []).length">
-          <div class="grid grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <CommentCard
               v-for="comment in (showAllComments ? accountStore.commentList ?? [] : (accountStore.commentList ?? []).slice(0, 4))"
               :key="comment.comment_id"

@@ -464,6 +464,10 @@ const goCreate = () => {
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 200px; /* 고정 높이 */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .comment-item:hover {
@@ -476,7 +480,8 @@ const goCreate = () => {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  flex-shrink: 0; /* 크기 고정 */
 }
 
 .user-avatar {
@@ -504,12 +509,15 @@ const goCreate = () => {
   font-weight: 500;
 }
 
-.date {
-}
 
 /* 댓글 내용 */
 .comment-content {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  flex: 1; /* 남은 공간 활용 */
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* flexbox overflow를 위해 필요 */
+  overflow: hidden;
 }
 
 .spoiler-warning {
@@ -524,6 +532,13 @@ const goCreate = () => {
   line-height: 1.6;
   margin: 0;
   font-size: 0.95rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* 4줄로 제한 */
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
 }
 
 /* 댓글 푸터 */
@@ -533,6 +548,8 @@ const goCreate = () => {
   align-items: center;
   padding-top: 12px;
   border-top: 1px solid;
+  flex-shrink: 0; /* 크기 고정 */
+  margin-top: auto; /* 하단에 고정 */
 }
 
 .comment-stats {
@@ -569,6 +586,7 @@ const goCreate = () => {
   
   .comment-item {
     padding: 16px;
+    height: 180px; /* 모바일에서 약간 작은 높이 */
   }
   
   .comment-header {
@@ -588,6 +606,7 @@ const goCreate = () => {
   
   .comment-item {
     padding: 12px;
+    height: 160px; /* 작은 화면에서 더 작은 높이 */
   }
   
   .comment-meta {
