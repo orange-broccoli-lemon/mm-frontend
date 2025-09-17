@@ -19,7 +19,6 @@ export default defineConfig({
     },
   },
   server: {
-    historyApiFallback: true,
     proxy: {
       '/api': {
         target: 'https://i13m105.p.ssafy.io',
