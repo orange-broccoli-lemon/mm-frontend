@@ -53,7 +53,7 @@ export const useThreadStore = defineStore('thread', () => {
         throw new Error('로그인이 필요합니다.')
       }
       
-      const res = await axios.post<Comment>(BASE_API, commentData, {
+      const res = await axios.post<Comment>(`https://i13m105.p.ssafy.io/api/v1/movies/${commentData.movie_id}/comments`, commentData, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accountStore.token}`,
