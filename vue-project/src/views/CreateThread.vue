@@ -250,12 +250,12 @@ const handleCreateComment = async () => {
                 </span>
               </p>
               <!-- 디버깅용 포스터 URL 표시 -->
-              <p v-if="moviePoster" class="text-xs text-gray-400 mt-2 break-all">
+              <!-- <p v-if="moviePoster" class="text-xs text-gray-400 mt-2 break-all">
                 포스터 URL: {{ moviePoster }}
-              </p>
-              <p v-else class="text-xs text-red-400 mt-2">
+              </p> -->
+              <!-- <p v-else class="text-xs text-red-400 mt-2">
                 포스터 URL이 없습니다
-              </p>
+              </p> -->
             </div>
           </div>
         </div>
