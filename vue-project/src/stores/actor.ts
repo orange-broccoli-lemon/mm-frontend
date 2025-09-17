@@ -27,11 +27,24 @@ export interface DetailActor {
   updated_at: string;
 }
 
+export interface ActorCredit {
+  movie_id: number;
+  movie_title: string;
+  movie_poster_url?: string;
+  character_name?: string;
+  department: string;
+  job?: string;
+  release_date?: string;
+  is_main_cast?: boolean;
+}
+
 export const useActorStore = defineStore('actor', () => {
   const BASE_API = `https://i13m105.p.ssafy.io/api/v1/persons`
   
   const actorDetails = ref<DetailActor | null>(null);
+  const actorCredits = ref<ActorCredit[]>([]);
   const loading = ref(false);
+  const creditsLoading = ref(false);
   const currentActorId = ref<number | null>(null); // 현재 로드된 배우 ID 추적
 
   const getActorDetail = async (person_id : number) => {
@@ -58,11 +71,71 @@ export const useActorStore = defineStore('actor', () => {
       loading.value = false;
     }
   }
+  
 
   const clearActorDetails = () => {
     actorDetails.value = null;
+    actorCredits.value = [];
     currentActorId.value = null;
     loading.value = false;
+    creditsLoading.value = false;
+  }
+
+  // 배우의 출연작 불러오기
+  const getActorCredits = async (person_id: number) => {
+    if (creditsLoading.value) return null; // 이미 요청 중이면 막기
+    
+    creditsLoading.value = true;
+    
+    try {
+      console.log('배우 출연작 요청:', person_id);
+      const res = await axios.get(`${BASE_API}/${person_id}/credits`);
+      console.log('배우 출연작 응답:', res.data);
+      console.log('응답 데이터 타입:', typeof res.data);
+      console.log('응답 데이터가 배열인가:', Array.isArray(res.data));
+      
+      // API 응답 구조: { acting_credits: [...], crew_credits: [...] }
+      let creditsData: ActorCredit[] = [];
+      
+      if (Array.isArray(res.data)) {
+        // 직접 배열인 경우
+        creditsData = res.data;
+      } else if (res.data && typeof res.data === 'object') {
+        // 객체인 경우 acting_credits와 crew_credits 배열을 합치기
+        const actingCredits = Array.isArray(res.data.acting_credits) ? res.data.acting_credits : [];
+        const crewCredits = Array.isArray(res.data.crew_credits) ? res.data.crew_credits : [];
+        
+        // acting_credits와 crew_credits를 합쳐서 하나의 배열로 만들기
+        creditsData = [...actingCredits, ...crewCredits];
+        
+        console.log('Acting credits 개수:', actingCredits.length);
+        console.log('Crew credits 개수:', crewCredits.length);
+        console.log('전체 출연작 개수:', creditsData.length);
+      } else {
+        console.warn('API 응답이 예상된 구조가 아님:', res.data);
+        creditsData = [];
+      }
+      
+      // 출연작 데이터 정렬 (최신순)
+      const sortedCredits = creditsData.sort((a, b) => {
+        if (!a.release_date && !b.release_date) return 0;
+        if (!a.release_date) return 1;
+        if (!b.release_date) return -1;
+        return new Date(b.release_date).getTime() - new Date(a.release_date).getTime();
+      });
+      
+      actorCredits.value = sortedCredits;
+      return sortedCredits;
+    } catch (err) {
+      const error = err as AxiosError;
+      console.error('배우 출연작 불러오기 실패:', error.response?.data || error.message);
+      console.error('상세 오류:', error.response?.status, error.response?.statusText);
+      
+      actorCredits.value = [];
+      return [];
+    } finally {
+      creditsLoading.value = false;
+    }
   }
 
   const actorList = ref<ActorSummary[]>([])
@@ -138,10 +211,13 @@ export const useActorStore = defineStore('actor', () => {
 
   return { 
     actorDetails, 
+    actorCredits,
     getActorDetail, 
+    getActorCredits,
     allActors, 
     actorList, 
     loading, 
+    creditsLoading,
     currentActorId,
     clearActorDetails,
     searchActors,

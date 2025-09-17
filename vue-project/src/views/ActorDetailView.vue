@@ -90,7 +90,7 @@
       </div>
 
       <!-- 바이오그래피 섹션 -->
-      <div v-if="store.actorDetails.biography" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+      <div v-if="store.actorDetails.biography" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-8">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
           <span class="text-2xl">📖</span>
           바이오그래피
@@ -101,17 +101,86 @@
           </p>
         </div>
       </div>
+
+      <!-- 출연작 섹션 -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+        <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
+          <span class="text-2xl">🎬</span>
+          출연작
+          <span v-if="store.actorCredits.length > 0" class="text-lg font-normal text-gray-500 dark:text-gray-400">
+            ({{ store.actorCredits.length }}편)
+          </span>
+        </h2>
+
+        <!-- 출연작 로딩 상태 -->
+        <div v-if="store.creditsLoading" class="flex items-center justify-center py-12">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800 dark:border-gray-200"></div>
+          <span class="ml-3 text-gray-600 dark:text-gray-400">출연작을 불러오는 중...</span>
+        </div>
+
+        <!-- 출연작 목록 -->
+        <div v-else-if="store.actorCredits.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div
+            v-for="credit in store.actorCredits"
+            :key="credit.movie_id"
+            class="group cursor-pointer transition-transform duration-200 hover:-translate-y-1"
+            @click="goToMovie(credit.movie_id)"
+          >
+            <!-- 영화 포스터 -->
+            <div class="relative overflow-hidden rounded-lg shadow-md mb-3">
+              <img
+                :src="credit.movie_poster_url || '/src/assets/spotti.png'"
+                :alt="credit.movie_title"
+                class="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
+              />
+            </div>
+
+            <!-- 영화 정보 -->
+            <div class="space-y-2">
+              <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 truncate" :title="credit.movie_title">
+                {{ credit.movie_title }}
+              </h3>
+              
+              <div v-if="credit.character_name" class="text-sm text-gray-600 dark:text-gray-400">
+                <span class="font-medium">역할:</span> {{ credit.character_name }}
+              </div>
+              
+              <div v-if="credit.job" class="text-sm text-gray-600 dark:text-gray-400">
+                <span class="font-medium">직책:</span> {{ credit.job }}
+              </div>
+              
+              <div v-if="credit.release_date" class="text-sm text-gray-500 dark:text-gray-500">
+                {{ formatDate(credit.release_date) }}
+              </div>
+              
+              <div v-if="credit.is_main_cast" class="flex items-center gap-1">
+                <span class="main-cast-badge text-xs bg-yellow-400 text-yellow-900 px-2 py-1 rounded-full font-medium">
+                  주연
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 출연작이 없는 경우 -->
+        <div v-else class="text-center py-12">
+          <div class="text-4xl mb-4">🎭</div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">출연작 정보가 없습니다</h3>
+          <p class="text-gray-600 dark:text-gray-400">이 배우의 출연작 정보를 찾을 수 없습니다.</p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useActorStore } from '@/stores/actor'
 import spottiImage from '@/assets/spotti.png'
 
 const route = useRoute()
+const router = useRouter()
 const store = useActorStore()
 
 const isFollowing = ref(false)
@@ -121,7 +190,14 @@ const loading = ref(true)
 const fetchActorDetail = async (id: number) => {
   loading.value = true
   store.actorDetails = null   // 🔥 이전 배우 데이터 초기화
-  await store.getActorDetail(id)
+  store.actorCredits = []     // 🔥 이전 출연작 데이터 초기화
+  
+  // 배우 정보와 출연작을 병렬로 로드
+  await Promise.all([
+    store.getActorDetail(id),
+    store.getActorCredits(id)
+  ])
+  
   if (store.actorDetails) {
     isFollowing.value = (store.actorDetails as any).is_following || false
     followersCount.value = (store.actorDetails as any).followers_count || 0
@@ -132,6 +208,7 @@ const fetchActorDetail = async (id: number) => {
 onMounted(() => {
   const personId = Number(route.params.id)
   if (personId) fetchActorDetail(personId)
+  
 })
 
 watch(
@@ -164,5 +241,30 @@ const formatDate = (dateString: string) => {
     return dateString
   }
 }
+
+// 영화 상세 페이지로 이동
+const goToMovie = (movieId: number) => {
+  router.push({
+    name: 'BookDetail',
+    params: { id: movieId }
+  })
+}
 </script>
+
+<style scoped>
+/* 주연 배지 다크모드 스타일 */
+.main-cast-badge {
+  background-color: #fbbf24 !important; /* yellow-400 */
+  color: #92400e !important; /* yellow-800 */
+  font-weight: 600 !important;
+}
+
+/* 다크모드에서 주연 배지 강제 스타일 */
+html.dark .main-cast-badge {
+  background-color: #fbbf24 !important; /* yellow-400 */
+  color: #92400e !important; /* yellow-800 */
+  font-weight: 600 !important;
+  border: 1px solid #f59e0b !important; /* yellow-500 */
+}
+</style>
 
