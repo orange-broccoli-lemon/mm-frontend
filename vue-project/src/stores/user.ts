@@ -225,6 +225,26 @@ export const useAccountStore = defineStore('account', () => {
     router.push('/')
   }
 
+  // 토큰 유효성 검사
+  const validateToken = async () => {
+    if (!token.value || !userId.value) {
+      return false
+    }
+
+    try {
+      const res = await axios.get(`${USERS_API}/${userId.value}`, {
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+          Accept: "application/json"
+        }
+      })
+      return res.status === 200
+    } catch (error) {
+      console.error('토큰 유효성 검사 실패:', error)
+      return false
+    }
+  }
+
   
   async function followUser(targetUserId: number) {
     if (!token.value) return
@@ -239,6 +259,41 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
+  async function unFollowUser(targetUserId: number) {
+    if (!token.value) return
+    try {
+      await axios.delete(`${FOLLOWS_API}/${targetUserId}`, { 
+        headers: { Authorization: `Bearer ${token.value}` } 
+      })
+    } catch (err: unknown) {
+      const error = err as AxiosError
+      console.error('언팔로우 실패:', error.response?.data || error.message)
+    }
+  }
+  async function getFollowers(targetUserId: number) {
+    if (!token.value) return
+    try {
+      const res = await axios.get(`${USERS_API}/${targetUserId}/followers`, {
+        headers: { Authorization: `Bearer ${token.value}` }
+      })
+      return res.data
+    } catch (err: unknown) {
+      const error = err as AxiosError
+      console.error('팔로워 가져오기 실패:', error.response?.data || error.message)
+    }
+  }
+  async function getFollowing(targetUserId: number) {
+    if (!token.value) return
+    try {
+      const res = await axios.get(`${USERS_API}/${targetUserId}/following`, {
+        headers: { Authorization: `Bearer ${token.value}` }
+      })
+      return res.data
+    } catch (err: unknown) {
+      const error = err as AxiosError
+      console.error('팔로잉 가져오기 실패:', error.response?.data || error.message)
+    }
+  }
 
   const userComment = async (targetUserId: number) => {
     if (!token.value) return
@@ -350,7 +405,11 @@ const likeList = async (user_id:number) => {
     userId,
     user,
     logOut,
+    validateToken,
     followUser,
+    unFollowUser,
+    getFollowers,
+    getFollowing,
     initializeAuth,
     userComment,
     commentList,

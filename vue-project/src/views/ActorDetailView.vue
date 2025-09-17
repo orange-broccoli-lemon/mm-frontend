@@ -68,23 +68,26 @@
               </div>
             </div>
             
-            <!-- 팔로우 섹션 -->
-            <div class="flex items-center gap-4">
-              <button 
-                @click="toggleFollow" 
-                :class="[
-                  'px-6 py-3 rounded-lg font-medium transition-all duration-200',
-                  isFollowing 
-                    ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600' 
-                    : 'bg-gray-800 dark:bg-gray-600 hover:bg-gray-900 dark:hover:bg-gray-500 text-white'
-                ]"
-              >
-                {{ isFollowing ? '팔로잉' : '팔로우' }}
-              </button>
-              <div class="text-sm text-gray-600 dark:text-gray-400">
-                <span class="font-medium">{{ followersCount }}</span>명이 팔로우 중
-              </div>
-            </div>
+                   <!-- 팔로우 섹션 -->
+                   <div class="flex items-center gap-4">
+                     <button
+                       @click="toggleFollow"
+                       :class="[
+                         'px-6 py-3 rounded-lg font-medium transition-all duration-200',
+                         isFollowing
+                           ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600'
+                           : 'bg-gray-800 dark:bg-gray-600 hover:bg-gray-900 dark:hover:bg-gray-500 text-white'
+                       ]"
+                     >
+                       {{ isFollowing ? '팔로잉' : '팔로우' }}
+                     </button>
+                     <button
+                       @click="showFollowerListModal = true"
+                       class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200 cursor-pointer"
+                     >
+                       <span class="font-medium">{{ followersCount }}</span>명이 팔로우 중
+                     </button>
+                   </div>
           </div>
         </div>
       </div>
@@ -170,6 +173,13 @@
         </div>
       </div>
     </div>
+
+    <!-- 팔로워 목록 모달 -->
+    <FollowerListModal
+      :is-open="showFollowerListModal"
+      :actor-id="Number(route.params.id)"
+      @close="showFollowerListModal = false"
+    />
   </div>
 </template>
 
@@ -177,6 +187,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useActorStore } from '@/stores/actor'
+import FollowerListModal from '@/components/FollowerListModal.vue'
 import spottiImage from '@/assets/spotti.png'
 
 const route = useRoute()
@@ -186,6 +197,8 @@ const store = useActorStore()
 const isFollowing = ref(false)
 const followersCount = ref(0)
 const loading = ref(true)
+const showFollowerModal = ref(false)
+const showFollowerListModal = ref(false)
 
 const fetchActorDetail = async (id: number) => {
   loading.value = true

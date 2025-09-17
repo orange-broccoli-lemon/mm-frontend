@@ -140,12 +140,21 @@ export const useActorStore = defineStore('actor', () => {
 
   const actorList = ref<ActorSummary[]>([])
   const error = ref<string | null>(null)
+  const isActorListLoaded = ref(false)
   
   const allActors = async function(){
+    // 이미 로드된 데이터가 있으면 API 호출하지 않음
+    if (isActorListLoaded.value && actorList.value.length > 0) {
+      console.log('배우 목록 데이터가 이미 로드됨, API 호출 생략')
+      return
+    }
+
     try {
       error.value = null
+      console.log('배우 목록 API 호출 시작...')
       const res = await axios.get(`${BASE_API}/`);
       actorList.value = res.data;
+      isActorListLoaded.value = true
       console.log('배우 목록 로드 성공:', res.data.length, '명')
     } catch (err) {
       const axiosError = err as AxiosError
@@ -221,6 +230,7 @@ export const useActorStore = defineStore('actor', () => {
     currentActorId,
     clearActorDetails,
     searchActors,
-    error
+    error,
+    isActorListLoaded
   }
 })

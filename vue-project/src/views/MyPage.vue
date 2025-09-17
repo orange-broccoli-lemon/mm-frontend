@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import { useAccountStore } from '@/stores/user'
 import CommentCard from '@/components/CommentCard.vue'
 import MovieCard from '@/components/MovieCard.vue'
+import FollowingModal from '@/components/FollowingModal.vue'
 import spottiImage from '@/assets/spotti.png'
 
 const accountStore = useAccountStore()
@@ -12,9 +13,21 @@ const defaultProfileImage = spottiImage
 const showAllComments = ref(false)
 const showAllLikes = ref(false)
 const showAllWatch = ref(false)
+const showFollowingModal = ref(false)
 
-const goFollowing = () => router.push('/following')
+const goFollowing = () => showFollowingModal.value = true
 const goToHotMovies = () => router.push('/select-movie')
+
+// 댓글 삭제 처리
+const handleCommentDeleted = async (commentId: number) => {
+  console.log('댓글 삭제됨:', commentId)
+  
+  // 사용자 정보와 댓글 목록 새로고침
+  if (accountStore.user?.user_id) {
+    await accountStore.getUserInfo()
+    await accountStore.userComment(accountStore.user.user_id)
+  }
+}
 
 onMounted(async () => {
   console.log('MyPage 마운트됨, 사용자 정보 로드 중...')
@@ -29,7 +42,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300" v-if="accountStore.user">
+  <div class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 relative" v-if="accountStore.user">
     <!-- 헤더 섹션 -->
     <div class="bg-gray-50 dark:bg-gray-800 py-8 px-4">
       <div class="max-w-4xl mx-auto">
@@ -117,6 +130,7 @@ onMounted(async () => {
               :movie_poster_url="comment.movie_poster_url"
               :movie_id="comment.movie_id"
               :rating="Number(comment.rating) || 0"
+              @deleted="handleCommentDeleted"
             />
           </div>
         </div>
@@ -183,5 +197,11 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+
+    <!-- 팔로워/팔로잉 모달 -->
+    <FollowingModal
+      :is-open="showFollowingModal"
+      @close="showFollowingModal = false"
+    />
   </div>
 </template>

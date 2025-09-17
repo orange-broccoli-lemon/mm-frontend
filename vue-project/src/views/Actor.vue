@@ -20,8 +20,14 @@
           </RouterLink>
         </div>
         
+        <!-- Loading State -->
+        <div v-if="isLoading" class="flex justify-center items-center py-8">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+          <span class="ml-2 text-gray-600 dark:text-gray-400">배우를 불러오는 중...</span>
+        </div>
+        
         <!-- Actors Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+        <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
           <ActorCard
             v-for="actor in actorStore.actorList.slice(0, 6)"
             :key="actor.person_id"
@@ -36,15 +42,20 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue';
+import { onMounted, ref } from 'vue';
 import { RouterLink } from 'vue-router';
 import { useActorStore } from '@/stores/actor';
 import ActorCard from '../components/ActorCard.vue';
 
 const actorStore = useActorStore();
+const isLoading = ref(true);
 
 onMounted(async () => {
-  await actorStore.allActors()
+  try {
+    await actorStore.allActors()
+  } finally {
+    isLoading.value = false
+  }
 })
 </script>
 

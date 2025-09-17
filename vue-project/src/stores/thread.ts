@@ -110,10 +110,13 @@ export const useThreadStore = defineStore('thread', () => {
   const deleteComment = async (commentId: number) => {
   if (!accountStore.token) {
     console.error('로그인이 필요합니다.')
-    return
+    throw new Error('로그인이 필요합니다.')
   }
 
   try {
+    console.log('댓글 삭제 시도:', commentId)
+    console.log('사용자 토큰:', accountStore.token ? '토큰 있음' : '토큰 없음')
+    
     const res = await axios.delete(`${BASE_API}${commentId}`, {
       headers: {
         Authorization: `Bearer ${accountStore.token}`,
@@ -128,6 +131,15 @@ export const useThreadStore = defineStore('thread', () => {
   } catch (err) {
     const error = err as AxiosError
     console.error(`댓글 삭제 실패: ${commentId}`, error.response?.data || error.message)
+    console.error('상세 오류:', error.response?.status, error.response?.statusText)
+    
+    // 401 오류 시 자동 로그아웃 처리
+    if (error.response?.status === 401) {
+      console.log('토큰이 유효하지 않음, 자동 로그아웃 처리')
+      accountStore.logOut()
+      throw new Error('로그인이 만료되었습니다. 다시 로그인해주세요.')
+    }
+    
     throw error
   }
 }

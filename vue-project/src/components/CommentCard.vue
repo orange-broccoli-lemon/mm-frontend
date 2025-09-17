@@ -111,6 +111,10 @@ const props = defineProps<{
   movie_poster_url: string
   rating: number 
 }>()
+
+const emit = defineEmits<{
+  deleted: [commentId: number]
+}>()
 const router = useRouter()
 const contentRef = ref<HTMLElement>()
 
@@ -133,10 +137,44 @@ const goToUpdate = () => {
 }
 
 // 삭제 버튼 클릭
-const deleteReview = () => {
+const deleteReview = async () => {
   showMenu.value = false
-  commentStore.deleteComment(props.comment_id)
-  window.location.reload()
+  
+  // 확인 대화상자
+  if (!confirm('정말로 이 리뷰를 삭제하시겠습니까?')) {
+    return
+  }
+  
+  try {
+    await commentStore.deleteComment(props.comment_id)
+    console.log('리뷰 삭제 완료')
+    
+    // 부모 컴포넌트에 삭제 완료 이벤트 전달
+    emit('deleted', props.comment_id)
+  } catch (error: any) {
+    console.error('리뷰 삭제 실패:', error)
+    
+    // 구체적인 오류 메시지 표시
+    let errorMessage = '리뷰 삭제에 실패했습니다.'
+    
+    if (error.message?.includes('로그인이 만료')) {
+      errorMessage = '로그인이 만료되었습니다. 다시 로그인해주세요.'
+      // 로그인 페이지로 이동
+      router.push('/login')
+    } else if (error.message?.includes('로그인이 필요')) {
+      errorMessage = '로그인이 필요합니다.'
+      router.push('/login')
+    } else if (error.response?.status === 401) {
+      errorMessage = '인증이 필요합니다. 다시 로그인해주세요.'
+      router.push('/login')
+    } else if (error.response?.status === 403) {
+      errorMessage = '삭제 권한이 없습니다.'
+    } else if (error.response?.status === 404) {
+      errorMessage = '해당 리뷰를 찾을 수 없습니다.'
+    }
+    
+    alert(errorMessage)
+  }
 }
 
 // fitty 적용
