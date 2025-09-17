@@ -163,6 +163,8 @@ const handleCreateComment = async () => {
 
   try {
     // 항상 새 리뷰 작성
+    if(userStore.user)
+  {
     await commentStore.createComment({
       movie_id: movieId.value,
       content: content.value,
@@ -170,8 +172,11 @@ const handleCreateComment = async () => {
       watched_date: new Date().toISOString().slice(0, 10),
       is_spoiler: isSpoiler.value,
       spoiler_confidence: 1,
-      is_public: true
+      is_public: true,
+      user_id: userStore.user?.user_id
     })
+
+  }
     alert('리뷰 작성 완료!')
     
     // 리뷰 작성/수정 완료 후 영화 상세 페이지로 이동
