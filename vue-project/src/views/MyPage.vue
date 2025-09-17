@@ -1,23 +1,57 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAccountStore } from '@/stores/user'
+import CommentCard from '@/components/CommentCard.vue'
+import MovieCard from '@/components/MovieCard.vue'
+import spottiImage from '@/assets/spotti.png'
+
+const accountStore = useAccountStore()
+const router = useRouter()
+const defaultProfileImage = spottiImage
+const showAll = ref(false)
+
+const goFollowing = () => router.push('/following')
+const goToHotMovies = () => router.push('/select-movie')
+
+onMounted(async () => {
+  console.log('MyPage 마운트됨, 사용자 정보 로드 중...')
+  await accountStore.getUserInfo()
+
+  if (accountStore.user?.user_id != null) {
+    await accountStore.userComment(accountStore.user.user_id)
+    await accountStore.watchList(accountStore.user.user_id)
+    await accountStore.likeList(accountStore.user.user_id)
+  }
+})
+</script>
+
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300" v-if="accountStore.user">
+  <div
+    class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300"
+    v-if="accountStore.user">
     <!-- 헤더 섹션 -->
     <div class="bg-gray-50 dark:bg-gray-800 py-8 px-4">
       <div class="max-w-4xl mx-auto">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
           <div class="flex items-center gap-4">
             <div class="relative">
               <img
                 :src="accountStore.user.profile_image_url || defaultProfileImage"
                 alt="프로필 이미지"
-                class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
-              />
+                class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600" />
               <div
                 class="absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white"
-                :class="{ 'bg-green-500': accountStore.user && accountStore.token, 'bg-gray-400': !accountStore.user || !accountStore.token }"
-              ></div>
+                :class="{
+                  'bg-green-500': accountStore.user && accountStore.token,
+                  'bg-gray-400': !accountStore.user || !accountStore.token
+                }"></div>
             </div>
             <div>
-              <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ accountStore.user.name }}</h1>
+              <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                {{ accountStore.user.name }}
+              </h1>
               <p class="text-gray-600 dark:text-gray-400">영화 리뷰어</p>
             </div>
           </div>
@@ -28,25 +62,39 @@
     <!-- 통계 카드 섹션 -->
     <div class="py-6 px-4">
       <div class="max-w-4xl mx-auto grid grid-cols-3 gap-4">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center">
-          <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ accountStore.user.comments_count || 0 }}</div>
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center">
+          <div
+            class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            {{ accountStore.user.comments_count || 0 }}
+          </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">리뷰</div>
         </div>
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" @click="goFollowing">
-          <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ accountStore.user.followers_count || 0 }}</div>
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+          @click="goFollowing">
+          <div
+            class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            {{ accountStore.user.followers_count || 0 }}
+          </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">팔로워</div>
         </div>
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" @click="goFollowing">
-          <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ accountStore.user.following_count || 0 }}</div>
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+          @click="goFollowing">
+          <div
+            class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+            {{ accountStore.user.following_count || 0 }}
+          </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">팔로잉</div>
         </div>
       </div>
     </div>
 
-    <!-- 액션 버튼 섹션 -->
+  <!-- 액션 버튼 섹션 -->
     <div class="py-6 px-4">
       <div class="max-w-4xl mx-auto">
-        <button class="w-full bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white py-3 px-4 rounded-md font-medium transition-colors duration-200 flex items-center justify-center" @click="goToHotMovies">
+        <button class="w-full bg-gray-800 dark:bg-white hover:bg-gray-900 dark:hover:bg-gray-100 text-white dark:text-gray-900 py-3 px-4 rounded-md font-medium transition-colors duration-200 flex items-center justify-center" @click="goToHotMovies">
           <img src="@/assets/spotti.png" alt="스포띠" class="w-6 h-6 mr-2">
           스포띠빠이와 함께 리뷰쓰러가기
         </button>
@@ -57,13 +105,18 @@
     <div class="py-6 px-4">
       <div class="max-w-4xl mx-auto">
         <div class="flex items-center justify-between mb-4">
-          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">리뷰 {{ accountStore.user.comments_count || 0 }}개</h2>
-          <span class="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
-            <button @click="showAll = !showAll">{{ showAll ? '접기' : '더보기' }}</button>
+          <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+            리뷰 {{ accountStore.user.comments_count || 0 }}개
+          </h2>
+          <span
+            class="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded">
+            <button @click="showAll = !showAll">
+              {{ showAll ? '접기' : '더보기' }}
+            </button>
           </span>
         </div>
-        
-        <!-- 기본 4개 한 줄로 -->
+
+         <!-- 기본 4개 한 줄로 -->
         <div v-if="!showAll && accountStore.commentList?.length" class="grid grid-cols-4 gap-4">
           <CommentCard
             v-for="(comment, index) in accountStore.commentList.slice(0,4)"
@@ -71,11 +124,13 @@
             :profileImage="accountStore.user.profile_image_url || defaultProfileImage"
             :content="comment.content"
             :name="accountStore.user?.name || '이름 없음'"
+            :movietitle="comment.movie_title"
+            :movie_poster_url="comment.movie_poster_url"
+            :movie_id="comment.movie_id"
             class="flex-shrink-0 w-[220px]"
           />
         </div>
-
-        <!-- 전체 리뷰 그리드 -->
+         <!-- 전체 리뷰 그리드 -->
         <div v-if="showAll && accountStore.commentList?.length" class="grid grid-cols-4 gap-4">
           <CommentCard
             v-for="comment in accountStore.commentList"
@@ -83,47 +138,72 @@
             :profileImage="accountStore.user.profile_image_url || defaultProfileImage"
             :content="comment.content"
             :name="accountStore.user?.name || '이름 없음'"
+            :movietitle="comment.movie_title"
+            :movie_poster_url="comment.movie_poster_url"
+            :movie_id="comment.movie_id"
             class="w-[220px]"
           />
         </div>
-
         <!-- 리뷰 없을 때 -->
-        <div v-else-if="!accountStore.commentList?.length" class="text-center py-12">
+        <div
+          v-else-if="!accountStore.commentList?.length"
+          class="text-center py-12">
           <div class="text-4xl mb-4">📝</div>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+          <h3
+            class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
             아직 작성한 리뷰가 없어요
           </h3>
-          <p class="text-gray-600 dark:text-gray-400">첫 번째 영화 리뷰를 작성해보세요!</p>
+          <p class="text-gray-600 dark:text-gray-400">
+            첫 번째 영화 리뷰를 작성해보세요!
+          </p>
         </div>
       </div>
     </div>
 
+    <!-- 좋아요한 영화 -->
+    <div class="py-6 px-4">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          좋아요한 영화 {{ accountStore.like_list?.length || 0 }}개
+        </h2>
+        <div
+          v-if="accountStore.like_list?.length"
+          class="grid grid-cols-4 gap-4">
+          <MovieCard
+            v-for="movie in accountStore.like_list"
+            :key="movie.movie_id"
+            :image="movie.poster_url || '/no-image.png'"
+            :title="movie.title" />
+        </div>
+        <div
+          v-else
+          class="text-center py-8 text-gray-600 dark:text-gray-400">
+          좋아요한 영화가 없어요
+        </div>
+      </div>
+    </div>
+
+    <!-- 저장한 영화 -->
+    <div class="py-6 px-4">
+      <div class="max-w-4xl mx-auto">
+        <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+          저장한 영화 {{ accountStore.watch_list?.length || 0 }}개
+        </h2>
+        <div
+          v-if="accountStore.watch_list?.length"
+          class="grid grid-cols-4 gap-4">
+          <MovieCard
+            v-for="movie in accountStore.watch_list"
+            :key="movie.movie_id"
+            :image="movie.poster_url || '/no-image.png'"
+            :title="movie.title" />
+        </div>
+        <div
+          v-else
+          class="text-center py-8 text-gray-600 dark:text-gray-400">
+          저장한 영화가 없어요
+        </div>
+      </div>
+    </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useAccountStore } from '../stores/user'
-import { useRouter } from 'vue-router'
-import CommentCard from '@/components/CommentCard.vue'
-import spottiImage from '@/assets/spotti.png'
-
-const accountStore = useAccountStore()
-const router = useRouter()
-const defaultProfileImage = spottiImage
-
-const showAll = ref(false) // 더보기 상태
-
-const goFollowing = () => router.push('/following')
-const goToHotMovies = () => router.push('/select-movie')
-
-onMounted(async () => {
-  console.log('MyPage 마운트됨, 사용자 정보 로드 중...')
-  const result = await accountStore.getUserInfo()
-  if (result.success) console.log('사용자 정보 로드 성공:', accountStore.user)
-
-  if (accountStore.user?.user_id != null) {
-    await accountStore.userComment(accountStore.user.user_id)
-  }
-})
-</script>
