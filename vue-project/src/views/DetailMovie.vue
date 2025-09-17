@@ -23,8 +23,8 @@
         <div class="header">
           <h1 class="text-gray-900 dark:text-white">{{ movieDetail.title }}</h1>
           <div class="actions">
-            <button class="like bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600" @click="likeMovie">좋아요</button>
-            <button class="save" @click="saveMovie">저장</button>
+            <button class="like bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600" @click="toggleLike">좋아요</button>
+            <button class="save" @click="toggleWath">저장</button>
             <button class="comment bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600" @click="goCreate">코멘트</button>
           </div>
         </div>
@@ -92,6 +92,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onActivated, watch } from "vue"
 import { useMovieStore } from "@/stores/movie"
+import { useAccountStore } from "@/stores/user"
 import type { DetailMovie, MovieComment } from "@/stores/movie"
 import { useRoute, useRouter } from "vue-router"
 import spottiImage from '@/assets/spotti.png'
@@ -101,9 +102,13 @@ const router = useRouter()
 const id = Number(route.params.id)
 
 const userMovie = useMovieStore()
+const useUser = useAccountStore()
+
 const movieDetail = ref<DetailMovie | null>(null)
 const movieComments = ref<MovieComment[]>([])
 const isLoadingComments = ref(false)
+
+const isLike = ref(false)
 
 onMounted(async () => {
   // 영화 상세 정보 가져오기
@@ -128,6 +133,25 @@ watch(() => route.query.refresh, async (newRefresh) => {
   }
 })
 
+const toggleLike = async () => {
+  if (isLike.value) {
+    await useUser.unlikeMovie(id)
+    isLike.value = false
+  } else {
+    await useUser.addLikeMovie(id)
+    isLike.value = true
+  }
+}
+
+const toggleWath = async () => {
+  if (isLike.value) {
+    await useUser.unWatchMovie(id)
+    isLike.value = false
+  } else {
+    await useUser.addWatchList(id)
+    isLike.value = true
+  }
+}
 // 영화 댓글 로드 함수
 const loadMovieComments = async () => {
   isLoadingComments.value = true
