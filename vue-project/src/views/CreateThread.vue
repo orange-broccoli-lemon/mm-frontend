@@ -170,7 +170,7 @@ const handleCreateComment = async () => {
       content: content.value,
       rating: rating.value,
       watched_date: new Date().toISOString().slice(0, 10),
-       is_spoiler: !isSpoiler.value,
+       is_spoiler: isSpoiler.value,
       spoiler_confidence: 1,
       is_public: true,
     })

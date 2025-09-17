@@ -122,37 +122,26 @@ export const useMovieStore = defineStore('counter', () => {
   }
 
   // 영화 댓글 가져오기 함수
-  const fetchMovieComments = async (movieId: number) => {
-    try {
-      console.log('영화 댓글 요청:', movieId)
-      
-      // 인증 토큰이 있으면 헤더에 포함
-      const headers: any = {
-        'Accept': 'application/json'
-      }
-      
-      // localStorage에서 토큰 가져오기 (userStore가 없을 수도 있음)
-      const token = localStorage.getItem('token')
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`
-        console.log('토큰 포함하여 요청')
-      } else {
-        console.log('토큰 없이 요청')
-      }
-      
-      // 올바른 엔드포인트 사용
-      const url = `${BASE_API}v1/movies/${movieId}/comments`
-      console.log('API 요청 URL:', url)
-      const res = await axios.get<MovieComment[]>(url, { headers })
-      console.log('영화 댓글 응답:', res.data)
-      return res.data ?? []
-    } catch (err) {
-      const error = err as AxiosError
-      console.error('영화 댓글 불러오기 실패', error.response?.data || error.message)
-      console.error('상세 오류:', error.response?.status, error.response?.statusText)
-      return []
-    }
+  // 영화 댓글 가져오기 함수
+const fetchMovieComments = async (movieId: number, includeSpoilers = false) => {
+  try {
+    console.log('영화 댓글 요청:', movieId, 'includeSpoilers:', includeSpoilers)
+    
+    const headers: any = { 'Accept': 'application/json' }
+    const token = localStorage.getItem('token')
+    if (token) headers['Authorization'] = `Bearer ${token}`
+
+    const url = `${BASE_API}v1/movies/${movieId}/comments?include_spoilers=${includeSpoilers}`
+    console.log('API 요청 URL:', url)
+    const res = await axios.get<MovieComment[]>(url, { headers })
+    console.log('영화 댓글 응답:', res.data)
+    return res.data ?? []
+  } catch (err) {
+    const error = err as AxiosError
+    console.error('영화 댓글 불러오기 실패', error.response?.data || error.message)
+    return []
   }
+}
 
   return { allMovies, movieList, detailMovie, popularMovies, fetchPopularMovies, fetchMovieComments, isPopularMoviesLoaded , movie}
 })
