@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
   <div class="thread-list-container">
     <h1 class="thread-list-title">Thread List</h1>
     <div class="controls">
@@ -43,4 +43,4 @@ const goToCreateThread = () => {
 .thread-title:hover { text-decoration: underline; }
 .thread-info { display: flex; align-items: center; gap: 0.5rem; }
 .thread-user { font-size: 0.9rem; color: #555; }
-</style>
+</style> -->

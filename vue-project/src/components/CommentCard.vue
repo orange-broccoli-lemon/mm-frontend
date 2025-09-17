@@ -1,7 +1,23 @@
 <template>
-  <div class="comment-card">
-    <img :src="profileImage || spottiImage" alt="프로필 이미지" class="profile-img" />
-    <p class="comment-content" ref="contentRef">{{ content }}</p>
+  <div
+    class="comment-card flex flex-col justify-start items-center bg-white dark:bg-gray-800 rounded-xl shadow-md p-4 w-56 h-64 overflow-hidden"
+  >
+    <div class="flex flex-col items-center gap-2 w-full">
+      <img
+        :src="profileImage || spottiImage"
+        alt="프로필 이미지"
+        class="w-14 h-14 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+      />
+      <p class="text-sm font-semibold text-gray-900 dark:text-gray-100">{{ name }}</p>
+      <hr class="w-full border-gray-200 dark:border-gray-700" />
+    </div>
+
+    <p
+      ref="contentRef"
+      class="comment-content text-left text-gray-800 dark:text-gray-200 break-words mt-2 overflow-hidden"
+    >
+      {{ content }}
+    </p>
   </div>
 </template>
 
@@ -13,6 +29,7 @@ import spottiImage from '@/assets/spotti.png'
 const props = defineProps<{
   profileImage: string
   content: string
+  name: string
 }>()
 
 const contentRef = ref<HTMLElement>()
@@ -20,9 +37,9 @@ const contentRef = ref<HTMLElement>()
 const applyFitty = () => {
   if (contentRef.value) {
     fitty(contentRef.value, {
-      minSize: 10,
+      minSize: 12,
       maxSize: 18,
-      multiLine: true 
+      multiLine: true
     })
   }
 }
@@ -31,40 +48,10 @@ onMounted(applyFitty)
 watch(() => props.content, applyFitty)
 </script>
 
-
 <style scoped>
-.comment-card {
-  background: white;
-  border-radius: 1rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  padding: 2rem;
-
-  width: 12rem;
-  height: 16rem;
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  overflow: hidden; 
-}
-
-.profile-img {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
 .comment-content {
   width: 100%;
-  text-align: center;
-  color: #333;
-  word-break: break-word;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+  line-height: 1.3;
+  white-space: normal; 
+  }
 </style>

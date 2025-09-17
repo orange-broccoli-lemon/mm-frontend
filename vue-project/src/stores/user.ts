@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios, { AxiosError } from 'axios'
 import router from '@/router'
+import { comment } from 'postcss'
 
 export interface User {
   user_id: number
@@ -49,6 +50,23 @@ export interface UserProfile {
   recent_comments: RecentComments[]
 }
 
+export interface UserComment{
+  comment_id : number
+  content: string 
+  rating: string 
+  watched_date:string
+  is_spoiler:boolean
+  is_public:boolean
+  likes_count:number
+  create_at: string
+  movie_id:number
+  movie_title:string
+  movie_poster_url:string
+  movie_release_date:string
+
+}
+
+
 export const useAccountStore = defineStore('account', () => {
   const AUTH_API = `https://i13m105.p.ssafy.io/api/v1/auth`
   const USERS_API = `https://i13m105.p.ssafy.io/api/v1/users`
@@ -56,6 +74,10 @@ export const useAccountStore = defineStore('account', () => {
   const token = ref<string | null>(localStorage.getItem('token'))
   const userId = ref<number | null>(JSON.parse(localStorage.getItem('userId') || 'null'))
   const user = ref<UserProfile | null>(null)
+
+  const commentList = ref<UserComment[] | null>(null);
+
+
 
   // 페이지 로드 시 저장된 사용자 정보 복원
   const initializeAuth = async () => {
@@ -250,7 +272,32 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
- 
+ const userComment = async (targetUserId: number) => {
+  if (!token.value) {
+    console.warn('토큰 없음, 유저 댓글 요청 불가')
+    return { success: false, error: '토큰 없음' }
+  }
 
-  return { signUp, login, googleLogin, getUserInfo, token, userId, user, logOut, followUser, initializeAuth}
+  try {
+    const res = await axios.get<UserComment[]>(
+      `${USERS_API}/${targetUserId}/comments`,
+      {
+        headers: {
+          Authorization: `Bearer ${token.value}`,
+          Accept: 'application/json'
+        }
+      }
+    );
+    console.log('유저 댓글 가져오기 성공:', res.data)
+
+    commentList.value = res.data
+
+    return { success: true, data: res.data }
+  } catch (err: unknown) {
+    const error = err as AxiosError
+    console.error('유저 댓글 가져오기 실패:', error.response?.data || error.message)
+    return { success: false, error: error.response?.data || error.message }
+  }
+};
+  return { signUp, login, googleLogin, getUserInfo, token, userId, user, logOut, followUser, initializeAuth , userComment, commentList }
 })
