@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import axios, { AxiosError } from 'axios'
+import { useAccountStore } from '@/stores/user'
 
 export interface MovieList {
   title: string
@@ -23,6 +24,8 @@ export interface DetailMovie {
   trailer_url: string
   create_at: string
   update_at: string
+  is_liked: boolean
+  is_in_watchlist: boolean
 }
 
 export interface MovieComment {
@@ -48,11 +51,20 @@ export const useMovieStore = defineStore('counter', () => {
   const movieList = ref<MovieList[]>([])
   const popularMovies = ref<MovieList[]>([])
 
+  const movie = ref<DetailMovie | null>(null)
+
+  const userStore = useAccountStore()
   const detailMovie = async (moviePk: number) => {
     try {
-      const res = await axios.get<DetailMovie>(`${BASE_API}/v1/movies/${moviePk}`)
+      const res = await axios.get<DetailMovie>(`${BASE_API}/v1/movies/${moviePk}`,{
+
+        headers: { Authorization: `Bearer ${userStore.token}`, Accept: "application/json" }
+      })
       console.log(res.data)
+      
+      movie.value = res.data as DetailMovie
       return res.data ?? null
+
     } catch (err) {
       const error = err as AxiosError
       console.error('상세페이지 불러오기 실패', error.response?.data || error.message)
@@ -134,5 +146,5 @@ export const useMovieStore = defineStore('counter', () => {
     }
   }
 
-  return { allMovies, movieList, detailMovie, popularMovies, fetchPopularMovies, fetchMovieComments }
+  return { allMovies, movieList, detailMovie, popularMovies, fetchPopularMovies, fetchMovieComments , movie }
 })

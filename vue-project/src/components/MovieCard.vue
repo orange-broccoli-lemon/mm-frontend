@@ -33,7 +33,7 @@ defineProps<{
         <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-1 rounded text-xs font-medium">
           <span>⭐</span>
           인기
-        </span>
+        </span> 
         <div class="text-gray-500 dark:text-gray-400 text-xs">
           상세보기
         </div>
