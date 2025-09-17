@@ -154,5 +154,5 @@ export const useMovieStore = defineStore('counter', () => {
     }
   }
 
-  return { allMovies, movieList, detailMovie, popularMovies, fetchPopularMovies, fetchMovieComments, isPopularMoviesLoaded }
+  return { allMovies, movieList, detailMovie, popularMovies, fetchPopularMovies, fetchMovieComments, isPopularMoviesLoaded , movie}
 })
