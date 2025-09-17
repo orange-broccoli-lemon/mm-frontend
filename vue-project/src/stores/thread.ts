@@ -29,6 +29,7 @@ export interface CreateCommentData {
   is_spoiler: boolean
   spoiler_confidence: number
   is_public: boolean
+  user_id: number
 }
 
 export interface UpdateCommentData {
@@ -80,16 +81,19 @@ export const useThreadStore = defineStore('thread', () => {
         throw new Error('로그인이 필요합니다.')
       }
       
-      const res = await axios.put<Comment>(`${BASE_API}${commentId}`, commentData, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accountStore.token}`,
-          Accept: 'application/json'
-        }
-      })
+      const res = await axios.put<Comment>(
+      `${BASE_API}${commentId}`, 
+      commentData,
+      {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${accountStore.token}`,
+            Accept: 'application/json'
+       }
+      }
+)   
       console.log('댓글 수정 성공', res.data)
       
-      // 기존 댓글 업데이트
       const index = commentList.value.findIndex(comment => comment.comment_id === commentId)
       if (index !== -1) {
         commentList.value[index] = res.data
@@ -103,6 +107,30 @@ export const useThreadStore = defineStore('thread', () => {
     }
   }
 
+  const deleteComment = async (commentId: number) => {
+  if (!accountStore.token) {
+    console.error('로그인이 필요합니다.')
+    return
+  }
+
+  try {
+    const res = await axios.delete(`${BASE_API}${commentId}`, {
+      headers: {
+        Authorization: `Bearer ${accountStore.token}`,
+        Accept: 'application/json',
+      },
+    })
+    console.log(`댓글 삭제 성공: ${commentId}`, res.data)
+
+    commentList.value = commentList.value.filter(c => c.comment_id !== commentId)
+
+    return res.data
+  } catch (err) {
+    const error = err as AxiosError
+    console.error(`댓글 삭제 실패: ${commentId}`, error.response?.data || error.message)
+    throw error
+  }
+}
   const detailComment = async (comment_id: number) => {
     try {
       const res = await axios.get<Comment>(`${BASE_API}/${comment_id}`,{
@@ -165,6 +193,7 @@ const likeComment = async (comment_id: number) => {
     updateComment,
     detailComment ,
     likeComment,
-    unLikeComment
+    unLikeComment,
+    deleteComment
   }
 })

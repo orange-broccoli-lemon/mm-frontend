@@ -62,6 +62,7 @@ export interface UserComment {
   movie_title: string
   movie_poster_url: string
   movie_release_date: string
+  user_id:number
 }
 
 export interface LikeData {
