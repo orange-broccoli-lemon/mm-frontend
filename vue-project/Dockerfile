@@ -1,7 +1,7 @@
 # --- 1단계: 빌드 환경 ---
 # Node.js 윈도우 설치 버전(22.17.1)을 기반으로 빌드용 이미지 생성
 # (builder 라는 별명 부여)
-FROM node:22.17.1-alpine as builder
+FROM node:22.19.0-alpine as builder
 
 # 작업 디렉토리 설정
 WORKDIR /app
