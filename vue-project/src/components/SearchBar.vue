@@ -482,12 +482,6 @@ const getJobTitle = (job: string) => {
     'Post-Production Manager': '포스트 프로덕션 매니저',
     'Post-Production Producer': '포스트 프로덕션 프로듀서',
     'Post-Production Executive': '포스트 프로덕션 임원',
-    'Post-Production Accountant': '포스트 프로덕션 회계사',
-    'Post-Production Coordinator': '포스트 프로덕션 코디네이터',
-    'Post-Production Assistant': '포스트 프로덕션 어시스턴트',
-    'Post-Production Manager': '포스트 프로덕션 매니저',
-    'Post-Production Producer': '포스트 프로덕션 프로듀서',
-    'Post-Production Executive': '포스트 프로덕션 임원',
     'Post-Production Accountant': '포스트 프로덕션 회계사'
   }
   
