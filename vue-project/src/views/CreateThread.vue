@@ -4,6 +4,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { useThreadStore } from '@/stores/thread'
 import { useAccountStore } from '@/stores/user'
 import axios from 'axios'
+import yellowstar from '@/assets/star-solid-full.svg'
+import graystar from '@/assets/star-solid-full_gray.svg'
 
 const route = useRoute()
 const router = useRouter()
@@ -83,16 +85,22 @@ const onStarLeave = () => {
   console.log('현재 hoveredRating.value:', hoveredRating.value)
 }
 
-// 별점 클래스 결정 함수
-const getStarClass = (starNumber: number) => {
-  // 호버 중이면 호버 값 사용, 아니면 실제 선택된 값 사용
+
+const totalStars = 10  // 5개의 별을 0.5점 단위로 나누어 10칸
+
+const getClipPathStyle = (starIndex: number) => {
   const displayRating = hoveredRating.value > 0 ? hoveredRating.value : rating.value
-  
-  // 별 번호가 표시할 별점보다 작거나 같으면 채워진 별
-  if (starNumber <= displayRating) {
-    return 'text-yellow-400 scale-110'
+  const starValue = starIndex * 2
+
+  if (displayRating >= starValue) {
+    // 꽉 찬 별, 전체 노출
+    return { clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' }
+  } else if (displayRating === starValue - 1) {
+    // 왼쪽 50%만 노출 (반별)
+    return { clipPath: 'polygon(0 0, 50% 0, 50% 100%, 0 100%)' }
   } else {
-    return 'text-gray-400 hover:text-yellow-300'
+    // 빈 별, 전부 숨김
+    return { clipPath: 'polygon(0 0, 0 0, 0 0, 0 0)' }
   }
 }
 
@@ -261,27 +269,49 @@ const handleCreateComment = async () => {
         <!-- Review Form -->
         <form v-else @submit.prevent="handleCreateComment" class="space-y-6">
           <!-- Rating Section -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">별점</h3>
-            <div class="flex items-center gap-2 mb-4">
-              <div class="flex items-center gap-1">
-                <span 
-                  v-for="star in 9" 
-                  :key="star"
-                  class="text-2xl cursor-pointer transition-all duration-200"
-                  :class="getStarClass(star)"
-                  @click="setRating(star)"
-                  @mouseenter="onStarHover(star)"
-                  @mouseleave="onStarLeave"
-                >
-                  ⭐
-                </span>
-              </div>
-              <span class="text-lg font-medium text-gray-700 ml-4">
-                {{ currentRating > 0 ? `${currentRating}/9` : '별점을 선택해주세요' }}
-              </span>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="flex items-center">
+              <template v-for="starIndex in 5" :key="starIndex">
+                <div class="relative cursor-pointer select-none w-10 h-10">
+                  
+                  <!-- 1. 배경 별 (회색) -->
+                  <span class="absolute inset-0">
+                    <img :src="graystar" alt="gray star" class="w-full h-full object-contain" />
+                  </span>
+                  
+                  <!-- 2. 노란 별 (반별/꽉찬별), 너비 0%, 50%, 100% 조절 -->
+                  <span
+                    class="absolute top-0 left-0 h-full w-full overflow-hidden"
+                    :style="getClipPathStyle(starIndex)"
+                  >
+                    <img :src="yellowstar" alt="yellow star" class="w-full h-full object-cover" />
+                  </span>
+                  
+                  <!-- 3. 클릭 영역 좌우 반칸 -->
+                  <span
+                    class="absolute top-0 left-0 w-1/2 h-full"
+                    @click="setRating(starIndex * 2 - 1)"
+                    @mouseenter="onStarHover(starIndex * 2 - 1)"
+                    @mouseleave="onStarLeave"
+                  ></span>
+                  <span
+                    class="absolute top-0 right-0 w-1/2 h-full"
+                    @click="setRating(starIndex * 2)"
+                    @mouseenter="onStarHover(starIndex * 2)"
+                    @mouseleave="onStarLeave"
+                  ></span>
+                </div>
+              </template>
             </div>
-          </div>
+
+
+
+
+            <span class="ml-4 font-medium text-gray-700">
+              {{ rating > 0 ? `${(rating / 2).toFixed(1)}/5` : '별점을 선택해주세요' }}
+            </span>
+
+          </div>    
 
           <!-- Content Section -->
           <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -331,3 +361,6 @@ const handleCreateComment = async () => {
   </div>
 </template>
 
+<style scoped>
+
+</style>
