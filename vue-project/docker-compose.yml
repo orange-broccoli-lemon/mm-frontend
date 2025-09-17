@@ -9,5 +9,4 @@ services:
     restart: unless-stopped
     env_file:
       - /var/lib/jenkins/workspace/Front_end_Pipeline/vue-project/.env
-    volumes:
-      - /var/lib/jenkins/workspace/Front_end_Pipeline/vue-project/dist:/usr/share/nginx/html
+

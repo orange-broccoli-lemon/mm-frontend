@@ -20,8 +20,6 @@ RUN npm run build
 # Nginx 서버를 기반으로 최종 서비스용 이미지 생성
 FROM nginx:stable-alpine
 
-# 빌드 단계(builder)에서 생성된 결과물(dist 폴더)을 Nginx 의 기본 웹 폴더로 복사
-COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Nginx가 80번 포트를 사용하도록 설정
 EXPOSE 80
