@@ -39,3 +39,14 @@ const deleteThread = async () => {
   router.push({ name: 'CommunityView' })
 }
 </script> -->
+
+<template>
+<h1>커뮤니티</h1>
+
+</template>
+
+<script lang="ts" setup>
+</script>
+
+<style scoped>
+</style>
