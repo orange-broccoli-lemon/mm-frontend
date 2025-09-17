@@ -97,7 +97,7 @@ export interface Watch{
 export const useAccountStore = defineStore('account', () => {
   const AUTH_API = `https://i13m105.p.ssafy.io/api/v1/auth`
   const USERS_API = `https://i13m105.p.ssafy.io/api/v1/users`
-  const FOLLOWS_API = `https://i13m105.p.ssafy.io/api/v1/follows/`
+  const FOLLOWS_API = `https://i13m105.p.ssafy.io/api/v1/persons`
   const MOVIE_API = `https://i13m105.p.ssafy.io/api/v1/movies`
 
 
@@ -248,26 +248,60 @@ export const useAccountStore = defineStore('account', () => {
   
   async function followUser(targetUserId: number) {
     if (!token.value) return
+    
     try {
-      const res = await axios.post(FOLLOWS_API, { following_id: targetUserId }, {
+      // 사용자 팔로우 API 엔드포인트 수정
+      const res = await axios.post(`${USERS_API}/${targetUserId}/follow`, {}, {
         headers: { Authorization: `Bearer ${token.value}`, 'Content-Type': 'application/json' }
       })
+      
+      // 팔로우 성공 후 현재 사용자 정보 새로고침
+      if (user.value?.user_id) {
+        await getUserInfo()
+      }
+      
       return res.data
     } catch (err: unknown) {
       const error = err as AxiosError
       console.error('팔로우 실패:', error.response?.data || error.message)
+      
+      // 401 오류 시 자동 로그아웃
+      if (error.response?.status === 401) {
+        console.log('토큰이 만료되었습니다. 자동 로그아웃합니다.')
+        logOut()
+        router.push('/login')
+      }
+      
+      throw error // 에러를 다시 던져서 호출하는 곳에서 처리할 수 있도록 함
     }
   }
 
   async function unFollowUser(targetUserId: number) {
     if (!token.value) return
     try {
-      await axios.delete(`${FOLLOWS_API}/${targetUserId}`, { 
+      // 사용자 언팔로우 API 엔드포인트 수정
+      await axios.delete(`${USERS_API}/${targetUserId}/follow`, { 
         headers: { Authorization: `Bearer ${token.value}` } 
       })
+      console.log('사용자 팔로우 취소 성공:', targetUserId)
+      
+      // 언팔로우 성공 후 현재 사용자 정보 새로고침
+      if (user.value?.user_id) {
+        await getUserInfo()
+      }
     } catch (err: unknown) {
       const error = err as AxiosError
       console.error('언팔로우 실패:', error.response?.data || error.message)
+      console.error('언팔로우 API URL:', `${USERS_API}/${targetUserId}/follow`)
+      
+      // 401 오류 시 자동 로그아웃
+      if (error.response?.status === 401) {
+        console.log('토큰이 만료되었습니다. 자동 로그아웃합니다.')
+        logOut()
+        router.push('/login')
+      }
+      
+      throw error // 에러를 다시 던져서 호출하는 곳에서 처리할 수 있도록 함
     }
   }
   async function getFollowers(targetUserId: number) {

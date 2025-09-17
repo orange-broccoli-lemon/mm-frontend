@@ -101,31 +101,46 @@
         </div>
 
         <!-- No Results -->
-        <div v-if="searchResults.movies.length === 0 && searchResults.actors.length === 0 && searchResults.users.length === 0 && searchQuery.length > 0" class="p-4 text-center text-gray-500">
-          <p class="text-sm">검색 결과가 없습니다</p>
+        <div v-if="searchResults.movies.length === 0 && searchResults.actors.length === 0 && searchResults.users.length === 0 && searchQuery.length > 0" class="p-6 text-center text-gray-500 dark:text-gray-400">
+          <div class="text-gray-400 dark:text-gray-500 mb-3">
+            <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+          </div>
+          <p class="text-sm font-medium">'{{ searchQuery }}'에 대한 검색 결과가 없습니다</p>
+          <p class="text-xs mt-1">다른 키워드로 검색해보세요</p>
         </div>
       </div>
 
       <!-- Quick Actions -->
       <div v-if="searchQuery.length === 0" class="p-3">
-        <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">빠른 검색</h4>
+        <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">빠른 검색</h4>
         <div class="space-y-1">
-          <div @click="goToSearchPage('movie')" class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <span class="text-blue-600 text-sm">🎬</span>
+          <div @click="goToSearchPage('movie')" class="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer">
+            <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+              <span class="text-blue-600 dark:text-blue-400 text-sm">🎬</span>
             </div>
             <div>
-              <p class="text-sm font-medium text-gray-900">영화 검색</p>
-              <p class="text-xs text-gray-500">인기 영화 찾기</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-100">영화 검색</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">인기 영화 찾기</p>
             </div>
           </div>
-          <div @click="goToSearchPage('actor')" class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
-            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-              <span class="text-green-600 text-sm">👤</span>
+          <div @click="goToSearchPage('actor')" class="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer">
+            <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+              <span class="text-green-600 dark:text-green-400 text-sm">👤</span>
             </div>
             <div>
-              <p class="text-sm font-medium text-gray-900">인물 검색</p>
-              <p class="text-xs text-gray-500">배우, 감독 찾기</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-100">배우 검색</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">배우, 감독 찾기</p>
+            </div>
+          </div>
+          <div @click="goToSearchPage('user')" class="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer">
+            <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+              <span class="text-purple-600 dark:text-purple-400 text-sm">👥</span>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-900 dark:text-gray-100">사용자 검색</p>
+              <p class="text-xs text-gray-500 dark:text-gray-400">친구, 팔로워 찾기</p>
             </div>
           </div>
         </div>
@@ -140,6 +155,7 @@ import { useRouter } from 'vue-router'
 import { useMovieStore } from '@/stores/movie'
 import { useActorStore } from '@/stores/actor'
 import { useAccountStore } from '@/stores/user'
+import axios from 'axios'
 
 const router = useRouter()
 const movieStore = useMovieStore()
@@ -175,16 +191,12 @@ const handleSearch = () => {
 
 // 실제 검색 수행
 const performSearch = async () => {
-  if (searchQuery.value.length < 2) return
+  if (searchQuery.value.length < 1) return
 
   isLoading.value = true
   try {
-    // 병렬로 모든 검색 수행
-    await Promise.all([
-      searchMovies(),
-      searchActors(),
-      searchUsers()
-    ])
+    // 통합 검색 API 사용
+    await searchAll()
   } catch (error) {
     console.error('검색 중 오류 발생:', error)
   } finally {
@@ -220,13 +232,85 @@ const searchActors = async () => {
   }
 }
 
-// 사용자 검색
-const searchUsers = async () => {
+// 통합 검색 (영화, 배우, 사용자)
+const searchAll = async () => {
   try {
-    // 사용자 검색 API가 있다면 사용, 없다면 빈 배열
+    console.log('통합 검색 시작:', searchQuery.value)
+    
+    // 통합 검색 API 호출
+    const searchUrl = `https://i13m105.p.ssafy.io/api/v1/search`
+    const searchParams = {
+      query: searchQuery.value,
+      language: 'ko-KR'
+    }
+    
+    console.log('검색 API 요청 URL:', searchUrl)
+    console.log('검색 파라미터:', searchParams)
+    
+    const response = await axios.get(searchUrl, {
+      params: searchParams,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    })
+    
+    console.log('통합 검색 응답:', response.data)
+    console.log('응답 상태:', response.status)
+    console.log('응답 헤더:', response.headers)
+    
+    // 응답 데이터 초기화
+    searchResults.value.movies = []
+    searchResults.value.actors = []
     searchResults.value.users = []
+    
+    // 결과를 타입별로 분류
+    if (response.data.results && Array.isArray(response.data.results)) {
+      response.data.results.forEach((item: any) => {
+        console.log('검색 결과 아이템:', item) // 디버깅용
+        
+        if (item.media_type === 'movie') {
+          // 영화 데이터 변환
+          searchResults.value.movies.push({
+            movie_id: item.id,
+            title: item.title,
+            poster_url: item.poster_path ? `https://image.tmdb.org/t/p/w500${item.poster_path}` : null,
+            overview: item.overview,
+            release_date: item.release_date,
+            vote_average: item.vote_average
+          })
+        } else if (item.media_type === 'person') {
+          // 인물 데이터 변환
+          searchResults.value.actors.push({
+            person_id: item.id,
+            name: item.name,
+            profile_image_url: item.profile_path ? `https://image.tmdb.org/t/p/w500${item.profile_path}` : null
+          })
+        } else if (item.user_id || (item.email && item.name && !item.media_type)) {
+          // 사용자 데이터 (user_id가 있거나, email과 name이 있고 media_type이 없으면 사용자)
+          searchResults.value.users.push({
+            user_id: item.user_id,
+            username: item.name,
+            email: item.email,
+            profile_image_url: item.profile_image_url,
+            is_active: item.is_active
+          })
+          console.log('사용자 검색 결과 추가:', item.name) // 디버깅용
+        }
+      })
+    }
+    
+    console.log('검색 결과 분류 완료:', {
+      movies: searchResults.value.movies.length,
+      actors: searchResults.value.actors.length,
+      users: searchResults.value.users.length
+    })
+    
   } catch (error) {
-    console.error('사용자 검색 실패:', error)
+    console.error('통합 검색 실패:', error)
+    // 에러 시 빈 배열로 초기화
+    searchResults.value.movies = []
+    searchResults.value.actors = []
     searchResults.value.users = []
   }
 }
@@ -254,8 +338,11 @@ const selectActor = (actor: any) => {
 
 // 사용자 선택
 const selectUser = (user: any) => {
-  // 사용자 프로필 페이지가 있다면 이동
   console.log('사용자 선택:', user)
+  // 사용자 프로필 페이지로 이동
+  if (user.user_id) {
+    router.push({ name: 'UserProfile', params: { userId: user.user_id } })
+  }
   showDropdown.value = false
   searchQuery.value = ''
 }

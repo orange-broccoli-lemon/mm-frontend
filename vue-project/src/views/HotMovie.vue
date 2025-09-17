@@ -4,10 +4,10 @@
     <div class="py-4 px-4">
       <div class="max-w-7xl mx-auto">
         <!-- Section Header -->
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2">
-            <!-- <span class="text-2xl">🔥</span> -->
-            <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-1 h-8 bg-gradient-to-b from-red-500 to-orange-500 rounded-full"></div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
               인기 영화
             </h1>
           </div>
@@ -20,9 +20,9 @@
         </div>
         
         <!-- Loading State -->
-        <div v-if="isLoading" class="flex justify-center items-center py-8">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
-          <span class="ml-2 text-gray-600 dark:text-gray-400">영화를 불러오는 중...</span>
+        <div v-if="isLoading" class="flex flex-col items-center justify-center py-12">
+          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-red-500"></div>
+          <span class="mt-3 text-sm font-medium text-gray-600 dark:text-gray-400">인기 영화를 불러오는 중...</span>
         </div>
         
         <!-- Movies Grid -->

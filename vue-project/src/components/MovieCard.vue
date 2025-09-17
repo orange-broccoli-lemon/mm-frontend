@@ -17,8 +17,8 @@ defineProps<{
     </div>
     
     <!-- Card Content -->
-    <div class="p-3">
-      <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 line-clamp-2 leading-tight">
+    <div class="p-4">
+      <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 line-clamp-2 leading-relaxed tracking-wide">
         {{ title }}
       </h3>
     </div>

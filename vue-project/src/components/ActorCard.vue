@@ -11,7 +11,7 @@
     />
     
     <!-- Actor Name -->
-    <h3 class="text-sm font-medium text-gray-900 dark:text-gray-100 mt-2 truncate max-w-30 text-center" :title="name">
+    <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mt-3 truncate max-w-30 text-center leading-relaxed tracking-wide" :title="name">
       {{ name }}
     </h3>
   </RouterLink>

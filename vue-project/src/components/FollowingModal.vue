@@ -38,7 +38,7 @@
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
               ]"
             >
-              팔로워 ({{ followers.length }})
+              팔로워 ({{ accountStore.user?.followers_count || followers.length }})
             </button>
             <button
               @click="activeTab = 'following'"
@@ -49,7 +49,7 @@
                   : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
               ]"
             >
-              팔로잉 ({{ following.length }})
+              팔로잉 ({{ accountStore.user?.following_count || following.length }})
             </button>
           </nav>
         </div>
@@ -69,35 +69,36 @@
             :key="follower.user_id"
             class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
           >
-            <!-- 프로필 이미지 -->
+            <!-- 프로필 이미지 (클릭 가능) -->
             <img
               :src="follower.profile_image_url || defaultProfileImage"
-              :alt="follower.name"
-              class="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-600"
+              :alt="follower.name || follower.username || '사용자'"
+              @click="goToUserProfile(follower.user_id)"
+              class="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-80 transition-opacity duration-200"
             />
             
             <!-- 사용자 정보 -->
             <div class="flex-1 min-w-0">
               <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                {{ follower.name }}
+                {{ follower.name || follower.username || '사용자' }}
               </h4>
               <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                {{ follower.email }}
+                {{ follower.email || '이메일 없음' }}
               </p>
             </div>
 
-            <!-- 팔로우 버튼 -->
+            <!-- 팔로우 버튼 (토글식) -->
             <button
               v-if="follower.user_id !== currentUserId"
               @click="toggleFollow(follower.user_id)"
               :class="[
                 'px-3 py-1 text-xs rounded-full font-medium transition-colors duration-200',
                 follower.is_following 
-                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
-                  : 'bg-gray-800 dark:bg-gray-600 text-white hover:bg-gray-900 dark:hover:bg-gray-500'
+                  ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-800'
+                  : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800'
               ]"
             >
-              {{ follower.is_following ? '팔로잉' : '팔로우' }}
+              {{ follower.is_following ? '팔로잉 취소' : '팔로우' }}
             </button>
           </div>
         </div>
@@ -105,6 +106,9 @@
           <div class="text-4xl mb-4">👥</div>
           <h4 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">팔로워가 없습니다</h4>
           <p class="text-gray-600 dark:text-gray-400 text-sm">아직 나를 팔로우하는 사용자가 없습니다.</p>
+          <p class="text-xs text-gray-500 dark:text-gray-500 mt-2">
+            (API 데이터: {{ followers.length }}개, 사용자 정보: {{ accountStore.user?.followers_count || 0 }}개)
+          </p>
         </div>
       </div>
 
@@ -116,20 +120,21 @@
             :key="user.user_id"
             class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
           >
-            <!-- 프로필 이미지 -->
+            <!-- 프로필 이미지 (클릭 가능) -->
             <img
               :src="user.profile_image_url || defaultProfileImage"
-              :alt="user.name"
-              class="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-600"
+              :alt="user.name || user.username || '사용자'"
+              @click="goToUserProfile(user.user_id)"
+              class="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-gray-600 cursor-pointer hover:opacity-80 transition-opacity duration-200"
             />
             
             <!-- 사용자 정보 -->
             <div class="flex-1 min-w-0">
               <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
-                {{ user.name }}
+                {{ user.name || user.username || '사용자' }}
               </h4>
               <p class="text-xs text-gray-500 dark:text-gray-400 truncate">
-                {{ user.email }}
+                {{ user.email || '이메일 없음' }}
               </p>
             </div>
 
@@ -137,9 +142,9 @@
             <button
               v-if="user.user_id !== currentUserId"
               @click="toggleFollow(user.user_id)"
-              class="px-3 py-1 text-xs rounded-full font-medium bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200"
+              class="px-3 py-1 text-xs rounded-full font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-800 transition-colors duration-200"
             >
-              팔로잉
+              팔로잉 취소
             </button>
           </div>
         </div>
@@ -147,6 +152,9 @@
           <div class="text-4xl mb-4">👤</div>
           <h4 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">팔로잉이 없습니다</h4>
           <p class="text-gray-600 dark:text-gray-400 text-sm">아직 팔로우하는 사용자가 없습니다.</p>
+          <p class="text-xs text-gray-500 dark:text-gray-500 mt-2">
+            (API 데이터: {{ following.length }}개, 사용자 정보: {{ accountStore.user?.following_count || 0 }}개)
+          </p>
         </div>
       </div>
     </div>
@@ -155,13 +163,15 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAccountStore } from '@/stores/user'
 import defaultProfileImage from '@/assets/spotti.png'
 
 interface User {
   user_id: number
-  name: string
-  email: string
+  name?: string
+  username?: string
+  email?: string
   profile_image_url?: string
   is_following?: boolean
 }
@@ -174,6 +184,7 @@ const emit = defineEmits<{
   close: []
 }>()
 
+const router = useRouter()
 const accountStore = useAccountStore()
 const activeTab = ref<'followers' | 'following'>('followers')
 const followers = ref<User[]>([])
@@ -184,12 +195,16 @@ const currentUserId = ref(accountStore.userId)
 // 모달이 열릴 때 데이터 로드
 watch(() => props.isOpen, async (isOpen) => {
   if (isOpen) {
+    // 먼저 사용자 정보를 새로고침하여 최신 팔로워/팔로잉 수를 가져옴
+    await accountStore.getUserInfo()
     await loadData()
   }
 })
 
 const loadData = async () => {
-  if (!accountStore.user?.user_id) return
+  if (!accountStore.user?.user_id) {
+    return
+  }
   
   loading.value = true
   try {
@@ -206,7 +221,24 @@ const loadData = async () => {
 const loadFollowers = async () => {
   try {
     const data = await accountStore.getFollowers(accountStore.user!.user_id)
-    followers.value = data || []
+    
+    // 데이터가 배열인지 확인하고 처리
+    if (Array.isArray(data)) {
+      followers.value = data
+    } else if (data && typeof data === 'object') {
+      // 객체인 경우 배열로 변환 시도
+      if (data.users && Array.isArray(data.users)) {
+        followers.value = data.users
+      } else if (data.followers && Array.isArray(data.followers)) {
+        followers.value = data.followers
+      } else if (data.results && Array.isArray(data.results)) {
+        followers.value = data.results
+      } else {
+        followers.value = []
+      }
+    } else {
+      followers.value = []
+    }
   } catch (error) {
     console.error('팔로워 로드 실패:', error)
     followers.value = []
@@ -215,9 +247,26 @@ const loadFollowers = async () => {
 
 const loadFollowing = async () => {
   try {
-    // 팔로잉 목록을 가져오는 API가 있다면 사용, 없다면 빈 배열
-    // 현재는 accountStore.user.following을 사용
-    following.value = accountStore.user?.following || []
+    // 팔로잉 목록을 API에서 직접 가져오기
+    const data = await accountStore.getFollowing(accountStore.user!.user_id)
+    
+    // 데이터가 배열인지 확인하고 처리
+    if (Array.isArray(data)) {
+      following.value = data
+    } else if (data && typeof data === 'object') {
+      // 객체인 경우 배열로 변환 시도
+      if (data.users && Array.isArray(data.users)) {
+        following.value = data.users
+      } else if (data.following && Array.isArray(data.following)) {
+        following.value = data.following
+      } else if (data.results && Array.isArray(data.results)) {
+        following.value = data.results
+      } else {
+        following.value = []
+      }
+    } else {
+      following.value = []
+    }
   } catch (error) {
     console.error('팔로잉 로드 실패:', error)
     following.value = []
@@ -226,6 +275,13 @@ const loadFollowing = async () => {
 
 const closeModal = () => {
   emit('close')
+}
+
+// 사용자 프로필 페이지로 이동
+const goToUserProfile = (userId: number) => {
+  // 모달을 닫고 사용자 프로필 페이지로 이동
+  closeModal()
+  router.push({ name: 'UserProfile', params: { userId: userId.toString() } })
 }
 
 const toggleFollow = async (targetUserId: number) => {
@@ -241,10 +297,17 @@ const toggleFollow = async (targetUserId: number) => {
         await accountStore.followUser(targetUserId)
         follower.is_following = true
       }
+      
+      // 팔로우/언팔로우 후 사용자 정보 새로고침
+      await accountStore.getUserInfo()
+      await loadFollowing()
     } else {
       // 팔로잉 탭에서는 언팔로우만 가능
       await accountStore.unFollowUser(targetUserId)
       following.value = following.value.filter(u => u.user_id !== targetUserId)
+      
+      // 언팔로우 후 사용자 정보 새로고침
+      await accountStore.getUserInfo()
     }
   } catch (error) {
     console.error('팔로우 토글 실패:', error)

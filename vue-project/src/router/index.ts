@@ -73,6 +73,11 @@ const router = createRouter({
       name: 'ActorDetail',
       component: () => import('@/views/ActorDetailView.vue'),
     },
+    {
+      path: '/user/:userId',
+      name: 'UserProfile',
+      component: () => import('@/views/UserProfileView.vue'),
+    },
 
     {
       path: '/community',
