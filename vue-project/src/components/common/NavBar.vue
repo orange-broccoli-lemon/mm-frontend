@@ -76,14 +76,14 @@ const logOut = () => {
 
 const handleThemeToggle = () => {
   console.log('🔄 테마 토글 버튼 클릭')
-  console.log('🌙 토글 전 다크모드 상태:', themeStore.isDark.value)
+  console.log('🌙 토글 전 다크모드 상태:', themeStore.isDark.valueOf)
   console.log('📄 HTML 클래스 (토글 전):', document.documentElement.className)
   
   themeStore.toggleDark()
   
   // 토글 후 상태 확인 (약간의 지연 후)
   setTimeout(() => {
-    console.log('🌙 토글 후 다크모드 상태:', themeStore.isDark.value)
+    console.log('🌙 토글 후 다크모드 상태:', themeStore.isDark.valueOf)
     console.log('📄 HTML 클래스 (토글 후):', document.documentElement.className)
     console.log('💾 localStorage 테마 설정:', localStorage.getItem('theme-preference'))
   }, 100)
