@@ -66,36 +66,73 @@ export const useActorStore = defineStore('actor', () => {
   }
 
   const actorList = ref<ActorSummary[]>([])
+  const error = ref<string | null>(null)
+  
   const allActors = async function(){
     try {
+      error.value = null
       const res = await axios.get(`${BASE_API}/`);
       actorList.value = res.data;
-    } catch (error) {
-      console.error('Error fetching actors:', error);
+      console.log('배우 목록 로드 성공:', res.data.length, '명')
+    } catch (err) {
+      const axiosError = err as AxiosError
+      console.error('Error fetching actors:', axiosError);
+      
+      if (axiosError.code === 'ERR_NETWORK' || axiosError.response?.status === 502) {
+        error.value = '서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.'
+      } else if (axiosError.response?.status === 404) {
+        error.value = '배우 정보를 찾을 수 없습니다.'
+      } else {
+        error.value = '배우 목록을 불러오는 중 오류가 발생했습니다.'
+      }
+      
+      // 빈 배열로 초기화하여 이전 데이터가 남아있지 않도록 함
+      actorList.value = []
     }
   }
 
   // 배우 검색 함수
   const searchActors = async (query: string) => {
+    console.log('배우 검색 시작:', query)
+    
+    // 먼저 로컬 데이터에서 검색 시도
     try {
-      console.log('배우 검색 시작:', query)
-      const res = await axios.get(`${BASE_API}/search?q=${encodeURIComponent(query)}`);
-      console.log('배우 검색 결과:', res.data)
-      return res.data || [];
-    } catch (error) {
-      console.error('배우 검색 실패:', error);
-      // 검색 API가 없다면 전체 배우 목록에서 필터링
-      try {
+      // 이미 로드된 데이터가 있으면 사용, 없으면 새로 로드
+      if (actorList.value.length === 0) {
+        console.log('배우 목록이 비어있음, 전체 목록 로드 시도')
         await allActors();
+      }
+      
+      // 로컬 데이터가 있으면 필터링
+      if (actorList.value.length > 0) {
         const filtered = actorList.value.filter(actor =>
           actor.name.toLowerCase().includes(query.toLowerCase())
         );
         console.log('로컬 필터링 결과:', filtered)
         return filtered;
-      } catch (fallbackError) {
-        console.error('배우 목록 로드 실패:', fallbackError);
-        return [];
       }
+    } catch (localError) {
+      console.error('로컬 필터링 실패:', localError);
+    }
+    
+    // 로컬 필터링이 실패하면 API 검색 시도
+    try {
+      console.log('API 검색 시도')
+      const res = await axios.get(`${BASE_API}/search?q=${encodeURIComponent(query)}`);
+      console.log('배우 검색 결과:', res.data)
+      return res.data || [];
+    } catch (error) {
+      const axiosError = error as AxiosError
+      console.error('API 검색 실패:', axiosError);
+      
+      // 422 오류는 검색 API가 지원하지 않는 형식
+      if (axiosError.response?.status === 422) {
+        console.log('검색 API가 해당 쿼리를 지원하지 않음')
+      }
+      
+      // 모든 방법이 실패하면 빈 배열 반환
+      console.log('모든 검색 방법 실패, 빈 결과 반환')
+      return [];
     }
   }
 
@@ -107,6 +144,7 @@ export const useActorStore = defineStore('actor', () => {
     loading, 
     currentActorId,
     clearActorDetails,
-    searchActors
+    searchActors,
+    error
   }
 })
