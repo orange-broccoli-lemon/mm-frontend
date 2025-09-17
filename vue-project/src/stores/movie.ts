@@ -47,6 +47,7 @@ export const useMovieStore = defineStore('counter', () => {
   const BASE_API = `https://i13m105.p.ssafy.io/api/`
   const movieList = ref<MovieList[]>([])
   const popularMovies = ref<MovieList[]>([])
+  const isPopularMoviesLoaded = ref(false)
 
   const detailMovie = async (moviePk: number) => {
     try {
@@ -76,9 +77,17 @@ export const useMovieStore = defineStore('counter', () => {
   }
 
   const fetchPopularMovies = async function() {
+    // 이미 로드된 데이터가 있으면 API 호출하지 않음
+    if (isPopularMoviesLoaded.value && popularMovies.value.length > 0) {
+      console.log('인기 영화 데이터가 이미 로드됨, API 호출 생략')
+      return
+    }
+
     try {
+      console.log('인기 영화 API 호출 시작...')
       const res = await axios.get<MovieList[]>(`${BASE_API}/v1/movies/popular`)
       popularMovies.value = res.data ?? []
+      isPopularMoviesLoaded.value = true
       console.log('popular movies:', res.data)
       
       // 포스터 URL 디버깅
@@ -134,5 +143,5 @@ export const useMovieStore = defineStore('counter', () => {
     }
   }
 
-  return { allMovies, movieList, detailMovie, popularMovies, fetchPopularMovies, fetchMovieComments }
+  return { allMovies, movieList, detailMovie, popularMovies, fetchPopularMovies, fetchMovieComments, isPopularMoviesLoaded }
 })
