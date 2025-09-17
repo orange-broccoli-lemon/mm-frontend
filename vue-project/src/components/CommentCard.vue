@@ -1,8 +1,43 @@
 <template>
   <div
-    class="comment-card bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 hover:shadow-lg transition-all duration-300 hover:-translate-y-2 overflow-hidden cursor-pointer h-80 flex flex-col"
+    class="comment-card relative bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-600 hover:shadow-lg transition-all duration-300 hover:-translate-y-2 cursor-pointer h-80 flex flex-col"
     @click="goToMovieDetail"
   >
+    <!-- ⋯ 버튼 -->
+    <div class="absolute top-2 right-2 z-20">
+      <button
+        @click.stop="toggleMenu"
+        class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+      >
+        ⋯
+      </button>
+
+      <!-- 드롭다운 메뉴 -->
+      <div
+        v-if="showMenu"
+        class="absolute right-0 mt-2 w-28 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-30"
+      >
+        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
+          <li>
+            <button
+              @click.stop="goToUpdate"
+              class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+            >
+              수정
+            </button>
+          </li>
+          <li>
+            <button
+              @click.stop="deleteReview"
+              class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+            >
+              삭제
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+
     <!-- Top Image Section -->
     <div class="relative h-40 overflow-hidden border-b border-gray-200 dark:border-gray-600 flex-shrink-0">
       <img
@@ -12,8 +47,8 @@
       />
       <!-- Gradient Overlay -->
       <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-      
-      <!-- Movie Title Overlay (하단 중앙) -->
+
+      <!-- Movie Title Overlay -->
       <div class="absolute bottom-0 left-0 right-0 p-3">
         <h3 class="text-white font-bold text-sm text-center drop-shadow-lg line-clamp-2">
           {{ movietitle }}
@@ -27,7 +62,7 @@
       <div class="mb-2 flex-shrink-0">
         <p class="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{{ name }}</p>
       </div>
-      
+
       <!-- Comment Content -->
       <div class="comment-content-wrapper flex-1 mb-3 min-h-0">
         <p
@@ -37,16 +72,19 @@
           {{ content }}
         </p>
       </div>
-      
+
       <!-- Rating Section -->
       <div class="flex items-center justify-between flex-shrink-0">
         <div class="flex items-center gap-1">
           <div class="flex">
-            <span class="text-yellow-400 text-sm">⭐</span>
-            <span class="text-yellow-400 text-sm">⭐</span>
-            <span class="text-yellow-400 text-sm">⭐</span>
-            <span class="text-yellow-400 text-sm">⭐</span>
-            <span class="text-yellow-400 text-sm">⭐</span>
+            <template v-for="i in 5" :key="i">
+              <span
+                :class="i <= Math.ceil(rating/2) ? 'text-yellow-400' : 'text-gray-300'"
+                class="text-sm"
+              >
+                ⭐
+              </span>
+            </template>
           </div>
         </div>
         <span class="text-xs text-gray-500 dark:text-gray-400">리뷰</span>
@@ -60,43 +98,49 @@ import { onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import fitty from 'fitty'
 import spottiImage from '@/assets/spotti.png'
+import { useThreadStore } from '@/stores/thread'
+
+const commentStore = useThreadStore()
 
 const props = defineProps<{
+  comment_id: number
+  movie_id: number
   profileImage: string
   content: string
   name: string
   movietitle: string
   movie_poster_url: string
-  movie_id: number
+  rating: number 
 }>()
-
-const contentRef = ref<HTMLElement>()
 const router = useRouter()
+const contentRef = ref<HTMLElement>()
+
+// 메뉴 상태
+const showMenu = ref(false)
+const toggleMenu = () => (showMenu.value = !showMenu.value)
 
 // 영화 디테일 페이지로 이동
 const goToMovieDetail = () => {
-  console.log('영화 디테일 페이지로 이동:', props.movie_id)
   router.push({
-    name: 'BookDetail',
+    name: 'BookDetail', // 실제 라우터 이름 맞게 수정
     params: { id: props.movie_id }
   })
 }
 
-// 디버깅을 위한 로그
-onMounted(() => {
-  console.log('=== CommentCard 디버깅 ===')
-  console.log('전체 props:', props)
-  console.log('movie_poster_url:', props.movie_poster_url)
-  console.log('movie_poster_url 타입:', typeof props.movie_poster_url)
-  console.log('movie_poster_url 길이:', props.movie_poster_url?.length)
-  console.log('movie_poster_url이 null인가:', props.movie_poster_url === null)
-  console.log('movie_poster_url이 undefined인가:', props.movie_poster_url === undefined)
-  console.log('movie_poster_url이 빈 문자열인가:', props.movie_poster_url === '')
-  console.log('spottiImage:', spottiImage)
-  console.log('최종 사용될 이미지 URL:', props.movie_poster_url || spottiImage)
-  console.log('========================')
-})
+// 수정 버튼 → /update-review/:id 이동
+const goToUpdate = () => {
+  router.push(`/update-review/${props.comment_id}`)
+  showMenu.value = false
+}
 
+// 삭제 버튼 클릭
+const deleteReview = () => {
+  showMenu.value = false
+  commentStore.deleteComment(props.comment_id)
+  window.location.reload()
+}
+
+// fitty 적용
 const applyFitty = () => {
   if (contentRef.value) {
     fitty(contentRef.value, {
@@ -109,6 +153,9 @@ const applyFitty = () => {
 
 onMounted(applyFitty)
 watch(() => props.content, applyFitty)
+
+// rating을 local state로 저장
+const rating = ref(props.rating || 0)
 </script>
 
 <style scoped>
@@ -158,4 +205,3 @@ watch(() => props.content, applyFitty)
   text-overflow: ellipsis;
 }
 </style>
-

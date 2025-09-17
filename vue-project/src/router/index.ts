@@ -48,6 +48,11 @@ const router = createRouter({
       component: () => import('@/views/CreateThread.vue'),
     },
     {
+      path: '/update-review/:id',
+      name: 'UpdateReview',
+      component: () => import('@/views/UpdateThread.vue'),
+    },
+    {
       path: '/search',
       name: 'SearchResults',
       component: () => import('@/views/SearchResults.vue'),

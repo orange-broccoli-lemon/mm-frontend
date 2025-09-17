@@ -109,12 +109,14 @@ onMounted(async () => {
             <CommentCard
               v-for="comment in (showAllComments ? accountStore.commentList ?? [] : (accountStore.commentList ?? []).slice(0, 4))"
               :key="comment.comment_id"
+              :comment_id="comment.comment_id"
               :profileImage="accountStore.user.profile_image_url || defaultProfileImage"
               :content="comment.content"
               :name="accountStore.user?.name || '이름 없음'"
               :movietitle="comment.movie_title"
               :movie_poster_url="comment.movie_poster_url"
               :movie_id="comment.movie_id"
+              :rating="Number(comment.rating) || 0"
             />
           </div>
         </div>
