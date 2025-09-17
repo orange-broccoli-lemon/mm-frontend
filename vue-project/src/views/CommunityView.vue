@@ -44,3 +44,13 @@ const goToCreateThread = () => {
 .thread-info { display: flex; align-items: center; gap: 0.5rem; }
 .thread-user { font-size: 0.9rem; color: #555; }
 </style> -->
+<template>
+<h1>커뮤니티</h1>
+
+</template>
+
+<script lang="ts" setup>
+</script>
+
+<style scoped>
+</style>
