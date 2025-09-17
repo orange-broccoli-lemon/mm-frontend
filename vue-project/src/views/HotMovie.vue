@@ -19,8 +19,14 @@
           </RouterLink>
         </div>
         
+        <!-- Loading State -->
+        <div v-if="isLoading" class="flex justify-center items-center py-8">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+          <span class="ml-2 text-gray-600 dark:text-gray-400">영화를 불러오는 중...</span>
+        </div>
+        
         <!-- Movies Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           <RouterLink
             v-for="(movie, index) in movieStore.popularMovies.slice(0,5)"
             :key="index"
@@ -40,15 +46,20 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue"
+import { ref, onMounted } from "vue"
 import { useMovieStore } from "../stores/movie"
 import MovieCard from "../components/MovieCard.vue"
 import { RouterLink } from "vue-router"
 
 const movieStore = useMovieStore()
+const isLoading = ref(true)
 
-onMounted(() => {
-  movieStore.fetchPopularMovies()
+onMounted(async () => {
+  try {
+    await movieStore.fetchPopularMovies()
+  } finally {
+    isLoading.value = false
+  }
 })
 
 </script>
