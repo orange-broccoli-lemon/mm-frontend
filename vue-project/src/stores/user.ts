@@ -130,6 +130,59 @@ export const useAccountStore = defineStore('account', () => {
     }
   }
 
+ async function googleLogin(idToken: string) {
+    try {
+      console.log('Google 로그인 시작 - ID Token:', idToken.substring(0, 50) + '...')
+      
+      const res = await axios.post(`${AUTH_API}/login/google`, 
+        { id_token: idToken }, // 백엔드에서 요구하는 id_token 형태로 전송
+        {
+          headers: { 
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          }
+        }
+      )
+      
+      console.log('구글 로그인 응답 데이터:', res.data)
+      console.log('구글 로그인 성공!')
+
+      const receivedToken = res.data?.access_token
+      const receivedUser = res.data?.user
+      const receivedUserId = receivedUser?.user_id
+
+      if (!receivedToken || !receivedUserId) {
+        throw new Error('응답에 토큰 또는 사용자 ID가 없습니다.')
+      }
+
+      // 토큰과 사용자 정보 저장
+      token.value = receivedToken
+      userId.value = receivedUserId
+      user.value = receivedUser // 백엔드에서 받은 사용자 정보 저장
+      localStorage.setItem('token', receivedToken)
+      localStorage.setItem('userId', JSON.stringify(receivedUserId))
+
+      console.log('사용자 정보 저장 완료:', receivedUser)
+      router.push('/')
+      return { success: true, data: receivedUser }
+    } catch (err: unknown) {
+      const error = err as AxiosError
+      console.error('구글 로그인 실패:', error.response?.data || error.message)
+      
+      // 백엔드에서 받은 에러 메시지 처리
+      let errorMessage = 'Google 로그인에 실패했습니다.'
+      if (error.response?.data) {
+        if (typeof error.response.data === 'string') {
+          errorMessage = error.response.data
+        } else if (error.response.data && typeof error.response.data === 'object' && 'detail' in error.response.data) {
+          errorMessage = (error.response.data as any).detail
+        }
+      }
+      
+      logOut() // 실패 시 정리
+      return { success: false, error: errorMessage }
+    }
+  }
 
   async function login(userData: { email: string; password: string }) {
     try {
@@ -307,7 +360,8 @@ const likeList = async (user_id:number) => {
     watchList,
     likeList,
     like_list,
-    watch_list
+    watch_list,
+    googleLogin
 
   }
 })
