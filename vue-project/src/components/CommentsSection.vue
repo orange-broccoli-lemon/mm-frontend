@@ -6,7 +6,6 @@
 
       <!-- 스포일러 토글 -->
       <div class="ml-4 flex items-center gap-2 text-sm">
-        <span class="text-gray-600 dark:text-gray-300"></span>
         <button 
           @click="$emit('toggleSpoilers')"
           :class="[
@@ -26,17 +25,25 @@
       </div>
     </div>
 
+    <!-- 로딩 -->
     <div v-if="isLoading" class="loading">
       <p>리뷰를 불러오는 중...</p>
     </div>
 
+    <!-- 댓글 없음 -->
     <div v-else-if="comments.length === 0" class="no-comments">
       <p>아직 등록된 리뷰가 없습니다.</p>
       <p>첫 번째 리뷰를 작성해보세요!</p>
     </div>
 
+    <!-- 댓글 리스트 -->
     <div v-else class="comments-grid">
-      <div v-for="comment in comments" :key="comment.comment_id" class="comment-item">
+      <div
+        v-for="comment in comments"
+        :key="comment.comment_id"
+        class="comment-item"
+      >
+        <!-- 헤더 -->
         <div class="comment-header">
           <img :src="getProfileImageUrl(comment.user_profile_image)" :alt="comment.user_name" class="user-avatar" />
           <div class="user-info">
@@ -48,23 +55,43 @@
           </div>
         </div>
 
+        <!-- 내용 -->
         <div class="comment-content">
-          <p v-if="comment.is_spoiler" class="spoiler-warning">
+         <p
+          class="comment-text clamped"
+          :class="{
+            expanded: expandedComments.includes(comment.comment_id),
+            spoiler: comment.is_spoiler
+          }"
+          :title="comment.content"
+          :ref="(el: any) => setContentRef(comment.comment_id, el)"
+        >
+          <template v-if="comment.is_spoiler">
             ⚠️ {{ comment.content }}
-          </p>
-          <p class="comment-text" :title="comment.content"> {{ comment.content }}</p>
+          </template>
+          <template v-else>
+            {{ comment.content }}
+          </template>
+        </p>
         </div>
 
+        <!-- 푸터 -->
         <div class="comment-footer">
-          <div class="comment-stats">
-            <span 
-              class="likes" 
-              :class="{ 'liked': comment.is_liked }"
-              @click="$emit('commentLikeToggle', comment)"
-            >
-              👍 {{ comment.likes_count }}
-            </span>
-          </div>
+          <span 
+            class="likes" 
+            :class="{ 'liked': comment.is_liked }"
+            @click="$emit('commentLikeToggle', comment)"
+          >
+            👍 {{ comment.likes_count }}
+          </span>
+
+          <button
+            v-if="needsMoreMap[comment.comment_id]"
+            @click="toggleExpand(comment.comment_id)"
+            class="more-btn"
+          >
+            {{ expandedComments.includes(comment.comment_id) ? '접기' : '더보기' }}
+          </button>
         </div>
       </div>
     </div>
@@ -72,58 +99,124 @@
 </template>
 
 <script setup lang="ts">
-import type { MovieComment } from "@/stores/movie"
+import { ref, onMounted, onUpdated, nextTick, onUnmounted, watch } from 'vue'
+import type { MovieComment } from '@/stores/movie'
 import defaultImage from '@/assets/spotti.png'
 
-interface Props {
+/** Props / Emits */
+const props = defineProps<{
   comments: MovieComment[]
   showSpoilers: boolean
   isLoading: boolean
-}
-
-defineProps<Props>()
+}>()
 
 defineEmits<{
   toggleSpoilers: []
   commentLikeToggle: [comment: MovieComment]
 }>()
 
-// 프로필 이미지 URL을 절대 경로로 변환
-const getProfileImageUrl = (url?: string) => {
-  if (!url) return defaultImage
-  
-  // 이미 절대 URL인 경우 (http:// 또는 https://로 시작)
-  if (url.startsWith('http://') || url.startsWith('https://')) {
-    return url
+/** 펼침 상태 */
+const expandedComments = ref<number[]>([])
+
+/** ref 저장소 (id -> HTMLElement) */
+const contentRefMap = ref<Record<number, HTMLElement>>({})
+
+/** ref 설정 함수 */
+const setContentRef = (id: number, el: any) => {
+  if (el instanceof HTMLElement) {
+    contentRefMap.value[id] = el
+  } else {
+    delete contentRefMap.value[id]
   }
-  
-  // 상대 경로인 경우 서버 주소 추가
-  const baseUrl = 'https://i13m105.p.ssafy.io'
-  return `${baseUrl}${url}`
 }
 
-// 날짜 포맷팅
+/** 1줄 초과 여부 */
+const needsMoreMap = ref<Record<number, boolean>>({})
+
+/** 더보기/접기 토글 */
+const toggleExpand = (id: number) => {
+  if (expandedComments.value.includes(id)) {
+    expandedComments.value = expandedComments.value.filter(c => c !== id)
+  } else {
+    expandedComments.value.push(id)
+  }
+}
+
+/** 이미지 경로 */
+const getProfileImageUrl = (url?: string) => {
+  if (!url) return defaultImage
+  if (url.startsWith('http://') || url.startsWith('https://')) return url
+  return `https://i13m105.p.ssafy.io${url}`
+}
+
+/** 날짜 포맷 */
 const formatDate = (dateString: string) => {
   if (!dateString) return '날짜 없음'
   const date = new Date(dateString)
   if (isNaN(date.getTime())) return '날짜 오류'
-  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'short', day: 'numeric' })
+  return date.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' })
 }
+
+/** 1줄 초과 체크 */
+const measureAll = () => {
+  const next: Record<number, boolean> = {}
+  Object.entries(contentRefMap.value).forEach(([idStr, el]) => {
+    const id = Number(idStr)
+    const computed = getComputedStyle(el)
+    const lineHeight = parseFloat(computed.lineHeight) || 20
+    const oneLine = lineHeight
+
+    // clamp 해제하고 전체 높이 확인
+    const prevDisplay = el.style.display
+    const prevClamp = (el.style as any).webkitLineClamp
+    const prevOverflow = el.style.overflow
+
+    el.style.display = 'block'
+    ;(el.style as any).webkitLineClamp = 'unset'
+    el.style.overflow = 'visible'
+
+    const fullHeight = el.scrollHeight
+
+    // 원복
+    el.style.display = prevDisplay
+    ;(el.style as any).webkitLineClamp = prevClamp
+    el.style.overflow = prevOverflow
+
+    next[id] = fullHeight > oneLine + 1
+  })
+  needsMoreMap.value = next
+}
+
+/** 디바운스 */
+const debounced = (fn: () => void, wait = 120) => {
+  let t: number | undefined
+  return () => {
+    if (t) window.clearTimeout(t)
+    t = window.setTimeout(fn, wait)
+  }
+}
+const measureAllDebounced = debounced(() => measureAll())
+
+/** 라이프사이클 */
+onMounted(async () => {
+  await nextTick()
+  measureAll()
+  window.addEventListener('resize', measureAllDebounced)
+})
+onUpdated(() => measureAllDebounced())
+onUnmounted(() => window.removeEventListener('resize', measureAllDebounced))
+
+watch(() => props.comments, async () => {
+  await nextTick()
+  measureAll()
+}, { deep: true })
 </script>
 
 <style scoped>
-/* 댓글 섹션 스타일 */
 .comments-section {
   max-width: 1380px;
   margin: 40px auto 0;
   padding: 0 20px 40px;
-  background-color: #ffffff;
-  color: #111827;
-}
-
-.dark .comments-section {
-  background-color: #111827;
-  color: white;
 }
 
 .comments-header {
@@ -133,103 +226,39 @@ const formatDate = (dateString: string) => {
   margin-bottom: 24px;
   padding-bottom: 16px;
   border-bottom: 2px solid #e5e7eb;
-  color: #111827;
 }
 
-.dark .comments-header {
-  border-bottom: 2px solid #374151;
-  color: white;
-}
-
-.comments-header h2 {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin: 0;
-}
-
-.comments-count {
-  font-size: 1rem;
-  padding: 6px 12px;
-  border-radius: 20px;
-}
-
-/* 로딩 스타일 */
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid;
-  border-top: 4px solid;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* 댓글 없음 스타일 */
-.no-comments {
+.loading, .no-comments {
   text-align: center;
   padding: 60px 20px;
 }
 
-.no-comments p {
-  margin: 8px 0;
-  font-size: 1.1rem;
-}
-
-/* 댓글 그리드 */
+/* 🔥 Masonry 레이아웃 */
 .comments-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 20px;
+  column-count: 3;     /* 기본 3열 */
+  column-gap: 20px;    /* 열 간격 */
   margin-top: 20px;
 }
 
-/* 댓글 아이템 */
 .comment-item {
+  display: inline-block;     /* column 안에서 블록처럼 */
+  width: 100%;
+  margin-bottom: 20px;       /* 카드 사이 간격 */
+  break-inside: avoid;       /* 카드가 쪼개져서 다른 열로 넘어가지 않도록 */
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 20px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  height: 200px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  color: #111827;
 }
 
-.dark .comment-item {
-  border: 1px solid #374151;
-  background-color: #1f2937;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  color: white;
-}
-
-.comment-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-}
-
-/* 댓글 헤더 */
 .comment-header {
   display: flex;
   align-items: center;
   gap: 12px;
   margin-bottom: 12px;
-  flex-shrink: 0;
 }
 
 .user-avatar {
@@ -237,174 +266,86 @@ const formatDate = (dateString: string) => {
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid;
-}
-
-.user-info h4 {
-  margin: 0 0 4px 0;
-  font-size: 1rem;
-  font-weight: 600;
 }
 
 .comment-meta {
   display: flex;
-  align-items: center;
   gap: 12px;
   font-size: 0.85rem;
+  color: #6b7280;
 }
 
-.rating {
-  font-weight: 500;
-}
-
-/* 댓글 내용 */
 .comment-content {
-  flex: 1;
-  min-height: 0;       /* flex 안에서 스크롤 가능하려면 필요 */
-  overflow-y: auto;    /* ✅ 스크롤 허용 */
-  padding-right: 6px;  /* 스크롤바와 텍스트 간격 */
-}
-
-
-.spoiler-warning {
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  margin-bottom: 12px;
-  border-left: 4px solid #3b82f6;
-  background-color: #dbeafe;
-  color: #1e40af;
-}
-
-.dark .spoiler-warning {
-  background-color: #1e3a8a;
-  color: #93c5fd;
-  border-left-color: #60a5fa;
+  padding-right: 4px;
 }
 
 .comment-text {
   line-height: 1.6;
-  margin: 0;
   font-size: 0.95rem;
+}
 
-  /* ✅ 기존 잘림 처리 제거 */
-  display: block;
+/* 기본 1줄 표시 */
+.comment-text.clamped {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 펼친 경우 전체 표시 */
+.comment-text.expanded {
   -webkit-line-clamp: unset;
   line-clamp: unset;
-  -webkit-box-orient: unset;
-  text-overflow: unset;
-  overflow: visible;
+  display: block;
 }
-/* 댓글 푸터 */
+
+/* 스포일러 스타일 */
+.comment-text.spoiler {
+  /* padding: 8px 12px; */
+  border-left: 4px solid #3b82f6;
+  background-color: #dbeafe;
+  color: #1e40af;
+  border-radius: 6px;
+}
+
 .comment-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-between; /* 👍 왼쪽: 좋아요, 오른쪽: 더보기 */
   align-items: center;
-  padding-top: 12px;
+  padding-top: 10px;
   border-top: 1px solid #e5e7eb;
-  flex-shrink: 0;
-  margin-top: auto;
-}
-
-.dark .comment-footer {
-  border-top: 1px solid #374151;
-}
-
-.comment-stats {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  margin-top: 10px;
 }
 
 .likes {
   font-size: 0.9rem;
-  font-weight: 500;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  opacity: 0.7;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
 }
 
-.likes:hover {
-  opacity: 1;
-  transform: scale(1.05);
+.more-btn {
+  font-size: 0.85rem;
+  color: #3b82f6;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.more-btn:hover {
+  text-decoration: underline;
 }
 
-.likes.liked {
-  opacity: 1;
-  background-color: #dbeafe;
-  color: #1e40af;
-  transform: scale(1.1);
-}
-
-.dark .likes.liked {
-  background-color: #1e3a8a;
-  color: #93c5fd;
-}
-
-/* 반응형 디자인 */
-@media (max-width: 768px) {
-  .comments-section {
-    padding: 0 16px 40px;
-  }
-  
-  .comments-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-  
-  .comments-header h2 {
-    font-size: 1.5rem;
-  }
-  
+/* 🔥 반응형: 열 개수 줄이기 */
+@media (max-width: 1024px) {
   .comments-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
+    column-count: 2;
   }
-  
-  .comment-item {
-    padding: 16px;
-    height: 180px;
-  }
-  
-  .comment-header {
-    gap: 10px;
-  }
-  
-  .user-avatar {
-    width: 36px;
-    height: 36px;
+}
+@media (max-width: 640px) {
+  .comments-grid {
+    column-count: 1;
   }
 }
 
-@media (max-width: 480px) {
-  .comments-section {
-    padding: 0 12px 40px;
-  }
-  
-  .comment-item {
-    padding: 12px;
-    height: 160px;
-  }
-  
-  .comment-meta {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-  }
-}
 
-/* 다크모드 전용 배경색 강제 설정 */
-.dark .comments-section {
-  background-color: #111827 !important;
-}
-
-.dark .comment-item {
-  background-color: #1f2937 !important;
-}
 </style>
