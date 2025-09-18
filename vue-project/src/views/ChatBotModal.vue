@@ -1,22 +1,21 @@
 <template>
-  <div
-    v-if="isOpen"
-    class="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
-    @click.self="closeModal"
-  >
-    <div class="bg-white dark:bg-gray-800 w-[500px] h-[650px] rounded-2xl shadow-xl flex flex-col">
+  <div v-if="isOpen" class="fixed bottom-6 right-6 z-50">
+    <!-- 확장 가능한 챗봇 패널 -->
+    <div 
+      class="bg-white dark:bg-gray-800 w-[400px] h-[600px] rounded-2xl shadow-xl flex flex-col overflow-hidden transition-all duration-300 ease-in-out"
+    >
       <!-- 헤더 -->
-      <div
-        class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700"
-      >
+      <div class="flex items-center justify-between px-4 py-3 border-b border-gray-200 dark:border-gray-700">
         <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
           스포띠파이 챗봇
         </h2>
         <button
-          @click="closeModal"
-          class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
+          @click="emit('close')"
+          class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 cursor-pointer p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200"
         >
-          ✖
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+          </svg>
         </button>
       </div>
 
@@ -63,7 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, nextTick } from 'vue'
+import { ref, nextTick, onMounted, onUnmounted, watch } from 'vue'
 import { useBotStore } from '@/stores/bot'
 
 const props = defineProps<{
@@ -80,8 +79,6 @@ const input = ref('')
 const messages = ref<{ sender: 'user' | 'bot'; text: string }[]>([])
 
 const chatContainer = ref<HTMLDivElement>()
-
-const closeModal = () => emit('close')
 
 const sendMessage = async () => {
   if (!input.value.trim()) return
