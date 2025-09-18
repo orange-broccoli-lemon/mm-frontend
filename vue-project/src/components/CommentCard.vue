@@ -4,7 +4,7 @@
     @click="goToMovieDetail"
   >
     <!-- ⋯ 버튼 -->
-    <div class="absolute top-2 right-2 z-20">
+    <div class="absolute top-2 right-2 z-20" v-if = "lastPathSegment === 'mypage'">
      <button
   @click.stop="toggleMenu"
   class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
@@ -94,13 +94,13 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter , useRoute} from 'vue-router'
 import fitty from 'fitty'
 import spottiImage from '@/assets/spotti.png'
 import { useThreadStore } from '@/stores/thread'
-
+const route = useRoute()
 const commentStore = useThreadStore()
-
+const lastPathSegment = route.fullPath.split('/').pop()
 const props = defineProps<{
   comment_id: number
   movie_id: number
