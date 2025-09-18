@@ -297,7 +297,7 @@ const goToUserProfile = (userId: number) => {
       router.push('/mypage')
   }
   else{
-    router.push({ name: 'UserProfile', params: { userId: userId.toString() } })
+    router.push({ name: 'user-profile', params: { userId: userId.toString() } })
   }
 }
 

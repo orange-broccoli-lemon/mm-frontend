@@ -12,7 +12,7 @@
             </h1>
           </div>
           <RouterLink 
-            :to="{ name: 'CategoryAll'}"
+            :to="{ name: 'category-all'}"
             class="text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
           >
             <span class="text-red-500 hover:text-red-600 text-xl font-bold group-hover:rotate-90 transition-all duration-300">+</span>
@@ -66,7 +66,7 @@ const displayGenres = computed(() => categoryStore.popularGenres.slice(0, 5))
 
 // 버튼 클릭 시 해당 장르 디테일 페이지로 이동
 const handleGenreClick = (genre: any) => {
-  router.push({ name: 'CategoryDetailView', params: { genreId: genre.genre_id } })
+  router.push({ name: 'category-detail', params: { genreId: genre.genre_id } })
 }
 
 // 마운트 시 인기 장르 데이터 로드

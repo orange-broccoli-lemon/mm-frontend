@@ -44,99 +44,107 @@ const router = createRouter({
       meta: { requiresAuth: true }
     },
     {
-      path: '/HotMovieDetailView',
-      name: 'HotMovieDetailView',
+      path: '/hot-movie-detail',
+      name: 'hot-movie-detail',
       component: HotMovieDetailView,
     },
 
     {
-      path: '/Category',
-      name: 'Category',
+      path: '/category',
+      name: 'category',
       component: () => import('@/views/Category.vue'),
       
     },
     {
-      path: '/Category/:genreId',   // ✅ 동적 라우트 추가
-      name: 'CategoryDetailView',
+      path: '/category/:genreId',   // ✅ 동적 라우트 추가
+      name: 'category-detail',
       component: CategoryDetailView,
       props: true, // params.id → props.id 로 받을 수 있음
     },
     {
-      path: '/CategoryAll',
-      name: 'CategoryAll',
+      path: '/category-all',
+      name: 'category-all',
       component: CategoryAll,
     },
     {
       path: '/select-movie',
-      name: 'SelectMovie',
+      name: 'select-movie',
       component: () => import('@/views/SelectMovie.vue'),
     },
     {
       path: '/create-review',
-      name: 'CreateReview',
+      name: 'create-review',
       component: () => import('@/views/CreateThread.vue'),
       meta: { requiresAuth: true }
     },
     {
       path: '/update-review/:id',
-      name: 'UpdateReview',
+      name: 'update-review',
       component: () => import('@/views/UpdateThread.vue'),
       meta: { requiresAuth: true }
     },
     {
       path: '/search',
-      name: 'SearchResults',
+      name: 'search-results',
       component: () => import('@/views/SearchResults.vue'),
     },
     {
-      path: '/movie/movieDetail/:id',
-      name: 'BookDetail',
+      path: '/movie/movie-detail/:id',
+      name: 'movie-detail',
       component: () => import('@/views/DetailMovie.vue'),
     },
 
     {
       path: '/actors',
-      name: 'AllActors',
+      name: 'all-actors',
       component: () => import('@/views/AllActorsView.vue'),
     },
     {
       path: '/person/:id',
-      name: 'ActorDetail',
+      name: 'actor-detail',
       component: () => import('@/views/ActorDetailView.vue'),
     },
     {
       path: '/user/:userId',
-      name: 'UserProfile',
+      name: 'user-profile',
       component: () => import('@/views/UserProfileView.vue'),
     },
 
     {
-      path: '/community',
-      children: [
-
-        {
-          path: 'create_thread/:id',
-          name: 'CreateThread',
-          // 동적 import
-          component: () => import('@/views/CreateThread.vue'),
-          props: true,
-          meta: { requiresAuth: true }
-        },
-      ],
+      path: '/create-thread/:id',
+      name: 'create-thread',
+      component: () => import('@/views/CreateThread.vue'),
+      props: true,
+      meta: { requiresAuth: true }
     },
   ],
 })
 
 // 라우터 가드 설정
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
   const accountStore = useAccountStore()
-  const token = localStorage.getItem('token')
-  const isAuthenticated = !!token
+  
+  // 스토어의 토큰 상태를 사용 (localStorage 직접 접근 방지)
+  const isAuthenticated = !!accountStore.token
 
   // 인증이 필요한 페이지
   if (to.meta.requiresAuth) {
     if (!isAuthenticated) {
       console.log('인증이 필요합니다. 로그인 페이지로 리다이렉트')
+      next({ name: 'login' })
+      return
+    }
+    
+    // 토큰이 있지만 유효한지 검증
+    try {
+      const isValid = await accountStore.validateToken()
+      if (!isValid) {
+        console.log('토큰이 유효하지 않습니다. 로그인 페이지로 리다이렉트')
+        next({ name: 'login' })
+        return
+      }
+    } catch (error) {
+      console.error('토큰 검증 중 오류:', error)
       next({ name: 'login' })
       return
     }

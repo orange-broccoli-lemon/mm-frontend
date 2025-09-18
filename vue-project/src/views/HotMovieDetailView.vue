@@ -21,7 +21,7 @@
             <RouterLink
               v-for="(movie, index) in movieStore.popularMovies"
               :key="movie.movie_id"
-              :to="{ name: 'BookDetail', params: { id: movie.movie_id } }"
+              :to="{ name: 'movie-detail', params: { id: movie.movie_id } }"
               class="movie-link"
             >
               <MovieCard
@@ -54,7 +54,7 @@
             <RouterLink
               v-for="(movie, index) in movieStore.movieList"
               :key="movie.movie_id"
-              :to="{ name: 'BookDetail', params: { id: movie.movie_id } }"
+              :to="{ name: 'movie-detail', params: { id: movie.movie_id } }"
               class="movie-link"
             >
               <MovieCard

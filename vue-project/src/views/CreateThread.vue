@@ -171,7 +171,7 @@ const handleCreateComment = async () => {
     
     // 리뷰 작성/수정 완료 후 영화 상세 페이지로 이동
     router.push({ 
-      name: 'BookDetail', 
+      name: 'movie-detail', 
       params: { id: movieId.value },
       query: { refresh: Date.now() }
     })

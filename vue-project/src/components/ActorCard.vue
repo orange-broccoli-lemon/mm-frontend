@@ -1,6 +1,6 @@
 <template>
   <RouterLink 
-    :to="{ name: 'ActorDetail', params: { id: id } }" 
+    :to="{ name: 'actor-detail', params: { id: id } }" 
     class="flex flex-col items-center cursor-pointer group"
   >
     <!-- Actor Image -->

@@ -4,6 +4,7 @@ import App from './App.vue'
 import router from './router'
 import { useAccountStore } from './stores/user'
 import { useThemeStore } from './stores/theme'
+import axios from 'axios'
 import './style.css'
 
 const app = createApp(App)
@@ -11,6 +12,22 @@ const pinia = createPinia()
 
 app.use(pinia)
 app.use(router)
+
+// Axios 인터셉터 설정 (전역 401 에러 처리)
+axios.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      // 401 에러 발생 시 자동 로그아웃
+      const accountStore = useAccountStore()
+      if (accountStore.token) {
+        console.log('401 에러 감지 - 자동 로그아웃 처리')
+        accountStore.logOut()
+      }
+    }
+    return Promise.reject(error)
+  }
+)
 
 // 인증 상태 및 테마 초기화
 const initializeApp = async () => {

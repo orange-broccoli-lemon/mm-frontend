@@ -111,6 +111,11 @@ export const useAccountStore = defineStore('account', () => {
   const watch_list = ref<Watch[] | null>(null)
   const like_list = ref<Like[] | null>(null)
   
+  // 토큰 검증 상태 관리 (중복 API 호출 방지)
+  const isTokenValidating = ref(false)
+  const lastTokenValidation = ref<number>(0)
+  const TOKEN_VALIDATION_CACHE_TIME = 5 * 60 * 1000 // 5분
+  
   const initializeAuth = async () => {
     if (token.value && userId.value) {
       try {
@@ -124,21 +129,27 @@ export const useAccountStore = defineStore('account', () => {
   async function getUserInfo() {
     if (!token.value || !userId.value) return
     try {
-      console.log('=== getUserInfo 디버깅 ===')
-      console.log('API URL:', `${USERS_API}/${userId.value}`)
-      console.log('토큰 존재:', !!token.value)
-      console.log('사용자 ID:', userId.value)
+      // 프로덕션 환경에서는 민감한 정보 로깅 제거
+      const isProduction = import.meta.env.PROD
+      if (!isProduction) {
+        console.log('=== getUserInfo 디버깅 ===')
+        console.log('API URL:', `${USERS_API}/${userId.value}`)
+        console.log('토큰 존재:', !!token.value)
+        console.log('사용자 ID:', userId.value)
+      }
       
       const res = await axios.get(`${USERS_API}/${userId.value}`, {
         headers: { Authorization: `Bearer ${token.value}`, Accept: "application/json" }
       })
       user.value = res.data as UserProfile
 
-      console.log("=== API 응답 데이터 ===")
-      console.log("전체 응답:", res.data)
-      console.log("프로필 이미지 URL:", res.data.profile_image_url)
-      console.log("사용자 이름:", res.data.name)
-      console.log("========================")
+      if (!isProduction) {
+        console.log("=== API 응답 데이터 ===")
+        console.log("전체 응답:", res.data)
+        console.log("프로필 이미지 URL:", res.data.profile_image_url)
+        console.log("사용자 이름:", res.data.name)
+        console.log("========================")
+      }
     } catch (err: unknown) {
       const error = err as AxiosError
       console.error('유저 정보 가져오기 실패:', error.response?.data || error.message)
@@ -147,7 +158,11 @@ export const useAccountStore = defineStore('account', () => {
 
  async function googleLogin(idToken: string) {
     try {
-      console.log('Google 로그인 시작 - ID Token:', idToken.substring(0, 50) + '...')
+      // 프로덕션 환경에서는 토큰 로깅 제거
+      const isProduction = import.meta.env.PROD
+      if (!isProduction) {
+        console.log('Google 로그인 시작 - ID Token:', idToken.substring(0, 50) + '...')
+      }
       
       const res = await axios.post(`${AUTH_API}/login/google`, 
         { id_token: idToken }, // 백엔드에서 요구하는 id_token 형태로 전송
@@ -232,14 +247,25 @@ export const useAccountStore = defineStore('account', () => {
 
   function logOut() {
     console.log('로그아웃 처리 중...')
+    
+    // 모든 상태 초기화
     token.value = null
     userId.value = null
     user.value = null
     commentList.value = null
     watch_list.value = null
     like_list.value = null
+    
+    // 토큰 검증 상태 초기화
+    isTokenValidating.value = false
+    lastTokenValidation.value = 0
+    
+    // localStorage 정리
     localStorage.removeItem('token')
     localStorage.removeItem('userId')
+    
+    // 세션 스토리지도 정리 (보안 강화)
+    sessionStorage.clear()
     
     // 챗봇 채팅 기록 초기화
     const botStore = useBotStore()
@@ -249,28 +275,74 @@ export const useAccountStore = defineStore('account', () => {
     router.push('/')
   }
 
-  // 토큰 유효성 검사
-  const validateToken = async () => {
+  // 토큰 유효성 검사 (캐싱 및 중복 호출 방지)
+  const validateToken = async (forceValidation = false) => {
     if (!token.value || !userId.value) {
       console.log('토큰 또는 사용자 ID가 없습니다')
       return false
     }
 
+    // 캐시된 검증 결과가 있고 강제 검증이 아닌 경우
+    const now = Date.now()
+    if (!forceValidation && 
+        lastTokenValidation.value > 0 && 
+        (now - lastTokenValidation.value) < TOKEN_VALIDATION_CACHE_TIME) {
+      return true
+    }
+
+    // 이미 검증 중인 경우 중복 호출 방지
+    if (isTokenValidating.value) {
+      return new Promise((resolve) => {
+        const checkValidation = () => {
+          if (!isTokenValidating.value) {
+            resolve(lastTokenValidation.value > 0 && 
+                   (now - lastTokenValidation.value) < TOKEN_VALIDATION_CACHE_TIME)
+          } else {
+            setTimeout(checkValidation, 100)
+          }
+        }
+        checkValidation()
+      })
+    }
+
+    isTokenValidating.value = true
+
     try {
-      console.log('토큰 유효성 검사 중...')
+      // 프로덕션 환경에서는 토큰 관련 로깅 제거
+      const isProduction = import.meta.env.PROD
+      if (!isProduction) {
+        console.log('토큰 유효성 검사 중...')
+      }
       const res = await axios.get(`${USERS_API}/${userId.value}`, {
         headers: {
           Authorization: `Bearer ${token.value}`,
           Accept: "application/json"
         }
       })
-      console.log('토큰 유효성 검사 성공')
-      return res.status === 200
-    } catch (error) {
+      
+      if (res.status === 200) {
+        lastTokenValidation.value = now
+        if (!isProduction) {
+          console.log('토큰 유효성 검사 성공')
+        }
+        return true
+      } else {
+        console.log('토큰이 유효하지 않습니다')
+        return false
+      }
+    } catch (error: any) {
       console.error('토큰 유효성 검사 실패:', error)
-      // 토큰이 유효하지 않으면 로그아웃
-      logOut()
+      
+      // 401 Unauthorized 에러인 경우 토큰이 만료된 것으로 간주
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        console.log('토큰이 만료되었습니다. 자동 로그아웃합니다.')
+        logOut()
+        return false
+      }
+      
       return false
+    } finally {
+      isTokenValidating.value = false
     }
   }
 
@@ -532,7 +604,11 @@ const likeList = async (user_id:number) => {
         formData.append('profile_image_url', profileData.profile_image_url)
       }
 
-      console.log('프로필 업데이트 요청 시작, 토큰:', token.value ? '존재함' : '없음')
+      // 프로덕션 환경에서는 토큰 관련 로깅 제거
+      const isProduction = import.meta.env.PROD
+      if (!isProduction) {
+        console.log('프로필 업데이트 요청 시작, 토큰:', token.value ? '존재함' : '없음')
+      }
 
       const response = await axios.put(
         `${USERS_API}/me/profile`,

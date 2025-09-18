@@ -336,7 +336,7 @@ const formatDate = (dateString: string) => {
 // 영화 상세 페이지로 이동
 const goToMovie = (movieId: number) => {
   router.push({
-    name: 'BookDetail',
+    name: 'movie-detail',
     params: { id: movieId }
   })
 }

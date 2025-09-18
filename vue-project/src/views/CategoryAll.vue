@@ -45,7 +45,7 @@ const safeScrollTop = () => {
 
 // 영화 상세 링크 생성 함수
 const movieDetailLink = (movieId: number) => ({
-  name: 'BookDetail',
+  name: 'movie-detail',
   params: { id: movieId }
 })
 

@@ -306,14 +306,14 @@ const handleBlur = () => {
 
 // 영화 선택
 const selectMovie = (movie: any) => {
-  router.push({ name: 'BookDetail', params: { id: movie.movie_id } })
+  router.push({ name: 'movie-detail', params: { id: movie.movie_id } })
   showDropdown.value = false
   searchQuery.value = ''
 }
 
 // 인물 선택
 const selectActor = (actor: any) => {
-  router.push({ name: 'ActorDetail', params: { id: actor.person_id } })
+  router.push({ name: 'actor-detail', params: { id: actor.person_id } })
   showDropdown.value = false
   searchQuery.value = ''
 }
@@ -322,7 +322,7 @@ const selectActor = (actor: any) => {
 const selectUser = (user: any) => {
   // 사용자 프로필 페이지로 이동
   if (user.user_id) {
-    router.push({ name: 'UserProfile', params: { userId: user.user_id } })
+    router.push({ name: 'user-profile', params: { userId: user.user_id } })
   }
   showDropdown.value = false
   searchQuery.value = ''
@@ -330,7 +330,7 @@ const selectUser = (user: any) => {
 
 // 검색 페이지로 이동
 const goToSearchPage = (type: string) => {
-  router.push({ name: 'SearchResults', query: { type, q: searchQuery.value } })
+  router.push({ name: 'search-results', query: { type, q: searchQuery.value } })
   showDropdown.value = false
 }
 

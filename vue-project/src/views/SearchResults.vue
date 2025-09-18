@@ -245,11 +245,11 @@ const goBack = () => {
 }
 
 const goToMovie = (movie: any) => {
-  router.push({ name: 'BookDetail', params: { id: movie.movie_id } })
+  router.push({ name: 'movie-detail', params: { id: movie.movie_id } })
 }
 
 const goToActor = (actor: any) => {
-  router.push({ name: 'ActorDetail', params: { id: actor.person_id } })
+  router.push({ name: 'actor-detail', params: { id: actor.person_id } })
 }
 
 const goToUser = (user: any) => {

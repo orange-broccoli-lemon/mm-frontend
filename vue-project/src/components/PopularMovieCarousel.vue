@@ -5,7 +5,7 @@
       <RouterLink
         v-for="(movie, idx) in visibleMovies"
         :key="movie.movie_id"
-        :to="{ name: 'BookDetail', params: { id: movie.movie_id } }"
+        :to="{ name: 'movie-detail', params: { id: movie.movie_id } }"
         class="carousel-item"
         :class="{
           'left-tilt': idx === 0,

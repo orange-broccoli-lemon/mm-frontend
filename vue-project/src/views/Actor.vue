@@ -13,7 +13,7 @@
           </div>
           <RouterLink
             v-if="actorStore.actorList.length > 5"
-            :to="{ name: 'AllActors' }"
+            :to="{ name: 'all-actors' }"
             class="group relative w-10 h-10 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-1"
           >
             <span class="text-blue-500 hover:text-blue-600 text-xl font-bold group-hover:rotate-90 transition-all duration-300">+</span>

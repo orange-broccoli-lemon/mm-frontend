@@ -12,7 +12,7 @@
             </h1>
           </div>
           <RouterLink 
-            to="HotMovieDetailView"
+            to="/hot-movie-detail"
             class="group relative w-10 h-10 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-1"
           >
             <span class="text-red-500 hover:text-red-600 text-xl font-bold group-hover:rotate-90 transition-all duration-300">+</span>
@@ -32,7 +32,7 @@
           <RouterLink
             v-for="(movie, index) in movieStore.popularMovies.slice(0,5)"
             :key="index"
-            :to="{ name: 'BookDetail', params: { id: movie.movie_id } }"
+            :to="{ name: 'movie-detail', params: { id: movie.movie_id } }"
             class="group transition-transform duration-200 hover:-translate-y-1"
           >
             <MovieCard

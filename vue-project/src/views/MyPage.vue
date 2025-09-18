@@ -25,7 +25,7 @@ const goToEditProfile = () => {
 
 // 영화 상세 페이지 이동
 const goToMovieDetail = (movieId: number) => {
-  router.push({ name: 'BookDetail', params: { id: movieId } })
+  router.push({ name: 'movie-detail', params: { id: movieId } })
 }
 
 // 댓글 삭제 처리

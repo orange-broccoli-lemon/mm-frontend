@@ -53,7 +53,7 @@
           <RouterLink
             v-for="movie in movies"
             :key="movie.movie_id"
-            :to="{ name: 'BookDetail', params: { id: movie.movie_id } }"
+            :to="{ name: 'movie-detail', params: { id: movie.movie_id } }"
             class="group transition-transform duration-200 hover:-translate-y-1"
           >
             <MovieCard
