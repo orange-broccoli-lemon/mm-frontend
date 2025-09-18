@@ -52,23 +52,30 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 relative" v-if="accountStore.user">
+  <div
+    class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 relative"
+    v-if="accountStore.user"
+  >
     <!-- 헤더 -->
     <div class="bg-gray-50 dark:bg-gray-800 py-8 px-4 animate-fade-in">
       <div class="max-w-4xl mx-auto">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+        >
           <div class="flex items-center gap-4">
             <div class="relative animate-scale-in">
               <img
                 :src="accountStore.user.profile_image_url || defaultProfileImage"
                 alt="프로필 이미지"
-                class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600" />
+                class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+              />
               <div
                 class="absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white"
                 :class="{
                   'bg-green-500': accountStore.user && accountStore.token,
                   'bg-gray-400': !accountStore.user || !accountStore.token
-                }"></div>
+                }"
+              ></div>
             </div>
             <div class="animate-slide-in-right">
               <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
@@ -77,6 +84,17 @@ onMounted(async () => {
               <p class="text-gray-600 dark:text-gray-400">영화 리뷰어</p>
             </div>
           </div>
+
+          <!-- 유저 성향 -->
+       <div
+            class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 
+                  text-gray-700 dark:text-gray-300 animate-slide-up"
+          >
+            <span class="font-bold">| 유저 성향</span>
+            <p class="mt-2 text-gray-600 dark:text-gray-400">
+              {{ accountStore.user.profile_review || '아직 설정되지 않았습니다.' }}
+            </p>
+      </div>
         </div>
       </div>
     </div>
@@ -84,19 +102,27 @@ onMounted(async () => {
     <!-- 통계 카드 -->
     <div class="py-6 px-4 animate-slide-up">
       <div class="max-w-4xl mx-auto grid grid-cols-3 gap-4">
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center animate-fade-in-delayed">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center animate-fade-in-delayed"
+        >
           <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {{ accountStore.user.comments_count || 0 }}
           </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">리뷰</div>
         </div>
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 animate-fade-in-delayed-2" @click="goFollowing">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 animate-fade-in-delayed-2"
+          @click="goFollowing"
+        >
           <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {{ accountStore.user.followers_count || 0 }}
           </div>
           <div class="text-sm text-gray-600 dark:text-gray-400">팔로워</div>
         </div>
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 animate-fade-in-delayed-3" @click="goFollowing">
+        <div
+          class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 animate-fade-in-delayed-3"
+          @click="goFollowing"
+        >
           <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">
             {{ accountStore.user.following_count || 0 }}
           </div>
@@ -112,7 +138,10 @@ onMounted(async () => {
           <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
             리뷰 {{ accountStore.user.comments_count || 0 }}개
           </h2>
-          <button class="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded" @click="showAllComments = !showAllComments">
+          <button
+            class="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"
+            @click="showAllComments = !showAllComments"
+          >
             {{ showAllComments ? '접기' : '더보기' }}
           </button>
         </div>
@@ -134,9 +163,16 @@ onMounted(async () => {
             />
           </div>
         </div>
-        <div v-else class="text-center py-12 text-gray-600 dark:text-gray-400">
+        <div
+          v-else
+          class="text-center py-12 text-gray-600 dark:text-gray-400"
+        >
           <div class="text-4xl mb-4">📝</div>
-          <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">아직 작성한 리뷰가 없어요</h3>
+          <h3
+            class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2"
+          >
+            아직 작성한 리뷰가 없어요
+          </h3>
           <p>첫 번째 영화 리뷰를 작성해보세요!</p>
         </div>
       </div>
@@ -149,7 +185,10 @@ onMounted(async () => {
           <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
             좋아요한 영화 {{ (accountStore.like_list ?? []).length }}개
           </h2>
-          <button class="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded" @click="showAllLikes = !showAllLikes">
+          <button
+            class="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"
+            @click="showAllLikes = !showAllLikes"
+          >
             {{ showAllLikes ? '접기' : '더보기' }}
           </button>
         </div>
@@ -165,7 +204,10 @@ onMounted(async () => {
             />
           </div>
         </div>
-        <div v-else class="text-center py-8 text-gray-600 dark:text-gray-400">
+        <div
+          v-else
+          class="text-center py-8 text-gray-600 dark:text-gray-400"
+        >
           좋아요한 영화가 없어요
         </div>
       </div>
@@ -178,7 +220,10 @@ onMounted(async () => {
           <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
             저장한 영화 {{ (accountStore.watch_list ?? []).length }}개
           </h2>
-          <button class="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded" @click="showAllWatch = !showAllWatch">
+          <button
+            class="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded"
+            @click="showAllWatch = !showAllWatch"
+          >
             {{ showAllWatch ? '접기' : '더보기' }}
           </button>
         </div>
@@ -194,7 +239,10 @@ onMounted(async () => {
             />
           </div>
         </div>
-        <div v-else class="text-center py-8 text-gray-600 dark:text-gray-400">
+        <div
+          v-else
+          class="text-center py-8 text-gray-600 dark:text-gray-400"
+        >
           저장한 영화가 없어요
         </div>
       </div>

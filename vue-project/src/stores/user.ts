@@ -48,6 +48,8 @@ export interface UserProfile {
   following: Follower[]
   following_persons: []
   recent_comments: RecentComments[]
+  profile_review:string
+  profile_review_date:string
 }
 
 export interface UserComment {
@@ -126,6 +128,8 @@ export const useAccountStore = defineStore('account', () => {
         headers: { Authorization: `Bearer ${token.value}`, Accept: "application/json" }
       })
       user.value = res.data as UserProfile
+
+      console.log("user", user.value)
     } catch (err: unknown) {
       const error = err as AxiosError
       console.error('유저 정보 가져오기 실패:', error.response?.data || error.message)
