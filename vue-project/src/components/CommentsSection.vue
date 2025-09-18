@@ -57,7 +57,13 @@
 
         <div class="comment-footer">
           <div class="comment-stats">
-            <span class="likes" @click="$emit('commentLikeToggle', comment)">❤️ {{ comment.likes_count }}</span>
+            <span 
+              class="likes" 
+              :class="{ 'liked': comment.is_liked }"
+              @click="$emit('commentLikeToggle', comment)"
+            >
+              👍 {{ comment.likes_count }}
+            </span>
           </div>
         </div>
       </div>
@@ -301,6 +307,30 @@ const formatDate = (dateString: string) => {
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.likes:hover {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.likes.liked {
+  opacity: 1;
+  background-color: #dbeafe;
+  color: #1e40af;
+  transform: scale(1.1);
+}
+
+.dark .likes.liked {
+  background-color: #1e3a8a;
+  color: #93c5fd;
 }
 
 /* 반응형 디자인 */
