@@ -1,10 +1,71 @@
 <template>
   <div class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 pt-16">
-    <!-- 로딩 상태 -->
-    <div v-if="loading" class="flex items-center justify-center min-h-screen">
-      <div class="text-center">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-800 dark:border-gray-200 mx-auto mb-4"></div>
-        <p class="text-gray-600 dark:text-gray-400 text-lg">배우 정보를 불러오는 중...</p>
+    <!-- 스켈레톤 로딩 상태 -->
+    <div v-if="loading" class="max-w-6xl mx-auto px-4 py-8">
+      <!-- 헤더 섹션 스켈레톤 -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+          <!-- 배우 이미지 스켈레톤 -->
+          <div class="flex-shrink-0">
+            <div class="w-64 h-80 lg:w-80 lg:h-96 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+          </div>
+          
+          <!-- 배우 정보 스켈레톤 -->
+          <div class="flex-1 space-y-4">
+            <!-- 이름 스켈레톤 -->
+            <div class="h-10 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
+            
+            <!-- 정보 항목들 스켈레톤 -->
+            <div class="space-y-3">
+              <div class="flex items-center gap-4">
+                <div class="w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                <div class="w-32 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                <div class="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                <div class="w-28 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              </div>
+              <div class="flex items-center gap-4">
+                <div class="w-20 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                <div class="w-20 h-2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              </div>
+            </div>
+            
+            <!-- 팔로우 버튼 스켈레톤 -->
+            <div class="flex items-center gap-4 mt-6">
+              <div class="w-20 h-10 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+              <div class="w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 바이오그래피 섹션 스켈레톤 -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-8">
+        <div class="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-48 mb-6"></div>
+        <div class="space-y-3">
+          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-5/6"></div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-4/5"></div>
+          <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
+        </div>
+      </div>
+
+      <!-- 출연작 섹션 스켈레톤 -->
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+        <div class="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-32 mb-6"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div v-for="i in 8" :key="i" class="space-y-3">
+            <div class="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+            <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
+            <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-1/2"></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -116,9 +177,19 @@
         </h2>
 
         <!-- 출연작 로딩 상태 -->
-        <div v-if="store.creditsLoading" class="flex items-center justify-center py-12">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-800 dark:border-gray-200"></div>
+        <div v-if="store.creditsLoading" class="space-y-6">
+          <div class="flex items-center justify-center py-8">
+            <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-800 dark:border-gray-200"></div>
           <span class="ml-3 text-gray-600 dark:text-gray-400">출연작을 불러오는 중...</span>
+          </div>
+          <!-- 출연작 스켈레톤 -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div v-for="i in 4" :key="i" class="space-y-3">
+              <div class="w-full h-64 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+              <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+              <div class="h-3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse w-3/4"></div>
+            </div>
+          </div>
         </div>
 
         <!-- 출연작 목록 -->
@@ -206,17 +277,19 @@ const fetchActorDetail = async (id: number) => {
   store.actorDetails = null   // 🔥 이전 배우 데이터 초기화
   store.actorCredits = []     // 🔥 이전 출연작 데이터 초기화
   
-  // 배우 정보와 출연작을 병렬로 로드
-  await Promise.all([
-    store.getActorDetail(id),
-    store.getActorCredits(id)
-  ])
+  // 배우 기본 정보만 먼저 로드
+  await store.getActorDetail(id)
   
   if (store.actorDetails) {
     isFollowing.value = (store.actorDetails as any).is_following || false
     followersCount.value = (store.actorDetails as any).followers_count || 0
   }
   loading.value = false
+  
+  // 출연작은 백그라운드에서 지연 로드
+  setTimeout(() => {
+    store.getActorCredits(id)
+  }, 100)
 }
 
 onMounted(() => {

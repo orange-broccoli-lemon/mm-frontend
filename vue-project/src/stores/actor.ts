@@ -46,9 +46,29 @@ export const useActorStore = defineStore('actor', () => {
   const loading = ref(false);
   const creditsLoading = ref(false);
   const currentActorId = ref<number | null>(null); // 현재 로드된 배우 ID 추적
+  
+  // 캐싱 시스템
+  const actorDetailsCache = ref<Map<number, DetailActor>>(new Map());
+  const actorCreditsCache = ref<Map<number, ActorCredit[]>>(new Map());
+  const cacheExpiry = ref<Map<number, number>>(new Map());
+  const CACHE_DURATION = 5 * 60 * 1000; // 5분 캐시
+
+  // 캐시 유효성 검사
+  const isCacheValid = (person_id: number): boolean => {
+    const expiry = cacheExpiry.value.get(person_id);
+    return expiry ? Date.now() < expiry : false;
+  };
 
   const getActorDetail = async (person_id : number) => {
     if (loading.value) return null; // 이미 요청 중이면 막기
+    
+    // 캐시에서 데이터 확인
+    if (actorDetailsCache.value.has(person_id) && isCacheValid(person_id)) {
+      console.log('캐시에서 배우 정보 로드:', person_id);
+      actorDetails.value = actorDetailsCache.value.get(person_id)!;
+      currentActorId.value = person_id;
+      return actorDetails.value;
+    }
     
     // 다른 배우로 변경될 때 이전 데이터 초기화
     if (currentActorId.value !== person_id) {
@@ -61,6 +81,11 @@ export const useActorStore = defineStore('actor', () => {
     try {
       const res = await axios.get<DetailActor>(`${BASE_API}/${person_id}`)
       actorDetails.value = res.data;
+      
+      // 캐시에 저장
+      actorDetailsCache.value.set(person_id, res.data);
+      cacheExpiry.value.set(person_id, Date.now() + CACHE_DURATION);
+      
       return res.data;
     } catch(err) {
       const error = err as AxiosError
@@ -81,9 +106,30 @@ export const useActorStore = defineStore('actor', () => {
     creditsLoading.value = false;
   }
 
-  // 배우의 출연작 불러오기
+  // 캐시 클리어 함수
+  const clearCache = () => {
+    actorDetailsCache.value.clear();
+    actorCreditsCache.value.clear();
+    cacheExpiry.value.clear();
+  }
+
+  // 특정 배우의 캐시만 클리어
+  const clearActorCache = (person_id: number) => {
+    actorDetailsCache.value.delete(person_id);
+    actorCreditsCache.value.delete(person_id);
+    cacheExpiry.value.delete(person_id);
+  }
+
+  // 배우의 출연작 불러오기 (캐싱 포함)
   const getActorCredits = async (person_id: number) => {
     if (creditsLoading.value) return null; // 이미 요청 중이면 막기
+    
+    // 캐시에서 데이터 확인
+    if (actorCreditsCache.value.has(person_id) && isCacheValid(person_id)) {
+      console.log('캐시에서 출연작 정보 로드:', person_id);
+      actorCredits.value = actorCreditsCache.value.get(person_id)!;
+      return actorCredits.value;
+    }
     
     creditsLoading.value = true;
     
@@ -125,6 +171,11 @@ export const useActorStore = defineStore('actor', () => {
       });
       
       actorCredits.value = sortedCredits;
+      
+      // 캐시에 저장
+      actorCreditsCache.value.set(person_id, sortedCredits);
+      cacheExpiry.value.set(person_id, Date.now() + CACHE_DURATION);
+      
       return sortedCredits;
     } catch (err) {
       const error = err as AxiosError;
@@ -229,6 +280,8 @@ export const useActorStore = defineStore('actor', () => {
     creditsLoading,
     currentActorId,
     clearActorDetails,
+    clearCache,
+    clearActorCache,
     searchActors,
     error,
     isActorListLoaded
