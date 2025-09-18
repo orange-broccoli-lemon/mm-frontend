@@ -5,11 +5,13 @@ import { useThreadStore } from '@/stores/thread'
 import { useAccountStore } from '@/stores/user'
 import yellowstar from '@/assets/star-solid-full.svg'
 import graystar from '@/assets/star-solid-full_gray.svg'
+import { useMovieStore } from '@/stores/movie'
 
 const route = useRoute()
 const router = useRouter()
 const commentStore = useThreadStore()
 const userStore = useAccountStore()
+const movieStore = useMovieStore()
 
 const content = ref('')
 const isSpoiler = ref(false)
@@ -52,8 +54,16 @@ const loadComment = async () => {
       isSpoiler.value = data.is_spoiler
       rating.value = Number(data.rating)
       movieTitle.value = data.movie_id ? `영화 #${data.movie_id}` : '영화'
-      moviePoster.value = data.user_profile_image || ''
+
+      if (data.movie_id) {
+     const movieData = await movieStore.detailMovie(data.movie_id)
+      if (movieData) {
+        movieTitle.value = movieData.title
+        moviePoster.value = movieData.poster_url || ''
+      }
+        }
     }
+    
   } catch (err) {
     console.error('댓글 불러오기 실패:', err)
     alert('댓글 정보를 불러오는데 실패했습니다.')
