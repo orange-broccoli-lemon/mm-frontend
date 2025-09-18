@@ -86,7 +86,7 @@
             </template>
           </div>
         </div>
-        <span class="text-xs text-gray-500 dark:text-gray-400">리뷰</span>
+        <span class="text-xs text-gray-500 dark:text-gray-400">👍{{likes_count}}</span>
       </div>
     </div>
   </div>
@@ -110,6 +110,7 @@ const props = defineProps<{
   movietitle: string
   movie_poster_url: string
   rating: number 
+  likes_count: number
 }>()
 
 const emit = defineEmits<{

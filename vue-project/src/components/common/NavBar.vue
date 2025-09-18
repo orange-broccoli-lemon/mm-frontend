@@ -45,9 +45,10 @@
               class="flex items-center space-x-2 hover:opacity-80 transition-opacity duration-200 focus:outline-none"
             >
               <img 
-                :src="accountStore.user?.profile_image_url || '/src/assets/spotti.png'" 
+                :src="getProfileImageUrl(accountStore.user?.profile_image_url)" 
                 :alt="accountStore.user?.name || 'User'"
                 class="w-8 h-8 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
+                @error="handleImageError"
               />
             </button>
             
@@ -140,5 +141,27 @@ const handleThemeToggle = () => {
     console.log('📄 HTML 클래스 (토글 후):', document.documentElement.className)
     console.log('💾 localStorage 테마 설정:', localStorage.getItem('theme-preference'))
   }, 100)
+}
+
+// Profile image URL helper
+const getProfileImageUrl = (profileImageUrl: string | null | undefined): string => {
+  if (!profileImageUrl) {
+    return new URL('/src/assets/spotti.png', import.meta.url).href
+  }
+  
+  // 이미 절대 URL인 경우 (http:// 또는 https://로 시작)
+  if (profileImageUrl.startsWith('http://') || profileImageUrl.startsWith('https://')) {
+    return profileImageUrl
+  }
+  
+  // 상대 경로인 경우 서버 주소 추가
+  const baseUrl = 'https://i13m105.p.ssafy.io'
+  return `${baseUrl}${profileImageUrl}`
+}
+
+// Handle image loading errors
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  img.src = new URL('/src/assets/spotti.png', import.meta.url).href
 }
 </script>

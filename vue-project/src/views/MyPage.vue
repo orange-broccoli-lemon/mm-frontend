@@ -37,6 +37,8 @@ const handleCommentDeleted = async (commentId: number) => {
   }
 }
 
+
+
 // 프로필 이미지 URL을 절대 경로로 변환
 const getProfileImageUrl = () => {
   const profileUrl = accountStore.user?.profile_image_url
@@ -217,6 +219,7 @@ onMounted(async () => {
               :movie_poster_url="comment.movie_poster_url"
               :movie_id="comment.movie_id"
               :rating="Number(comment.rating) || 0"
+              :likes_count="comment.likes_count || 0"
               @deleted="handleCommentDeleted"
             />
           </div>
