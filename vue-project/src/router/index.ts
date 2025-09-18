@@ -6,6 +6,7 @@ import LoginView from '@/views/LoginView.vue'
 import SignUpView from '@/views/SignUp.vue'
 import MyPage from '@/views/MyPage.vue'
 import HotMovieDetailView from '@/views/HotMovieDetailView.vue'
+import CategoryDetailView from '@/views/CategoryDetailView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,8 +26,6 @@ const router = createRouter({
       name: 'signup',
       component: SignUpView,
     },
-    
-
     {
       path: '/mypage',
       name: 'mypage',
@@ -36,6 +35,23 @@ const router = createRouter({
       path: '/HotMovieDetailView',
       name: 'HotMovieDetailView',
       component: HotMovieDetailView,
+    },
+    {
+      path: '/Category',
+      name: 'Category',
+      component: () => import('@/views/Category.vue'),
+    },
+    {
+      path: '/Category/:id',   // ✅ 동적 라우트 추가
+      name: 'CategoryMovies',
+      component: CategoryDetailView,
+      props: true, // params.id → props.id 로 받을 수 있음
+    },
+
+    {
+      path: '/CategoryDetailView',
+      name: 'CategoryDetailView',
+      component: CategoryDetailView,
     },
     {
       path: '/select-movie',

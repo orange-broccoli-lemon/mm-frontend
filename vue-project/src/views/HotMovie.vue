@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue"
-import { useMovieStore } from "../stores/movie"
+import { useMovieStore } from "../stores/movie.ts"
 import MovieCard from "../components/MovieCard.vue"
 import { RouterLink } from "vue-router"
 
