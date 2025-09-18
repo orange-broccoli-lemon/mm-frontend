@@ -177,7 +177,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useAccountStore } from '@/stores/user'
 import FollowingModal from '@/components/FollowingModal.vue'
@@ -204,12 +204,12 @@ const showFollowingModal = ref(false)
 const showAllLikes = ref(false)
 const showAllComments = ref(false)
 
-// 사용자 ID
-const userId = Number(route.params.userId)
+// 사용자 ID (반응형으로 변경)
+const userId = ref(Number(route.params.userId))
 
 // 현재 사용자의 프로필인지 확인
 const isOwnProfile = computed(() => {
-  return accountStore.user?.user_id === userId
+  return accountStore.user?.user_id === userId.value
 })
 
 // 팔로우 상태 확인 함수
@@ -223,7 +223,7 @@ const checkFollowStatus = async () => {
   
   try {
     // 팔로우 상태 확인 API 호출 (팔로우 관계 확인 엔드포인트 사용)
-    const response = await axios.get(`https://i13m105.p.ssafy.io/api/v1/users/${userId}/follow/check`, {
+    const response = await axios.get(`https://i13m105.p.ssafy.io/api/v1/users/${userId.value}/follow/check`, {
       headers: {
         'Authorization': `Bearer ${accountStore.token}`,
         'Accept': 'application/json'
@@ -253,7 +253,7 @@ const loadUserProfile = async () => {
     isLoading.value = true
     error.value = ''
     
-    const response = await axios.get(`https://i13m105.p.ssafy.io/api/v1/users/${userId}`, {
+    const response = await axios.get(`https://i13m105.p.ssafy.io/api/v1/users/${userId.value}`, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -279,7 +279,7 @@ const loadUserProfile = async () => {
 const loadUserComments = async () => {
   try {
     // 직접 API 호출 (토큰 없이도 접근 가능하도록)
-    const response = await axios.get(`https://i13m105.p.ssafy.io/api/v1/users/${userId}/comments`, {
+    const response = await axios.get(`https://i13m105.p.ssafy.io/api/v1/users/${userId.value}/comments`, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -297,7 +297,7 @@ const loadUserComments = async () => {
 const loadUserLikes = async () => {
   try {
     // 직접 API 호출 (토큰 없이도 접근 가능하도록)
-    const response = await axios.get(`https://i13m105.p.ssafy.io/api/v1/users/${userId}/liked-movies`, {
+    const response = await axios.get(`https://i13m105.p.ssafy.io/api/v1/users/${userId.value}/liked-movies`, {
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
@@ -323,14 +323,14 @@ const toggleFollow = async () => {
     isFollowLoading.value = true
     
     if (isFollowing.value) {
-      await accountStore.unFollowUser(userId)
+      await accountStore.unFollowUser(userId.value)
       isFollowing.value = false
       // 팔로워 수 감소
       if (userProfile.value) {
         userProfile.value.followers_count = Math.max((userProfile.value.followers_count || 0) - 1, 0)
       }
     } else {
-      await accountStore.followUser(userId)
+      await accountStore.followUser(userId.value)
       isFollowing.value = true
       // 팔로워 수 증가
       if (userProfile.value) {
@@ -365,16 +365,31 @@ const formatDate = (dateString: string) => {
 }
 
 
+// 데이터 로드 함수
+const loadAllData = async () => {
+  console.log('UserProfileView 데이터 로드 - userId:', userId.value)
+  await loadUserProfile()
+  await checkFollowStatus() // 팔로우 상태 확인
+  await loadUserComments()
+  await loadUserLikes()
+}
+
+// 라우트 파라미터 변경 감지
+watch(() => route.params.userId, async (newUserId) => {
+  if (newUserId) {
+    userId.value = Number(newUserId)
+    console.log('라우트 변경 감지 - 새로운 userId:', userId.value)
+    await loadAllData()
+  }
+}, { immediate: false })
+
 // 컴포넌트 마운트 시 데이터 로드
 onMounted(async () => {
   console.log('UserProfileView 마운트 - 현재 사용자:', accountStore.user)
   console.log('UserProfileView 마운트 - 토큰 존재:', !!accountStore.token)
   console.log('UserProfileView 마운트 - 토큰 길이:', accountStore.token?.length)
   
-  await loadUserProfile()
-  await checkFollowStatus() // 팔로우 상태 확인
-  await loadUserComments()
-  await loadUserLikes()
+  await loadAllData()
 })
 </script>
 

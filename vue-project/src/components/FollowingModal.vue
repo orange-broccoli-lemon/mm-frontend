@@ -95,13 +95,13 @@
               v-if="lastPathSegment === 'mypage' && follower.user_id !== currentUserId"
               @click="toggleFollow(follower.user_id)"
               :class="[
-                'px-3 py-1 text-xs rounded-full font-medium transition-colors duration-200',
+                'px-3 py-1 text-xs rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-200 border',
                 follower.is_following 
-                  ? 'bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-800'
-                  : 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 hover:bg-blue-200 dark:hover:bg-blue-800'
+                  ? 'bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-300 hover:border-blue-400'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white border-blue-600 hover:border-blue-700'
               ]"
             >
-              {{ follower.is_following ? '팔로잉 취소' : '팔로우' }}
+              {{ follower.is_following ? '팔로잉' : '팔로우' }}
             </button>
           </div>
         </div>
@@ -142,9 +142,9 @@
             <button
               v-if="lastPathSegment === 'mypage' && user.user_id !== currentUserId"
               @click="toggleFollow(user.user_id)"
-              class="px-3 py-1 text-xs rounded-full font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-800 transition-colors duration-200"
+              class="px-3 py-1 text-xs rounded-lg font-medium bg-blue-100 hover:bg-blue-200 text-blue-800 shadow-sm hover:shadow-md transition-all duration-200 border border-blue-300 hover:border-blue-400"
             >
-              팔로잉 취소
+              팔로잉
             </button>
           </div>
         </div>
@@ -300,10 +300,6 @@ const goToUserProfile = (userId: number) => {
     router.push({ name: 'UserProfile', params: { userId: userId.toString() } })
   }
 }
-
-watch(() => route.fullPath, () => {
-  window.location.href = route.fullPath  
-})
 
 
 const toggleFollow = async (targetUserId: number) => {
