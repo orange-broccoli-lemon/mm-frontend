@@ -5,6 +5,7 @@ import { useAccountStore } from '@/stores/user'
 import CommentCard from '@/components/CommentCard.vue'
 import MovieCard from '@/components/MovieCard.vue'
 import FollowingModal from '@/components/FollowingModal.vue'
+import EditProfileModal from '@/components/EditProfileModal.vue'
 import spottiImage from '@/assets/spotti.png'
 
 const accountStore = useAccountStore()
@@ -14,9 +15,13 @@ const showAllComments = ref(false)
 const showAllLikes = ref(false)
 const showAllWatch = ref(false)
 const showFollowingModal = ref(false)
+const showEditProfileModal = ref(false)
 
 const goFollowing = () => showFollowingModal.value = true
 const goToHotMovies = () => router.push('/select-movie')
+const goToEditProfile = () => {
+  showEditProfileModal.value = true
+}
 
 // 영화 상세 페이지 이동
 const goToMovieDetail = (movieId: number) => {
@@ -62,27 +67,40 @@ onMounted(async () => {
         <div
           class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6"
         >
-          <div class="flex items-center gap-4">
-            <div class="relative animate-scale-in">
-              <img
-                :src="accountStore.user.profile_image_url || defaultProfileImage"
-                alt="프로필 이미지"
-                class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
-              />
-              <div
-                class="absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white"
-                :class="{
-                  'bg-green-500': accountStore.user && accountStore.token,
-                  'bg-gray-400': !accountStore.user || !accountStore.token
-                }"
-              ></div>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-4">
+              <div class="relative animate-scale-in">
+                <img
+                  :src="accountStore.user.profile_image_url || defaultProfileImage"
+                  alt="프로필 이미지"
+                  class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                />
+                <div
+                  class="absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white"
+                  :class="{
+                    'bg-green-500': accountStore.user && accountStore.token,
+                    'bg-gray-400': !accountStore.user || !accountStore.token
+                  }"
+                ></div>
+              </div>
+              <div class="animate-slide-in-right">
+                <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+                  {{ accountStore.user.name }}
+                </h1>
+                <p class="text-gray-600 dark:text-gray-400">영화 리뷰어</p>
+              </div>
             </div>
-            <div class="animate-slide-in-right">
-              <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                {{ accountStore.user.name }}
-              </h1>
-              <p class="text-gray-600 dark:text-gray-400">영화 리뷰어</p>
-            </div>
+            
+            <!-- 회원정보 수정 아이콘 -->
+            <button
+              @click="goToEditProfile"
+              class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors duration-200"
+              title="회원정보 수정"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+              </svg>
+            </button>
           </div>
 
           <!-- 유저 성향 -->
@@ -252,6 +270,12 @@ onMounted(async () => {
     <FollowingModal
       :is-open="showFollowingModal"
       @close="showFollowingModal = false"
+    />
+
+    <!-- 프로필 수정 모달 -->
+    <EditProfileModal
+      :is-open="showEditProfileModal"
+      @close="showEditProfileModal = false"
     />
   </div>
 </template>

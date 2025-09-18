@@ -491,6 +491,73 @@ const likeList = async (user_id:number) => {
 }
 
 
+  // 프로필 수정 함수
+  const updateProfile = async (profileData: {
+    name?: string
+    password?: string
+    current_password?: string
+    profile_image_url?: File
+  }) => {
+    try {
+      // 토큰 유효성 검사
+      if (!token.value) {
+        console.error('토큰이 없습니다.')
+        return { success: false, error: '토큰이 없습니다. 다시 로그인해주세요.' }
+      }
+
+      const formData = new FormData()
+      
+      if (profileData.name) {
+        formData.append('name', profileData.name)
+      }
+      
+      if (profileData.password) {
+        formData.append('password', profileData.password)
+      }
+      
+      if (profileData.current_password) {
+        formData.append('current_password', profileData.current_password)
+      }
+      
+      if (profileData.profile_image_url) {
+        formData.append('profile_image_url', profileData.profile_image_url)
+      }
+
+      console.log('프로필 업데이트 요청 시작, 토큰:', token.value ? '존재함' : '없음')
+
+      const response = await axios.put(
+        'https://i13m105.p.ssafy.io/api/v1/users/me/profile',
+        formData,
+        {
+          headers: {
+            'Authorization': `Bearer ${token.value}`
+            // Content-Type은 multipart/form-data일 때 자동으로 설정되도록 제거
+          }
+        }
+      )
+
+      if (response.data.user) {
+        user.value = response.data.user
+        console.log('프로필 업데이트 성공:', response.data)
+        return { success: true, data: response.data }
+      }
+    } catch (err: unknown) {
+      const error = err as AxiosError
+      console.error('프로필 업데이트 실패:', error.response?.data || error.message)
+      console.error('응답 상태:', error.response?.status)
+      console.error('응답 헤더:', error.response?.headers)
+      
+      // 401 오류 시 토큰 만료로 간주하고 로그아웃 처리
+      if (error.response?.status === 401) {
+        console.log('토큰이 만료되었습니다. 로그아웃 처리합니다.')
+        logOut()
+        return { success: false, error: '인증이 만료되었습니다. 다시 로그인해주세요.' }
+      }
+      
+      return { success: false, error: error.response?.data || error.message }
+    }
+  }
+
   return {
     signUp,
     login,
@@ -515,7 +582,8 @@ const likeList = async (user_id:number) => {
     likeList,
     like_list,
     watch_list,
-    googleLogin 
+    googleLogin,
+    updateProfile
 
   }
 })

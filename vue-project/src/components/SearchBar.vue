@@ -114,9 +114,8 @@
 
       <!-- Quick Actions -->
       <div v-if="searchQuery.length === 0" class="p-3">
-        <h4 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">빠른 검색</h4>
         <div class="space-y-1">
-          <div @click="goToSearchPage('movie')" class="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer">
+          <div class="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer">
             <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
               <span class="text-blue-600 dark:text-blue-400 text-sm">🎬</span>
             </div>
@@ -125,7 +124,7 @@
               <p class="text-xs text-gray-500 dark:text-gray-400">인기 영화 찾기</p>
             </div>
           </div>
-          <div @click="goToSearchPage('actor')" class="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer">
+          <div class="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer">
             <div class="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
               <span class="text-green-600 dark:text-green-400 text-sm">👤</span>
             </div>
@@ -134,7 +133,7 @@
               <p class="text-xs text-gray-500 dark:text-gray-400">배우, 감독 찾기</p>
             </div>
           </div>
-          <div @click="goToSearchPage('user')" class="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer">
+          <div  class="flex items-center gap-3 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded cursor-pointer">
             <div class="w-8 h-8 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
               <span class="text-purple-600 dark:text-purple-400 text-sm">👥</span>
             </div>
