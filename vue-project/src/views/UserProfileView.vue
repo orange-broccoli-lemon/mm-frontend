@@ -21,11 +21,11 @@
     <!-- 사용자 정보 -->
     <div v-else-if="userProfile">
       <!-- 헤더 섹션 -->
-      <div class="bg-gray-50 dark:bg-gray-800 py-8 px-4">
+      <div class="bg-gray-50 dark:bg-gray-800 py-8 px-4 animate-fade-in">
         <div class="max-w-4xl mx-auto">
           <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
             <div class="flex items-center gap-4">
-              <div class="relative">
+              <div class="relative animate-scale-in">
                 <img
                   :src="userProfile.profile_image_url || defaultProfileImage"
                   :alt="userProfile.name"
@@ -39,7 +39,7 @@
                   }"
                 ></div>
               </div>
-              <div>
+              <div class="animate-slide-in-right">
                 <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
                   {{ userProfile.name }}
                 </h1>
@@ -51,17 +51,17 @@
       </div>
 
       <!-- 통계 카드 섹션 -->
-      <div class="py-6 px-4">
+      <div class="py-6 px-4 animate-slide-up">
         <div class="max-w-4xl mx-auto">
           <div class="grid grid-cols-3 gap-4">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center animate-fade-in-delayed">
               <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {{ userProfile.comments_count || 0 }}
               </div>
               <div class="text-sm text-gray-600 dark:text-gray-400">리뷰</div>
             </div>
             <div 
-              class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 animate-fade-in-delayed-2"
               @click="showFollowingModal = true"
             >
               <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -70,7 +70,7 @@
               <div class="text-sm text-gray-600 dark:text-gray-400">팔로워</div>
             </div>
             <div 
-              class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+              class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 animate-fade-in-delayed-3"
               @click="showFollowingModal = true"
             >
               <div class="text-2xl font-bold text-gray-900 dark:text-gray-100">
@@ -83,7 +83,7 @@
       </div>
 
       <!-- 액션 버튼 섹션 -->
-      <div class="py-6 px-4">
+      <div class="py-6 px-4 animate-slide-up-delayed">
         <div class="max-w-4xl mx-auto">
           <div class="flex gap-4">
             <button 
@@ -102,7 +102,7 @@
       </div>
 
       <!-- 최근 리뷰 섹션 -->
-      <div class="py-6 px-4">
+      <div class="py-6 px-4 animate-slide-up-delayed-2">
         <div class="max-w-4xl mx-auto">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
@@ -138,7 +138,7 @@
       </div>
 
       <!-- 좋아요한 영화 섹션 -->
-      <div class="py-6 px-4">
+      <div class="py-6 px-4 animate-slide-up-delayed-3">
         <div class="max-w-4xl mx-auto">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
@@ -175,6 +175,103 @@
     />
   </div>
 </template>
+
+<style scoped>
+/* 애니메이션 효과 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInDelayed {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 애니메이션 클래스 */
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s ease-out 0.2s both;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.6s ease-out 0.4s both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s ease-out 0.6s both;
+}
+
+.animate-fade-in-delayed {
+  animation: fadeInDelayed 0.6s ease-out 0.8s both;
+}
+
+.animate-fade-in-delayed-2 {
+  animation: fadeInDelayed 0.6s ease-out 1.0s both;
+}
+
+.animate-fade-in-delayed-3 {
+  animation: fadeInDelayed 0.6s ease-out 1.2s both;
+}
+
+.animate-slide-up-delayed {
+  animation: slideUp 0.8s ease-out 1.0s both;
+}
+
+.animate-slide-up-delayed-2 {
+  animation: slideUp 0.8s ease-out 1.2s both;
+}
+
+.animate-slide-up-delayed-3 {
+  animation: slideUp 0.8s ease-out 1.4s both;
+}
+</style>
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'

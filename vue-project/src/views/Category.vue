@@ -4,12 +4,19 @@
     <div class="py-4 px-4">
       <div class="max-w-7xl mx-auto">
         <!-- Section Header -->
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-2">
-            <h1 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">
-              장르
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <div class="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
+            <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
+              인기 장르
             </h1>
           </div>
+          <RouterLink 
+            :to="{ name: 'CategoryDetailView', params: { genreId: displayGenres[0]?.genre_id || 0 } }"
+            class="text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+          >
+            <span class="text-lg font-medium">+</span>
+          </RouterLink>
         </div>
 
         <!-- Loading State -->
@@ -37,6 +44,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { RouterLink } from 'vue-router'
 import { useCategoryStore } from '@/stores/category'
 
 const categoryStore = useCategoryStore()

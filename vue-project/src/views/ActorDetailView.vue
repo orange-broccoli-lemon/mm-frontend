@@ -11,10 +11,10 @@
     <!-- 배우 상세 정보 -->
     <div v-else-if="store.actorDetails" class="max-w-6xl mx-auto px-4 py-8">
       <!-- 헤더 섹션 -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-8">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-8 animate-fade-in">
         <div class="flex flex-col lg:flex-row gap-8">
           <!-- 배우 이미지 -->
-          <div class="flex-shrink-0">
+          <div class="flex-shrink-0 animate-scale-in">
             <img 
               :src="store.actorDetails.profile_image_url || spottiImage" 
               :alt="store.actorDetails.name"
@@ -23,7 +23,7 @@
           </div>
           
           <!-- 배우 기본 정보 -->
-          <div class="flex-1">
+          <div class="flex-1 animate-slide-in-right">
             <h1 class="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
               {{ store.actorDetails.name }}
             </h1>
@@ -69,7 +69,7 @@
             </div>
             
                    <!-- 팔로우 섹션 -->
-                   <div class="flex items-center gap-4">
+                   <div class="flex items-center gap-4 animate-fade-in-delayed">
                      <button
                        @click="toggleFollow"
                        :class="[
@@ -93,7 +93,7 @@
       </div>
 
       <!-- 바이오그래피 섹션 -->
-      <div v-if="store.actorDetails.biography" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-8">
+      <div v-if="store.actorDetails.biography" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 mb-8 animate-slide-up">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
           <span class="text-2xl">📖</span>
           바이오그래피
@@ -106,7 +106,7 @@
       </div>
 
       <!-- 출연작 섹션 -->
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-8 animate-slide-up-delayed">
         <h2 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-6 flex items-center gap-2">
           <span class="text-2xl">🎬</span>
           출연작
@@ -124,9 +124,10 @@
         <!-- 출연작 목록 -->
         <div v-else-if="store.actorCredits.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           <div
-            v-for="credit in store.actorCredits"
+            v-for="(credit, index) in store.actorCredits"
             :key="credit.movie_id"
-            class="group cursor-pointer transition-transform duration-200 hover:-translate-y-1"
+            class="group cursor-pointer transition-transform duration-200 hover:-translate-y-1 animate-fade-in-delayed"
+            :style="{ animationDelay: `${0.1 + index * 0.05}s` }"
             @click="goToMovie(credit.movie_id)"
           >
             <!-- 영화 포스터 -->
@@ -278,6 +279,85 @@ html.dark .main-cast-badge {
   color: #92400e !important; /* yellow-800 */
   font-weight: 600 !important;
   border: 1px solid #f59e0b !important; /* yellow-500 */
+}
+
+/* 애니메이션 효과 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInDelayed {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 애니메이션 클래스 */
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s ease-out 0.2s both;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.6s ease-out 0.4s both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s ease-out 0.6s both;
+}
+
+.animate-fade-in-delayed {
+  animation: fadeInDelayed 0.6s ease-out 0.8s both;
+}
+
+.animate-slide-up-delayed {
+  animation: slideUp 0.8s ease-out 1.0s both;
 }
 </style>
 

@@ -2,13 +2,13 @@
   <!-- 모달 오버레이 -->
   <div 
     v-if="isOpen" 
-    class="fixed inset-0 flex items-center justify-center z-50"
+    class="fixed inset-0 flex items-center justify-center z-50 modal-overlay"
     @click="closeModal"
   >
     <!-- 모달 컨텐츠 -->
     <div 
       ref="modalRef"
-      class="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 w-[800px] h-[700px] mx-4 overflow-hidden cursor-move"
+      class="bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-600 w-[800px] h-[700px] mx-4 overflow-hidden cursor-move modal-content"
       @click.stop
       @mousedown="startDrag"
       :style="{ transform: `translate(${position.x}px, ${position.y}px)` }"
@@ -70,7 +70,7 @@
           <div
             v-for="follower in followers"
             :key="follower.user_id"
-            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 user-item"
           >
             <!-- 프로필 이미지 -->
             <img
@@ -118,7 +118,7 @@
           <div
             v-for="user in following"
             :key="user.user_id"
-            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+            class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 user-item"
           >
             <!-- 프로필 이미지 -->
             <img
@@ -327,3 +327,61 @@ const toggleFollow = async (targetUserId: number) => {
   }
 }
 </script>
+
+<style scoped>
+/* 모달 애니메이션 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-overlay {
+  animation: fadeIn 0.3s ease-out;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  animation: slideIn 0.4s ease-out;
+}
+
+/* 모달 내부 요소들에 대한 추가 애니메이션 */
+.modal-header {
+  animation: fadeIn 0.5s ease-out 0.1s both;
+}
+
+/* 탭과 리스트에 대한 순차적 애니메이션 */
+.tab-content {
+  animation: fadeIn 0.4s ease-out 0.2s both;
+}
+
+.user-item {
+  animation: fadeIn 0.3s ease-out both;
+}
+
+/* 각 사용자 아이템에 순차적 지연 적용 */
+.user-item:nth-child(1) { animation-delay: 0.1s; }
+.user-item:nth-child(2) { animation-delay: 0.15s; }
+.user-item:nth-child(3) { animation-delay: 0.2s; }
+.user-item:nth-child(4) { animation-delay: 0.25s; }
+.user-item:nth-child(5) { animation-delay: 0.3s; }
+.user-item:nth-child(6) { animation-delay: 0.35s; }
+.user-item:nth-child(7) { animation-delay: 0.4s; }
+.user-item:nth-child(8) { animation-delay: 0.45s; }
+.user-item:nth-child(9) { animation-delay: 0.5s; }
+.user-item:nth-child(10) { animation-delay: 0.55s; }
+</style>

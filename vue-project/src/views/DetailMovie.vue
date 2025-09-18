@@ -1,21 +1,21 @@
 <template>
   <div v-if="movieDetail" class="movie-detail min-h-screen bg-white dark:bg-gray-900">
     <!-- 영화 배경 -->
-    <div class="movie-hero">
+    <div class="movie-hero animate-fade-in">
       <img v-if="movieDetail.backdrop_url" :src="movieDetail.backdrop_url" class="backdrop" />
       <div v-else class="backdrop no-image">이미지 없음</div>
     </div>
 
     <!-- 영화 정보 영역 -->
-    <div class="movie-bottom">
-      <div class="movie-poster">
+    <div class="movie-bottom animate-slide-up">
+      <div class="movie-poster animate-scale-in">
         <img v-if="movieDetail.poster_url" :src="movieDetail.poster_url" class="poster" />
         <div v-else class="poster no-image">이미지 없음</div>
         <span>평점 </span>
         <span>{{ movieDetail.average_rating }}</span>
       </div>
 
-      <div class="movie-content1">
+      <div class="movie-content1 animate-slide-in-right">
         <div class="header">
           <h1>{{ movieDetail.title }}</h1>
           <div class="actions">
@@ -34,13 +34,15 @@
     </div>
 
     <!-- 영화 댓글 섹션 -->
-    <CommentsSection
-      :comments="movieComments"
-      :show-spoilers="showSpoilers"
-      :is-loading="isLoadingComments"
-      @toggle-spoilers="toggleSpoilers"
-      @comment-like-toggle="commentLikeToggle"
-    />
+    <div class="animate-fade-in-delayed">
+      <CommentsSection
+        :comments="movieComments"
+        :show-spoilers="showSpoilers"
+        :is-loading="isLoadingComments"
+        @toggle-spoilers="toggleSpoilers"
+        @comment-like-toggle="commentLikeToggle"
+      />
+    </div>
   </div>
 </template>
 
@@ -475,5 +477,80 @@ const goCreate = () => {
   background-color: #ffffff; /* white */
   z-index: -1;
   pointer-events: none;
+}
+
+/* 애니메이션 효과 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInDelayed {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 애니메이션 클래스 */
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s ease-out 0.2s both;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.6s ease-out 0.4s both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s ease-out 0.6s both;
+}
+
+.animate-fade-in-delayed {
+  animation: fadeInDelayed 0.8s ease-out 0.8s both;
 }
 </style>

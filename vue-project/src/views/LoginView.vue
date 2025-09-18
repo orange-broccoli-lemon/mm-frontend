@@ -1,54 +1,68 @@
 <template>
-  <main class="login">
-    <h1>Login</h1>
+  <main class="login-container">
+    <div class="login-card">
+      <div class="login-header">
+        <h1 class="login-title">로그인</h1>
+        <p class="login-subtitle">계정에 로그인하세요</p>
+      </div>
+      
+      <!-- 일반 로그인 폼 -->
+      <form @submit.prevent="logInMember" class="login-form">
+        <div class="form-group">
+          <label for="username">이메일 <span class="required">*</span></label>
+          <input id="username" v-model="username" type="text" placeholder="이메일 입력" required />
+        </div>
 
-    <!-- 일반 로그인 폼 -->
-    <form @submit.prevent="logInMember">
-      <div class="form-group">
-        <label for="username">ID</label>
-        <input id="username" v-model="username" type="text" placeholder="ID 입력" required />
+        <div class="form-group">
+          <label for="password">비밀번호 <span class="required">*</span></label>
+          <input id="password" v-model="password" type="password" placeholder="비밀번호 입력" required />
+        </div>
+
+        <button type="submit" class="submit-button">로그인</button>
+      </form>
+
+      <div class="divider"><span>또는</span></div>
+
+      <!-- Google Identity Services 로그인 버튼 -->
+      <div class="google-section">
+        <div id="g_id_onload"
+             :data-client_id="googleClientId"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-size="large"
+             data-theme="outline"
+             data-text="sign_in_with"
+             data-shape="rectangular"
+             data-logo_alignment="left">
+        </div>
+        
+        <!-- 대안: 수동 Google 로그인 버튼 -->
+        <button v-if="showManualButton" class="google-login-btn" @click="redirectToGoogle">
+          <img src="https://developers.google.com/identity/images/g-logo.png" alt="G" width="20" />
+          Google 계정으로 로그인 (수동)
+        </button>
       </div>
 
-      <div class="form-group">
-        <label for="password">비밀번호</label>
-        <input id="password" v-model="password" type="password" placeholder="비밀번호 입력" required />
+      <!-- 에러 메시지 표시 -->
+      <div v-if="errorMessage" class="error-message">
+        {{ errorMessage }}
       </div>
-
-      <button type="submit">로그인</button>
-    </form>
-
-    <div class="divider"><span>또는</span></div>
-
-    <!-- Google Identity Services 로그인 버튼 -->
-    <div id="g_id_onload"
-         :data-client_id="googleClientId"
-         data-callback="handleCredentialResponse"
-         data-auto_prompt="false">
-    </div>
-    <div class="g_id_signin"
-         data-type="standard"
-         data-size="large"
-         data-theme="outline"
-         data-text="sign_in_with"
-         data-shape="rectangular"
-         data-logo_alignment="left">
-    </div>
-    
-    <!-- 대안: 수동 Google 로그인 버튼 -->
-    <button v-if="showManualButton" class="google-login-btn" @click="redirectToGoogle">
-      <img src="https://developers.google.com/identity/images/g-logo.png" alt="G" width="20" />
-      Google 계정으로 로그인 (수동)
-    </button>
-
-    <!-- 에러 메시지 표시 -->
-    <div v-if="errorMessage" class="error-message">
-      {{ errorMessage }}
+      
+      <div class="login-footer">
+        <p>계정이 없으신가요? 
+          <RouterLink to="/signup" class="signup-link">회원가입</RouterLink>
+        </p>
+      </div>
     </div>
   </main>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { RouterLink } from 'vue-router'
 import { useAccountStore } from '../stores/user'
 import { useRouter } from 'vue-router'
 
@@ -210,19 +224,87 @@ const handleGoogleLogin = async (idToken: string) => {
 </script>
 
 <style scoped>
-.login {
-  max-width: 420px;
-  margin: 4rem auto;
-  padding: 2rem 2.5rem;
-  border-radius: 8px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  background-color: #ffffff;
+/* 메인 컨테이너 */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  padding: 2rem 1rem;
+  font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  transition: background-color 0.3s ease;
 }
 
-h1 {
+.dark .login-container {
+  background: #1a202c;
+}
+
+/* 카드 스타일 */
+.login-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark .login-card {
+  background: #2d3748;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.login-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+/* 헤더 */
+.login-header {
   text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.login-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: color 0.3s ease;
+}
+
+.dark .login-title {
+  color: #e2e8f0;
+}
+
+.login-subtitle {
+  color: #718096;
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 400;
+  transition: color 0.3s ease;
+}
+
+.dark .login-subtitle {
+  color: #a0aec0;
+}
+
+/* 폼 */
+.login-form {
   margin-bottom: 2rem;
-  color: #2c3e50;
 }
 
 .form-group {
@@ -231,55 +313,103 @@ h1 {
 
 label {
   display: block;
+  font-weight: 600;
+  color: #2d3748;
   margin-bottom: 0.5rem;
-  color: #34495e;
-  font-weight: 500;
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
+}
+
+.dark label {
+  color: #e2e8f0;
 }
 
 input {
   width: 100%;
-  padding: 0.75rem 1rem;
-  box-sizing: border-box;
-  border: 1px solid #dcdfe6;
-  border-radius: 4px;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
   font-size: 1rem;
-  transition: border-color 0.2s;
+  transition: all 0.3s ease;
+  background: #f8fafc;
+  box-sizing: border-box;
+  color: #2d3748;
+}
+
+.dark input {
+  background: #4a5568;
+  border-color: #4a5568;
+  color: #e2e8f0;
 }
 
 input:focus {
-  border-color: #007bff;
   outline: none;
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  transform: translateY(-1px);
 }
 
-/* Base button style */
-button {
+.dark input:focus {
+  background: #4a5568;
+  border-color: #667eea;
+}
+
+input:hover {
+  border-color: #cbd5e0;
+  background: white;
+}
+
+.dark input:hover {
+  background: #4a5568;
+  border-color: #718096;
+}
+
+/* 버튼 */
+.submit-button {
   width: 100%;
-  padding: 0.8rem;
-  border-radius: 4px;
-  border: none;
-  cursor: pointer;
-  font-size: 1rem;
-  font-weight: 600;
-  transition: all 0.2s ease-in-out;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-/* Login button specific style */
-button[type="submit"] {
-  background-color: #007bff;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
 }
 
-button[type="submit"]:hover {
-  background-color: #0056b3;
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
 }
 
+.submit-button:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.submit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.submit-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* 구분선 */
 .divider {
   text-align: center;
-  margin: 2.5rem 0;
+  margin: 2rem 0;
   position: relative;
 }
 
@@ -290,28 +420,67 @@ button[type="submit"]:hover {
   left: 0;
   right: 0;
   height: 1px;
-  background-color: #e0e0e0;
+  background-color: #e2e8f0;
   z-index: 0;
+}
+
+.dark .divider::before {
+  background-color: #4a5568;
 }
 
 .divider span {
   background-color: white;
   padding: 0 1rem;
-  color: #7f8c8d;
+  color: #718096;
   position: relative;
   z-index: 1;
+  font-size: 0.9rem;
 }
 
-/* Google login button specific style */
+.dark .divider span {
+  background-color: #2d3748;
+  color: #a0aec0;
+}
+
+/* Google 섹션 */
+.google-section {
+  margin-bottom: 2rem;
+}
+
+/* Google 로그인 버튼 */
 .google-login-btn {
-  background-color: #ffffff;
+  width: 100%;
+  padding: 1rem 2rem;
+  background: white;
   color: #333;
-  border: 1px solid #dcdfe6;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.dark .google-login-btn {
+  background: #4a5568;
+  border-color: #4a5568;
+  color: #e2e8f0;
 }
 
 .google-login-btn:hover {
-  background-color: #f8f9fa;
-  border-color: #c0c4cc;
+  background: #f8f9fa;
+  border-color: #cbd5e0;
+  transform: translateY(-1px);
+}
+
+.dark .google-login-btn:hover {
+  background: #5a6578;
+  border-color: #718096;
 }
 
 .google-login-btn img {
@@ -319,32 +488,113 @@ button[type="submit"]:hover {
   height: 20px;
 }
 
-/* Google Sign-In 버튼 스타일 */
-#g_id_onload,
-.g_id_signin {
-  margin: 1rem 0;
-}
-
-/* 에러 메시지 스타일 */
-.error-message {
-  margin-top: 1rem;
-  padding: 0.75rem 1rem;
-  background-color: #fff5f5;
-  border: 1px solid #fed7d7;
-  border-radius: 4px;
-  color: #e53e3e;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
 /* Google Identity Services 버튼 스타일 */
 #g_id_onload,
 .g_id_signin {
   margin: 1rem 0;
+  display: flex;
+  justify-content: center;
 }
 
-/* 수동 Google 로그인 버튼 스타일 */
-.google-login-btn {
-  margin-top: 1rem;
+/* 에러 메시지 */
+.error-message {
+  margin: 1rem 0;
+  padding: 1rem 1.25rem;
+  background-color: #fed7d7;
+  border: 2px solid #feb2b2;
+  border-radius: 12px;
+  color: #e53e3e;
+  font-size: 0.9rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.dark .error-message {
+  background-color: #742a2a;
+  border-color: #9c1a1a;
+  color: #feb2b2;
+}
+
+/* 푸터 */
+.login-footer {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  transition: border-color 0.3s ease;
+}
+
+.dark .login-footer {
+  border-color: #4a5568;
+}
+
+.login-footer p {
+  color: #718096;
+  margin: 0;
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
+}
+
+.dark .login-footer p {
+  color: #a0aec0;
+}
+
+.signup-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.signup-link:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+/* 필수 표시 */
+.required {
+  color: #e53e3e;
+  font-weight: bold;
+  margin-left: 2px;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 640px) {
+  .login-container {
+    padding: 1rem;
+  }
+  
+  .login-card {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+  }
+  
+  .login-title {
+    font-size: 2rem;
+  }
+  
+  input {
+    padding: 0.875rem 1rem;
+  }
+  
+  .submit-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+/* 애니메이션 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.login-card {
+  animation: fadeInUp 0.6s ease-out;
 }
 </style>

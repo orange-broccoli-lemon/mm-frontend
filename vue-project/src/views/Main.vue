@@ -3,6 +3,7 @@
     <HotMovie />
     <Actor />
     <Category />
+    <YouTubeVideos />
 
     <button
       class="fixed bottom-6 right-6 w-16 h-16 rounded-full shadow-lg flex items-center justify-center bg-white dark:bg-gray-800 hover:scale-105 transition-transform duration-200"
@@ -20,7 +21,8 @@ import { ref } from 'vue'
 import HotMovie from '@/views/HotMovie.vue'
 import Actor from '@/views/Actor.vue'
 import Category from '@/views/Category.vue'
-import ChatBotModal from '@/views/ChatBotModal.vue' 
+import ChatBotModal from '@/views/ChatBotModal.vue'
+import YouTubeVideos from '@/components/YouTubeVideos.vue' 
 
 const showBotModal = ref(false)
 </script>

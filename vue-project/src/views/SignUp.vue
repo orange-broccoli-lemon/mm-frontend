@@ -1,9 +1,14 @@
 <template>
-  <main class="signup">
-    <h1>회원가입</h1>
-    <form @submit.prevent="signUpMember">
+  <main class="signup-container">
+    <div class="signup-card">
+      <div class="signup-header">
+        <h1 class="signup-title">회원가입</h1>
+        <p class="signup-subtitle">새로운 계정을 만들어보세요</p>
+      </div>
+      
+      <form @submit.prevent="signUpMember" class="signup-form">
       <div class="form-group">
-        <label for="name">이름</label>
+        <label for="name">이름 <span class="required">*</span></label>
         <input
           id="name"
           v-model="name"
@@ -16,7 +21,7 @@
       </div>
 
       <div class="form-group">
-        <label for="email">이메일</label>
+        <label for="email">이메일 <span class="required">*</span></label>
         <input
           id="email"
           v-model="email"
@@ -29,7 +34,7 @@
       </div>
 
       <div class="form-group">
-        <label for="password1">비밀번호</label>
+        <label for="password1">비밀번호 <span class="required">*</span></label>
         <input
           id="password1"
           v-model="password1"
@@ -42,7 +47,7 @@
       </div>
 
       <div class="form-group">
-        <label for="password2">비밀번호 확인</label>
+        <label for="password2">비밀번호 확인 <span class="required">*</span></label>
         <input
           id="password2"
           v-model="password2"
@@ -60,19 +65,29 @@
           id="image"
           v-model="image"
           type="text"
-          placeholder="이미지 URL 입력"
+          placeholder="이미지 URL 입력 (선택사항)"
           @blur="validateImageUrl"
         />
         <div v-if="errors.image" class="error-message">{{ errors.image }}</div>
       </div>
 
-      <button type="submit" :disabled="!isFormValid">회원가입</button>
-    </form>
+        <button type="submit" :disabled="!isFormValid" class="submit-button">
+          회원가입
+        </button>
+      </form>
+      
+      <div class="signup-footer">
+        <p>이미 계정이 있으신가요? 
+          <RouterLink to="/login" class="login-link">로그인</RouterLink>
+        </p>
+      </div>
+    </div>
   </main>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from "vue"
+import { RouterLink } from "vue-router"
 import { useAccountStore } from "../stores/user"
 import spottiImage from '@/assets/spotti.png'
 
@@ -217,64 +232,293 @@ const signUpMember = function () {
 </script>
 
 <style scoped>
-.signup {
-  max-width: 400px;
-  margin: 2rem auto;
-  padding: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+/* 메인 컨테이너 */
+.signup-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  padding: 2rem 1rem;
+  font-family: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  transition: background-color 0.3s ease;
+}
+
+.dark .signup-container {
+  background: #1a202c;
+}
+
+/* 카드 스타일 */
+.signup-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark .signup-card {
+  background: #2d3748;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.signup-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+/* 헤더 */
+.signup-header {
+  text-align: center;
+  margin-bottom: 2.5rem;
+}
+
+.signup-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  transition: color 0.3s ease;
+}
+
+.dark .signup-title {
+  color: #e2e8f0;
+}
+
+.signup-subtitle {
+  color: #718096;
+  font-size: 1rem;
+  margin: 0;
+  font-weight: 400;
+  transition: color 0.3s ease;
+}
+
+.dark .signup-subtitle {
+  color: #a0aec0;
+}
+
+/* 폼 */
+.signup-form {
+  margin-bottom: 2rem;
 }
 
 .form-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
+}
+
+.dark label {
+  color: #e2e8f0;
 }
 
 input {
   width: 100%;
-  padding: 0.5rem;
-  margin-top: 0.3rem;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #f8fafc;
   box-sizing: border-box;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  transition: border-color 0.3s ease;
+  color: #2d3748;
+}
+
+.dark input {
+  background: #4a5568;
+  border-color: #4a5568;
+  color: #e2e8f0;
 }
 
 input:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: #667eea;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  transform: translateY(-1px);
+}
+
+.dark input:focus {
+  background: #4a5568;
+  border-color: #667eea;
+}
+
+input:hover {
+  border-color: #cbd5e0;
+  background: white;
+}
+
+.dark input:hover {
+  background: #4a5568;
+  border-color: #718096;
 }
 
 input.error {
-  border-color: #dc3545;
+  border-color: #e53e3e;
+  background: #fed7d7;
+}
+
+input.error:focus {
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
 }
 
 .error-message {
-  color: #dc3545;
+  color: #e53e3e;
   font-size: 0.875rem;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
   min-height: 1.25rem;
+  font-weight: 500;
 }
 
-button {
+/* 버튼 */
+.submit-button {
   width: 100%;
-  padding: 0.7rem;
-  background-color: #007bff;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  position: relative;
+  overflow: hidden;
 }
 
-button:hover:not(:disabled) {
-  background-color: #0056b3;
+.submit-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
 }
 
-button:disabled {
-  background-color: #6c757d;
+.submit-button:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.submit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.submit-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit-button:disabled {
+  background: #a0aec0;
   cursor: not-allowed;
-  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+/* 푸터 */
+.signup-footer {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e2e8f0;
+  transition: border-color 0.3s ease;
+}
+
+.dark .signup-footer {
+  border-color: #4a5568;
+}
+
+.signup-footer p {
+  color: #718096;
+  margin: 0;
+  font-size: 0.95rem;
+  transition: color 0.3s ease;
+}
+
+.dark .signup-footer p {
+  color: #a0aec0;
+}
+
+.login-link {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.login-link:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+/* 필수 표시 */
+.required {
+  color: #e53e3e;
+  font-weight: bold;
+  margin-left: 2px;
+}
+
+
+/* 반응형 디자인 */
+@media (max-width: 640px) {
+  .signup-container {
+    padding: 1rem;
+  }
+  
+  .signup-card {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
+  }
+  
+  .signup-title {
+    font-size: 2rem;
+  }
+  
+  input {
+    padding: 0.875rem 1rem;
+  }
+  
+  .submit-button {
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+  }
+}
+
+/* 애니메이션 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.signup-card {
+  animation: fadeInUp 0.6s ease-out;
 }
 </style>
