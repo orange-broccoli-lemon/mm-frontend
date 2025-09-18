@@ -16,6 +16,7 @@ import SignUpView from '@/views/SignUp.vue'
 import MyPage from '@/views/MyPage.vue'
 import HotMovieDetailView from '@/views/HotMovieDetailView.vue'
 import CategoryDetailView from '@/views/CategoryDetailView.vue'
+import CategoryAll from '@/views/CategoryAll.vue'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -36,8 +37,6 @@ const router = createRouter({
       component: SignUpView,
       meta: { requiresGuest: true }
     },
-    
-
     {
       path: '/mypage',
       name: 'mypage',
@@ -48,6 +47,23 @@ const router = createRouter({
       path: '/HotMovieDetailView',
       name: 'HotMovieDetailView',
       component: HotMovieDetailView,
+    },
+
+    {
+      path: '/Category',
+      name: 'Category',
+      component: () => import('@/views/Category.vue'),
+    },
+    {
+      path: '/Category/:genreId',   // ✅ 동적 라우트 추가
+      name: 'CategoryDetailView',
+      component: CategoryDetailView,
+      props: true, // params.id → props.id 로 받을 수 있음
+    },
+    {
+      path: '/CategoryAll',
+      name: 'CategoryAll',
+      component: CategoryAll,
     },
     {
       path: '/select-movie',
@@ -76,17 +92,7 @@ const router = createRouter({
       name: 'BookDetail',
       component: () => import('@/views/DetailMovie.vue'),
     },
-    {
-      path: '/Category',
-      name: 'Category',
-      component: () => import('@/views/Category.vue'),
-    },
-    {
-      path: '/Category/:genreId',   // ✅ 동적 라우트 추가
-      name: 'CategoryDetailView',
-      component: CategoryDetailView,
-      props: true, // params.id → props.id 로 받을 수 있음
-    },
+
     {
       path: '/actors',
       name: 'AllActors',

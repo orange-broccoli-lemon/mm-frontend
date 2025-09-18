@@ -55,11 +55,16 @@ export const useCategoryStore = defineStore('category', () => {
   const fetchMoviesByGenre = async function(genreId: number, page: number = 1) {
     if (!genreId || genreId <= 0) throw new Error('올바르지 않은 장르 ID입니다.')
 
+    if (page === 1) {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
     try {
       genreMoviesLoading.value[genreId] = true
 
      const res = await axios.get<GenreMoviesResponse>(
   `${BASE_API}v1/genres/${genreId}/movies?page=${page}`
+  
+  
 )
 
 
