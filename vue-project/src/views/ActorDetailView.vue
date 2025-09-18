@@ -140,13 +140,13 @@
                            : 'bg-gray-800 dark:bg-gray-600 hover:bg-gray-900 dark:hover:bg-gray-500 text-white'
                        ]"
                      >
-                       {{ isFollowing ? '팔로잉' : '팔로우' }}
+                       {{ isFollowing ? '좋아요 취소' : '좋아요' }}
                      </button>
                      <button
                        @click="showFollowerListModal = true"
                        class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200 cursor-pointer"
                      >
-                       <span class="font-medium">{{ followersCount }}</span>명이 팔로우 중
+                       <span class="font-medium">❤️: {{ store.actorDetails.followers_count }}</span>
                      </button>
                    </div>
           </div>
@@ -216,12 +216,15 @@
                 {{ credit.movie_title }}
               </h3>
               
-              <div v-if="credit.character_name" class="text-sm text-gray-600 dark:text-gray-400">
-                <span class="font-medium">역할:</span> {{ credit.character_name }}
-              </div>
-              
-              <div v-if="credit.job" class="text-sm text-gray-600 dark:text-gray-400">
-                <span class="font-medium">직책:</span> {{ credit.job }}
+           
+                <div v-if="credit.job" class="text-sm text-gray-600 dark:text-gray-400">
+                <div v-if ="credit.is_main_cast && credit.job == 'Actor' ">
+                      <span class="font-medium">직책: 주연</span> 
+
+                </div>
+                <div v-else>
+                  <span class="font-medium">직책:</span> {{ credit.job }}
+                </div>
               </div>
               
               <div v-if="credit.release_date" class="text-sm text-gray-500 dark:text-gray-500">
@@ -305,14 +308,15 @@ watch(
   }
 )
 
-const toggleFollow = () => {
-  isFollowing.value = !isFollowing.value
+const toggleFollow = async () => {
   if (isFollowing.value) {
-    followersCount.value++
+    await store.unFollowActor(Number(route.params.id))
+     console.log(store.actorDetails)
+    isFollowing.value = false
   } else {
-    followersCount.value--
+    await store.followActor(Number(route.params.id))
+    isFollowing.value = true
   }
-  // TODO: API 호출해서 팔로우 상태 동기화
 }
 
 const formatDate = (dateString: string) => {
