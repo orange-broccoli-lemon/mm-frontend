@@ -27,7 +27,7 @@
             <div class="flex items-center gap-4">
               <div class="relative animate-scale-in">
                 <img
-                  :src="userProfile.profile_image_url || defaultProfileImage"
+                  :src="getProfileImageUrl(userProfile.profile_image_url)"
                   :alt="userProfile.name"
                   class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
                 />
@@ -129,13 +129,14 @@
                 v-for="comment in (showAllComments ? userComments : userComments.slice(0, 4))"
                 :key="comment.comment_id"
                 :comment_id="comment.comment_id"
-                :profileImage="userProfile.profile_image_url || defaultProfileImage"
+                :profileImage="getProfileImageUrl(userProfile.profile_image_url)"
                 :content="comment.content"
                 :name="userProfile?.name || '이름 없음'"
                 :movietitle="comment.movie_title"
                 :movie_poster_url="comment.movie_poster_url"
                 :movie_id="comment.movie_id"
                 :rating="Number(comment.rating) || 0"
+                :likes_count="comment.likes_count || 0"
               />
             </div>
           </div>
@@ -298,6 +299,20 @@ const accountStore = useAccountStore()
 
 // 기본 프로필 이미지
 const defaultProfileImage = '/src/assets/spotti.png'
+
+// 프로필 이미지 URL을 절대 경로로 변환
+const getProfileImageUrl = (url?: string) => {
+  if (!url) return defaultProfileImage
+  
+  // 이미 절대 URL인 경우 (http:// 또는 https://로 시작)
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+  
+  // 상대 경로인 경우 서버 주소 추가
+  const baseUrl = 'https://i13m105.p.ssafy.io'
+  return `${baseUrl}${url}`
+}
 
 // 반응형 데이터
 const isLoading = ref(true)
