@@ -7,7 +7,7 @@
     leave-from-class="opacity-100 scale-100"
     leave-to-class="opacity-0 scale-95"
   >
-    <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center">
       <div class="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md mx-4 p-6">
         <!-- 헤더 -->
         <div class="flex items-center justify-between mb-6">

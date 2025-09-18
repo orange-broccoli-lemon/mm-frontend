@@ -53,10 +53,18 @@
             </button>
             
             <!-- Dropdown Menu -->
-            <div 
-              v-if="showProfileDropdown"
-              class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50"
+            <Transition
+              enter-active-class="transition ease-out duration-200"
+              enter-from-class="opacity-0 scale-95"
+              enter-to-class="opacity-100 scale-100"
+              leave-active-class="transition ease-in duration-150"
+              leave-from-class="opacity-100 scale-100"
+              leave-to-class="opacity-0 scale-95"
             >
+              <div 
+                v-if="showProfileDropdown"
+                class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 z-50 transform origin-top-right"
+              >
               <div class="py-1">
                 <RouterLink 
                   to="/mypage"
@@ -79,7 +87,8 @@
                   로그아웃
                 </button>
               </div>
-            </div>
+              </div>
+            </Transition>
           </div>
         </div>
       </div>
@@ -88,7 +97,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, Transition } from 'vue'
 import { useAccountStore } from '@/stores/user'
 import { useThemeStore } from '@/stores/theme'
 import SearchBar from '@/components/SearchBar.vue'
