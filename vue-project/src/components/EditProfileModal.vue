@@ -71,16 +71,26 @@
               프로필 이미지
             </label>
             <div class="flex items-center space-x-4">
-              <div class="w-16 h-16 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-600">
+              <div 
+                class="w-16 h-16 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-600 relative cursor-pointer hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors duration-200"
+                @click="fileInput?.click()"
+              >
                 <img
-                  v-if="previewImage"
-                  :src="previewImage"
+                  v-if="previewImage || accountStore.user?.profile_image_url"
+                  :src="previewImage || getProfileImageUrl(accountStore.user?.profile_image_url)"
                   alt="프로필 미리보기"
                   class="w-full h-full object-cover"
+                  @error="handleImageError"
                 />
                 <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
                   <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                  </svg>
+                </div>
+                <!-- 편집 아이콘 -->
+                <div class="absolute bottom-0 right-0 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center shadow-md">
+                  <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                   </svg>
                 </div>
               </div>
@@ -178,6 +188,26 @@ const handleFileChange = (event: Event) => {
     }
     reader.readAsDataURL(file)
   }
+}
+
+// 프로필 이미지 URL을 절대 경로로 변환
+const getProfileImageUrl = (url?: string) => {
+  if (!url) return ''
+  
+  // 이미 절대 URL인 경우 (http:// 또는 https://로 시작)
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+  
+  // 상대 경로인 경우 서버 주소 추가
+  const baseUrl = 'https://i13m105.p.ssafy.io'
+  return `${baseUrl}${url}`
+}
+
+// 이미지 로딩 에러 처리
+const handleImageError = () => {
+  console.log('프로필 이미지 로딩 실패')
+  previewImage.value = ''
 }
 
 // 폼 제출 처리

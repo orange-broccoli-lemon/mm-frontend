@@ -124,12 +124,21 @@ export const useAccountStore = defineStore('account', () => {
   async function getUserInfo() {
     if (!token.value || !userId.value) return
     try {
+      console.log('=== getUserInfo 디버깅 ===')
+      console.log('API URL:', `${USERS_API}/${userId.value}`)
+      console.log('토큰 존재:', !!token.value)
+      console.log('사용자 ID:', userId.value)
+      
       const res = await axios.get(`${USERS_API}/${userId.value}`, {
         headers: { Authorization: `Bearer ${token.value}`, Accept: "application/json" }
       })
       user.value = res.data as UserProfile
 
-      console.log("user", user.value)
+      console.log("=== API 응답 데이터 ===")
+      console.log("전체 응답:", res.data)
+      console.log("프로필 이미지 URL:", res.data.profile_image_url)
+      console.log("사용자 이름:", res.data.name)
+      console.log("========================")
     } catch (err: unknown) {
       const error = err as AxiosError
       console.error('유저 정보 가져오기 실패:', error.response?.data || error.message)

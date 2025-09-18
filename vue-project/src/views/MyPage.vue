@@ -5,7 +5,7 @@ import { useAccountStore } from '@/stores/user'
 import CommentCard from '@/components/CommentCard.vue'
 import MovieCard from '@/components/MovieCard.vue'
 import FollowingModal from '@/components/FollowingModal.vue'
-import EditProfileModal from '@/components/EditProfileModal.vue'
+import EditProfileModal from '../components/EditProfileModal.vue'
 import spottiImage from '@/assets/spotti.png'
 
 const accountStore = useAccountStore()
@@ -37,6 +37,36 @@ const handleCommentDeleted = async (commentId: number) => {
   }
 }
 
+// 프로필 이미지 URL을 절대 경로로 변환
+const getProfileImageUrl = () => {
+  const profileUrl = accountStore.user?.profile_image_url
+  if (!profileUrl) {
+    return defaultProfileImage
+  }
+  
+  // 이미 절대 URL인 경우 (http:// 또는 https://로 시작)
+  if (profileUrl.startsWith('http://') || profileUrl.startsWith('https://')) {
+    return profileUrl
+  }
+  
+  // 상대 경로인 경우 서버 주소 추가
+  const baseUrl = 'https://i13m105.p.ssafy.io'
+  return `${baseUrl}${profileUrl}`
+}
+
+// 프로필 이미지 로딩 성공 처리
+const handleProfileImageLoad = () => {
+  console.log('프로필 이미지 로딩 성공:', getProfileImageUrl())
+}
+
+// 프로필 이미지 로딩 에러 처리
+const handleProfileImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement
+  console.log('프로필 이미지 로딩 실패:', img.src)
+  console.log('기본 이미지로 대체:', defaultProfileImage)
+  img.src = defaultProfileImage
+}
+
 onMounted(async () => {
   console.log('MyPage 마운트됨, 사용자 정보 로드 중...')
   const isValidToken = await accountStore.validateToken()
@@ -46,6 +76,14 @@ onMounted(async () => {
   }
   
   await accountStore.getUserInfo()
+  
+  // 디버깅: 사용자 정보와 프로필 이미지 확인
+  console.log('=== MyPage 디버깅 정보 ===')
+  console.log('사용자 정보:', accountStore.user)
+  console.log('프로필 이미지 URL:', accountStore.user?.profile_image_url)
+  console.log('기본 프로필 이미지:', defaultProfileImage)
+  console.log('최종 이미지 소스:', accountStore.user?.profile_image_url || defaultProfileImage)
+  console.log('========================')
 
   if (accountStore.user?.user_id != null) {
     console.log('사용자 ID:', accountStore.user.user_id)
@@ -71,9 +109,11 @@ onMounted(async () => {
             <div class="flex items-center gap-4">
               <div class="relative animate-scale-in">
                 <img
-                  :src="accountStore.user.profile_image_url || defaultProfileImage"
+                  :src="getProfileImageUrl()"
                   alt="프로필 이미지"
                   class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"
+                  @error="handleProfileImageError"
+                  @load="handleProfileImageLoad"
                 />
                 <div
                   class="absolute bottom-1 right-1 w-4 h-4 rounded-full border-2 border-white"
@@ -170,7 +210,7 @@ onMounted(async () => {
               v-for="comment in (showAllComments ? accountStore.commentList ?? [] : (accountStore.commentList ?? []).slice(0, 4))"
               :key="comment.comment_id"
               :comment_id="comment.comment_id"
-              :profileImage="accountStore.user.profile_image_url || defaultProfileImage"
+              :profileImage="getProfileImageUrl()"
               :content="comment.content"
               :name="accountStore.user?.name || '이름 없음'"
               :movietitle="comment.movie_title"
