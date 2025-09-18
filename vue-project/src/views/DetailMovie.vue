@@ -44,7 +44,7 @@
   <div
     class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6"
   >
-    <span class="font-bold text-gray-900 dark:text-gray-100">| 코멘트 요약</span>
+    <span class="font-bold text-gray-900 dark:text-gray-100">| AI코멘트 요약</span>
     <p class="mt-2 text-gray-600 dark:text-gray-400 leading-relaxed">
       {{ movieDetail.concise_review }}
     </p>

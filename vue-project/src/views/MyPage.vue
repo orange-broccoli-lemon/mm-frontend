@@ -150,7 +150,7 @@ onMounted(async () => {
             class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 
                   text-gray-700 dark:text-gray-300 animate-slide-up"
           >
-            <span class="font-bold">| 유저 성향</span>
+            <span class="font-bold">| AI 유저 성향</span>
             <p class="mt-2 text-gray-600 dark:text-gray-400">
               {{ accountStore.user.profile_review || '아직 설정되지 않았습니다.' }}
             </p>
