@@ -18,11 +18,14 @@ const showFollowingModal = ref(false)
 const goFollowing = () => showFollowingModal.value = true
 const goToHotMovies = () => router.push('/select-movie')
 
+// 영화 상세 페이지 이동
+const goToMovieDetail = (movieId: number) => {
+  router.push({ name: 'BookDetail', params: { id: movieId } })
+}
+
 // 댓글 삭제 처리
 const handleCommentDeleted = async (commentId: number) => {
   console.log('댓글 삭제됨:', commentId)
-  
-  // 사용자 정보와 댓글 목록 새로고침
   if (accountStore.user?.user_id) {
     await accountStore.getUserInfo()
     await accountStore.userComment(accountStore.user.user_id)
@@ -31,8 +34,6 @@ const handleCommentDeleted = async (commentId: number) => {
 
 onMounted(async () => {
   console.log('MyPage 마운트됨, 사용자 정보 로드 중...')
-  
-  // 토큰 유효성 검사 먼저 수행
   const isValidToken = await accountStore.validateToken()
   if (!isValidToken) {
     console.log('토큰이 유효하지 않습니다. 로그인 페이지로 이동합니다.')
@@ -43,22 +44,16 @@ onMounted(async () => {
 
   if (accountStore.user?.user_id != null) {
     console.log('사용자 ID:', accountStore.user.user_id)
-    
     await accountStore.userComment(accountStore.user.user_id)
-    console.log('댓글 목록:', accountStore.commentList)
-    
     await accountStore.watchList(accountStore.user.user_id)
-    console.log('저장한 영화 목록:', accountStore.watch_list)
-    
     await accountStore.likeList(accountStore.user.user_id)
-    console.log('좋아요한 영화 목록:', accountStore.like_list)
   }
 })
 </script>
 
 <template>
   <div class="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300 relative" v-if="accountStore.user">
-    <!-- 헤더 섹션 -->
+    <!-- 헤더 -->
     <div class="bg-gray-50 dark:bg-gray-800 py-8 px-4">
       <div class="max-w-4xl mx-auto">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
@@ -86,7 +81,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- 통계 카드 섹션 -->
+    <!-- 통계 카드 -->
     <div class="py-6 px-4">
       <div class="max-w-4xl mx-auto grid grid-cols-3 gap-4">
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 text-center">
@@ -110,17 +105,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- 액션 버튼 섹션 -->
-    <div class="py-6 px-4">
-      <div class="max-w-4xl mx-auto">
-        <button class="w-full bg-gray-800 dark:bg-white hover:bg-gray-900 dark:hover:bg-gray-100 text-white dark:text-gray-900 py-3 px-4 rounded-md font-medium transition-colors duration-200 flex items-center justify-center" @click="goToHotMovies">
-          <img src="@/assets/spotti.png" alt="스포띠" class="w-6 h-6 mr-2">
-          스포띠빠이와 함께 리뷰쓰러가기
-        </button>
-      </div>
-    </div>
-
-    <!-- 최근 리뷰 섹션 -->
+    <!-- 리뷰 -->
     <div class="py-6 px-4">
       <div class="max-w-4xl mx-auto">
         <div class="flex items-center justify-between mb-4">
@@ -157,7 +142,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- 좋아요한 영화 섹션 -->
+    <!-- 좋아요한 영화 -->
     <div class="py-6 px-4">
       <div class="max-w-4xl mx-auto">
         <div class="flex items-center justify-between mb-4">
@@ -176,6 +161,7 @@ onMounted(async () => {
               :key="movie.movie_id"
               :image="movie.poster_url || '/no-image.png'"
               :title="movie.title"
+              @click="goToMovieDetail(movie.movie_id)"
             />
           </div>
         </div>
@@ -185,7 +171,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- 저장한 영화 섹션 -->
+    <!-- 저장한 영화 -->
     <div class="py-6 px-4">
       <div class="max-w-4xl mx-auto">
         <div class="flex items-center justify-between mb-4">
@@ -204,6 +190,7 @@ onMounted(async () => {
               :key="movie.movie_id"
               :image="movie.poster_url || '/no-image.png'"
               :title="movie.title"
+              @click="goToMovieDetail(movie.movie_id)"
             />
           </div>
         </div>

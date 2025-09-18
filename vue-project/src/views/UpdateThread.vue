@@ -181,7 +181,7 @@ onMounted(loadComment)
           </div>
 
           <!-- Spoiler Section -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <!-- <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">스포일러 설정</h3>
             <label class="flex items-center gap-3 cursor-pointer">
               <input
@@ -191,7 +191,7 @@ onMounted(loadComment)
               />
               <span class="text-gray-700">이 리뷰에는 스포일러가 포함되어 있습니다</span>
             </label>
-          </div>
+          </div> -->
 
           <!-- Submit Button -->
           <div class="flex gap-4">

@@ -24,12 +24,6 @@ const movieId = ref(Number(route.query.movieId) || Number(route.params.id) || 1)
 const movieTitle = ref(route.query.movieTitle as string || '영화')
 const moviePoster = ref(decodeURIComponent(route.query.poster_url as string || ''))
 
-// 디버깅: 쿼리 파라미터 확인
-console.log('CreateThread 쿼리 파라미터:', route.query)
-console.log('포스터 URL:', moviePoster.value)
-console.log('포스터 URL 타입:', typeof moviePoster.value)
-console.log('포스터 URL 길이:', moviePoster.value?.length)
-console.log('포스터 URL이 비어있는가:', !moviePoster.value)
 
 // 현재 표시할 별점 (호버 중이면 호버 값, 아니면 선택된 값)
 const currentRating = computed(() => {
@@ -134,10 +128,7 @@ const handleImageError = (event: Event) => {
   img.style.display = 'none'
 }
 
-// 이미지 로딩 성공 처리
-const handleImageLoad = (event: Event) => {
-  console.log('이미지 로딩 성공:', moviePoster.value)
-}
+
 
 const handleCreateComment = async () => {
   // 입력 검증
@@ -238,7 +229,6 @@ const handleCreateComment = async () => {
                 :alt="movieTitle"
                 class="w-full h-full object-cover"
                 @error="handleImageError"
-                @load="handleImageLoad"
               />
               <div v-else class="w-full h-full flex flex-col items-center justify-center text-gray-400 bg-gradient-to-br from-gray-100 to-gray-200">
                 <div class="text-2xl mb-1">🎬</div>
@@ -328,7 +318,7 @@ const handleCreateComment = async () => {
           </div>
 
           <!-- Spoiler Section -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <!-- <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">스포일러 설정</h3>
             <label class="flex items-center gap-3 cursor-pointer">
               <input
@@ -338,7 +328,7 @@ const handleCreateComment = async () => {
               />
               <span class="text-gray-700">이 리뷰에는 스포일러가 포함되어 있습니다</span>
             </label>
-          </div>
+          </div> -->
 
           <!-- Submit Button -->
           <div class="flex gap-4">
