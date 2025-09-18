@@ -57,11 +57,7 @@
       <div
         v-for="comment in comments"
         :key="comment.comment_id"
-<<<<<<< HEAD
         class="comment-item transition-all duration-300 ease-in-out hover-expandable bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 shadow-sm dark:shadow-gray-900 hover:shadow-lg dark:hover:shadow-gray-800"
-=======
-        class="comment-item"
->>>>>>> 2a42c6072eb5bda5d06263399eba7568f55c819b
       >
         <!-- 헤더 -->
         <div class="comment-header">
@@ -78,21 +74,14 @@
         <!-- 내용 -->
         <div class="comment-content">
          <p
-<<<<<<< HEAD
           class="comment-text transition-all duration-300 ease-in-out text-gray-800 dark:text-gray-200"
           :class="{
             'line-clamp-1': !expandedComments.includes(comment.comment_id),
             'line-clamp-none': expandedComments.includes(comment.comment_id),
-=======
-          class="comment-text clamped"
-          :class="{
-            expanded: expandedComments.includes(comment.comment_id),
->>>>>>> 2a42c6072eb5bda5d06263399eba7568f55c819b
             spoiler: comment.is_spoiler
           }"
           :title="comment.content"
           :ref="(el: any) => setContentRef(comment.comment_id, el)"
-<<<<<<< HEAD
          >
            {{ comment.content }}
          </p>
@@ -110,35 +99,6 @@
             <span class="like-icon">👍</span>
             <span class="like-count">{{ comment.likes_count }}</span>
           </span>
-=======
-        >
-          <template v-if="comment.is_spoiler">
-            ⚠️ {{ comment.content }}
-          </template>
-          <template v-else>
-            {{ comment.content }}
-          </template>
-        </p>
-        </div>
-
-        <!-- 푸터 -->
-        <div class="comment-footer">
-          <span 
-            class="likes" 
-            :class="{ 'liked': comment.is_liked }"
-            @click="$emit('commentLikeToggle', comment)"
-          >
-            👍 {{ comment.likes_count }}
-          </span>
-
-          <button
-            v-if="needsMoreMap[comment.comment_id]"
-            @click="toggleExpand(comment.comment_id)"
-            class="more-btn"
-          >
-            {{ expandedComments.includes(comment.comment_id) ? '접기' : '더보기' }}
-          </button>
->>>>>>> 2a42c6072eb5bda5d06263399eba7568f55c819b
         </div>
       </div>
     </div>
@@ -162,7 +122,6 @@ defineEmits<{
   commentLikeToggle: [comment: MovieComment]
 }>()
 
-<<<<<<< HEAD
 /** 펼침 상태 (호버용) */
 const expandedComments = ref<number[]>([])
 
@@ -170,11 +129,6 @@ const expandedComments = ref<number[]>([])
 const showTip = ref(false)
 const tipVisible = ref(false)
 
-=======
-/** 펼침 상태 */
-const expandedComments = ref<number[]>([])
-
->>>>>>> 2a42c6072eb5bda5d06263399eba7568f55c819b
 /** ref 저장소 (id -> HTMLElement) */
 const contentRefMap = ref<Record<number, HTMLElement>>({})
 
@@ -190,18 +144,6 @@ const setContentRef = (id: number, el: any) => {
 /** 1줄 초과 여부 */
 const needsMoreMap = ref<Record<number, boolean>>({})
 
-<<<<<<< HEAD
-=======
-/** 더보기/접기 토글 */
-const toggleExpand = (id: number) => {
-  if (expandedComments.value.includes(id)) {
-    expandedComments.value = expandedComments.value.filter(c => c !== id)
-  } else {
-    expandedComments.value.push(id)
-  }
-}
-
->>>>>>> 2a42c6072eb5bda5d06263399eba7568f55c819b
 /** 이미지 경로 */
 const getProfileImageUrl = (url?: string) => {
   if (!url) return defaultImage
@@ -257,7 +199,6 @@ const debounced = (fn: () => void, wait = 120) => {
 }
 const measureAllDebounced = debounced(() => measureAll())
 
-<<<<<<< HEAD
 /** 팁 표시 함수 */
 const showWelcomeTip = () => {
   setTimeout(() => {
@@ -274,17 +215,12 @@ const showWelcomeTip = () => {
   }, 1000)
 }
 
-=======
->>>>>>> 2a42c6072eb5bda5d06263399eba7568f55c819b
 /** 라이프사이클 */
 onMounted(async () => {
   await nextTick()
   measureAll()
   window.addEventListener('resize', measureAllDebounced)
-<<<<<<< HEAD
   showWelcomeTip()
-=======
->>>>>>> 2a42c6072eb5bda5d06263399eba7568f55c819b
 })
 onUpdated(() => measureAllDebounced())
 onUnmounted(() => window.removeEventListener('resize', measureAllDebounced))
@@ -316,17 +252,10 @@ watch(() => props.comments, async () => {
   padding: 60px 20px;
 }
 
-<<<<<<< HEAD
 .comments-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 20px;
-=======
-/* 🔥 Masonry 레이아웃 */
-.comments-grid {
-  column-count: 3;     /* 기본 3열 */
-  column-gap: 20px;    /* 열 간격 */
->>>>>>> 2a42c6072eb5bda5d06263399eba7568f55c819b
   margin-top: 20px;
   align-items: start;
   position: relative;
@@ -334,7 +263,6 @@ watch(() => props.comments, async () => {
 }
 
 .comment-item {
-<<<<<<< HEAD
   border: 1px solid;
   border-radius: 12px;
   padding: 20px;
@@ -359,21 +287,6 @@ watch(() => props.comments, async () => {
   display: block !important;
 }
 
-=======
-  display: inline-block;     /* column 안에서 블록처럼 */
-  width: 100%;
-  margin-bottom: 20px;       /* 카드 사이 간격 */
-  break-inside: avoid;       /* 카드가 쪼개져서 다른 열로 넘어가지 않도록 */
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 20px;
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-}
-
->>>>>>> 2a42c6072eb5bda5d06263399eba7568f55c819b
 .comment-header {
   display: flex;
   align-items: center;
@@ -402,7 +315,6 @@ watch(() => props.comments, async () => {
 .comment-text {
   line-height: 1.6;
   font-size: 0.95rem;
-<<<<<<< HEAD
 }
 
 /* 스포일러 */
@@ -423,52 +335,19 @@ watch(() => props.comments, async () => {
     border-left: 3px solid #a78bfa;
     color: #a78bfa;
   }
-=======
-}
-
-/* 기본 1줄 표시 */
-.comment-text.clamped {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  line-clamp: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* 펼친 경우 전체 표시 */
-.comment-text.expanded {
-  -webkit-line-clamp: unset;
-  line-clamp: unset;
-  display: block;
-}
-
-/* 스포일러 스타일 */
-.comment-text.spoiler {
-  /* padding: 8px 12px; */
-  border-left: 4px solid #3b82f6;
-  background-color: #dbeafe;
-  color: #1e40af;
-  border-radius: 6px;
->>>>>>> 2a42c6072eb5bda5d06263399eba7568f55c819b
 }
 
 .comment-footer {
   display: flex;
-  justify-content: space-between; /* 👍 왼쪽: 좋아요, 오른쪽: 더보기 */
+  justify-content: space-between;
   align-items: center;
   padding-top: 10px;
-<<<<<<< HEAD
   border-top: 1px solid;
-=======
-  border-top: 1px solid #e5e7eb;
->>>>>>> 2a42c6072eb5bda5d06263399eba7568f55c819b
   margin-top: 10px;
 }
 
 /* 👍 좋아요 버튼 */
 .likes {
-<<<<<<< HEAD
   display: inline-flex;
   align-items: center;
   gap: 4px;
@@ -544,34 +423,4 @@ watch(() => props.comments, async () => {
     grid-template-columns: 1fr;
   }
 }
-=======
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.more-btn {
-  font-size: 0.85rem;
-  color: #3b82f6;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-.more-btn:hover {
-  text-decoration: underline;
-}
-
-/* 🔥 반응형: 열 개수 줄이기 */
-@media (max-width: 1024px) {
-  .comments-grid {
-    column-count: 2;
-  }
-}
-@media (max-width: 640px) {
-  .comments-grid {
-    column-count: 1;
-  }
-}
-
-
->>>>>>> 2a42c6072eb5bda5d06263399eba7568f55c819b
 </style>
