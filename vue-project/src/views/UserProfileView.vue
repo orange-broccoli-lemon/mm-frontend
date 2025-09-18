@@ -45,7 +45,17 @@
                 </h1>
                 <p class="text-gray-600 dark:text-gray-400">영화 리뷰어</p>
               </div>
+
             </div>
+            <div
+          class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700 
+                text-gray-700 dark:text-gray-300 animate-slide-up"
+        >
+          <span class="font-bold">| 유저 성향</span>
+          <p class="mt-2 text-gray-600 dark:text-gray-400">
+            {{ userProfile.profile_review || '아직 설정되지 않았습니다.' }}
+          </p>
+          </div>
           </div>
         </div>
       </div>
