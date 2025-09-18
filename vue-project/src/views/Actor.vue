@@ -4,7 +4,7 @@
     <div class="py-4 px-4">
       <div class="max-w-7xl mx-auto">
         <!-- Section Header -->
-        <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center justify-between mb-6 section-header">
           <div class="flex items-center gap-3">
             <div class="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
@@ -31,11 +31,13 @@
         <!-- Actors Grid -->
         <div v-else class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
           <ActorCard
-            v-for="actor in actorStore.actorList.slice(0, 6)"
+            v-for="(actor, index) in actorStore.actorList.slice(0, 6)"
             :key="actor.person_id"
             :id="actor.person_id"
             :name="actor.name"
             :image="actor.profile_image_url"
+            class="actor-card"
+            :style="{ animationDelay: `${index * 100}ms` }"
           />
         </div>
       </div>
@@ -59,4 +61,67 @@ onMounted(async () => {
   await actorStore.allActors()
 })
 </script>
+
+<style scoped>
+/* Section Header Animation */
+.section-header {
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: slideInDown 0.8s ease-out forwards;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Actor Card Entrance Animation */
+.actor-card {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: slideInUp 0.6s ease-out forwards;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Staggered animation delays */
+.actor-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.actor-card:nth-child(2) {
+  animation-delay: 100ms;
+}
+
+.actor-card:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+.actor-card:nth-child(4) {
+  animation-delay: 300ms;
+}
+
+.actor-card:nth-child(5) {
+  animation-delay: 400ms;
+}
+
+.actor-card:nth-child(6) {
+  animation-delay: 500ms;
+}
+</style>
 

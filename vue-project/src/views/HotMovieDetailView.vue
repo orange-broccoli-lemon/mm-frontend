@@ -5,7 +5,7 @@
       <div class="max-w-7xl mx-auto">
         <!-- 인기 영화 섹션 -->
         <section class="mb-8">
-          <div class="flex items-center gap-3 mb-6">
+          <div class="flex items-center gap-3 mb-6 section-header">
             <div class="w-1 h-8 bg-gradient-to-b from-orange-500 to-red-500 rounded-full"></div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
               인기 영화 TOP 10
@@ -22,7 +22,8 @@
               v-for="(movie, index) in movieStore.popularMovies"
               :key="movie.movie_id"
               :to="{ name: 'movie-detail', params: { id: movie.movie_id } }"
-              class="movie-link"
+              class="movie-link popular-movie-card"
+              :style="{ animationDelay: `${index * 80}ms` }"
             >
               <MovieCard
                 :title="movie.title"
@@ -38,7 +39,7 @@
 
         <!-- 추천 영화 섹션 -->
         <section class="mt-8">
-          <div class="flex items-center gap-3 mb-6">
+          <div class="flex items-center gap-3 mb-6 section-header">
             <div class="w-1 h-8 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
             <h2 class="text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
               추천 영화
@@ -55,7 +56,8 @@
               v-for="(movie, index) in movieStore.movieList"
               :key="movie.movie_id"
               :to="{ name: 'movie-detail', params: { id: movie.movie_id } }"
-              class="movie-link"
+              class="movie-link recommended-movie-card"
+              :style="{ animationDelay: `${index * 60}ms` }"
             >
               <MovieCard
                 :title="movie.title"
@@ -103,10 +105,23 @@ onMounted(() => {
   height: 1px;
   background: linear-gradient(90deg, transparent, #e5e7eb 20%, #e5e7eb 80%, transparent);
   margin: 2rem 0;
+  opacity: 0;
+  animation: fadeInDivider 1s ease-out 0.5s forwards;
 }
 
 .dark .divider {
   background: linear-gradient(90deg, transparent, #374151 20%, #374151 80%, transparent);
+}
+
+@keyframes fadeInDivider {
+  from {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
 }
 
 /* 영화 그리드 */
@@ -118,11 +133,76 @@ onMounted(() => {
 
 .movie-link {
   text-decoration: none;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 12px;
+  overflow: hidden;
 }
 
 .movie-link:hover {
-  transform: translateY(-4px);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+}
+
+.dark .movie-link:hover {
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+}
+
+/* Popular Movies Entrance Animation */
+.popular-movie-card {
+  opacity: 0;
+  transform: translateY(40px) scale(0.9);
+  animation: slideInScale 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideInScale {
+  from {
+    opacity: 0;
+    transform: translateY(40px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Recommended Movies Entrance Animation */
+.recommended-movie-card {
+  opacity: 0;
+  transform: translateX(-30px);
+  animation: slideInLeft 0.7s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Section Header Animation */
+.section-header {
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: slideInDown 0.8s ease-out forwards;
+}
+
+.section-header:nth-of-type(2) {
+  animation-delay: 0.3s;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* 로딩 상태 */

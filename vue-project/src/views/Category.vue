@@ -4,7 +4,7 @@
     <div class="py-4 px-4">
       <div class="max-w-7xl mx-auto">
         <!-- Section Header -->
-        <div class="flex items-baseline justify-between mb-6">
+        <div class="flex items-baseline justify-between mb-6 section-header">
           <div class="flex items-center gap-3">
             <div class="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
@@ -13,9 +13,9 @@
           </div>
           <RouterLink 
             :to="{ name: 'category-all'}"
-            class="text-gray-800 dark:text-gray-200 hover:text-gray-900 dark:hover:text-white transition-colors duration-200"
+            class="group relative w-10 h-10 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-1"
           >
-            <span class="text-red-500 hover:text-red-600 text-xl font-bold group-hover:rotate-90 transition-all duration-300">+</span>
+            <span class="text-green-500 hover:text-green-600 text-xl font-bold group-hover:rotate-90 transition-all duration-300">+</span>
             <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
               더보기
             </div>
@@ -36,9 +36,10 @@
         <!-- Genre Buttons -->
         <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
           <button 
-            v-for="genre in displayGenres" 
+            v-for="(genre, index) in displayGenres" 
             :key="genre.genre_id"
-            class="genre-button group"
+            class="genre-button group genre-card"
+            :style="{ animationDelay: `${index * 100}ms` }"
             @click="handleGenreClick(genre)"
           >
             <span class="genre-name">{{ genre.name }}</span>
@@ -163,5 +164,62 @@ onMounted(async () => {
 .dark .skeleton-genre-text {
   background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
   background-size: 200px 100%;
+}
+
+/* Section Header Animation */
+.section-header {
+  opacity: 0;
+  transform: translateY(-20px);
+  animation: slideInDown 0.8s ease-out forwards;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Genre Card Entrance Animation */
+.genre-card {
+  opacity: 0;
+  transform: translateY(30px) scale(0.9);
+  animation: genreSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes genreSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Staggered animation delays */
+.genre-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.genre-card:nth-child(2) {
+  animation-delay: 100ms;
+}
+
+.genre-card:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+.genre-card:nth-child(4) {
+  animation-delay: 300ms;
+}
+
+.genre-card:nth-child(5) {
+  animation-delay: 400ms;
 }
 </style>

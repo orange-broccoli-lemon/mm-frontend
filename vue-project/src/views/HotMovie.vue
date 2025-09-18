@@ -33,7 +33,8 @@
             v-for="(movie, index) in movieStore.popularMovies.slice(0,5)"
             :key="index"
             :to="{ name: 'movie-detail', params: { id: movie.movie_id } }"
-            class="group transition-transform duration-200 hover:-translate-y-1"
+            class="movie-card group transition-all duration-500 ease-out hover:-translate-y-2 hover:scale-105"
+            :style="{ animationDelay: `${index * 100}ms` }"
           >
             <MovieCard
               :title="movie.title"
@@ -64,3 +65,53 @@ onMounted(async () => {
 })
 
 </script>
+
+<style scoped>
+/* Movie Card Entrance Animation */
+.movie-card {
+  opacity: 0;
+  transform: translateY(30px);
+  animation: slideInUp 0.6s ease-out forwards;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced hover effects */
+.movie-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.dark .movie-card:hover {
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+/* Section header animation */
+.movie-card:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.movie-card:nth-child(2) {
+  animation-delay: 100ms;
+}
+
+.movie-card:nth-child(3) {
+  animation-delay: 200ms;
+}
+
+.movie-card:nth-child(4) {
+  animation-delay: 300ms;
+}
+
+.movie-card:nth-child(5) {
+  animation-delay: 400ms;
+}
+</style>

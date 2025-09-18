@@ -14,7 +14,8 @@
       <div 
         v-for="n in count" 
         :key="n" 
-        class="movie-card-skeleton"
+        class="movie-card-skeleton skeleton-card"
+        :style="{ animationDelay: `${(n - 1) * 100}ms` }"
       >
         <div class="skeleton-poster"></div>
         <div class="skeleton-content">
@@ -110,6 +111,24 @@ withDefaults(defineProps<Props>(), {
 /* Movie Card Skeleton */
 .movie-card-skeleton {
   transition: transform 0.2s ease-in-out;
+}
+
+/* Skeleton Card Entrance Animation */
+.skeleton-card {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: skeletonSlideIn 0.5s ease-out forwards;
+}
+
+@keyframes skeletonSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .skeleton-poster {

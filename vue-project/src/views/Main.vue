@@ -1,9 +1,17 @@
 <template>
   <div class="main-container bg-white dark:bg-gray-900 transition-colors duration-300">
-    <HotMovie />
-    <Actor />
-    <Category />
-    <YouTubeVideos />
+    <div class="main-section" style="animation-delay: 0ms;">
+      <HotMovie />
+    </div>
+    <div class="main-section" style="animation-delay: 200ms;">
+      <Actor />
+    </div>
+    <div class="main-section" style="animation-delay: 400ms;">
+      <Category />
+    </div>
+    <div class="main-section" style="animation-delay: 600ms;">
+      <YouTubeVideos />
+    </div>
 
     <button
       class="group fixed bottom-8 right-8 w-16 h-16 rounded-full shadow-xl hover:shadow-2xl flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 transition-all duration-300 hover:scale-110 hover:-translate-y-2 z-50"
@@ -38,5 +46,40 @@ const toggleBotModal = () => {
 <style scoped>
 .main-container > * + * {
   margin-top: 0;
+}
+
+/* Main Section Entrance Animation */
+.main-section {
+  opacity: 0;
+  transform: translateY(40px);
+  animation: sectionSlideIn 1s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes sectionSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Staggered animation delays for main sections */
+.main-section:nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.main-section:nth-child(2) {
+  animation-delay: 200ms;
+}
+
+.main-section:nth-child(3) {
+  animation-delay: 400ms;
+}
+
+.main-section:nth-child(4) {
+  animation-delay: 600ms;
 }
 </style>
