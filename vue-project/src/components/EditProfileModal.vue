@@ -94,7 +94,7 @@
                 />
                 <button
                   type="button"
-                  @click="$refs.fileInput.click()"
+                  @click="fileInput?.click()"
                   class="px-4 py-2 text-sm font-medium text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 border border-purple-300 dark:border-purple-600 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors duration-200"
                 >
                   이미지 선택

@@ -98,10 +98,10 @@ export interface Watch{
   added_at:string
 }
 export const useAccountStore = defineStore('account', () => {
-  const AUTH_API = `/api/v1/auth`
-  const USERS_API = `/api/v1/users`
-  const FOLLOWS_API = `/api/v1/persons`
-  const MOVIE_API = `/api/v1/movies`
+  const AUTH_API = `https://i13m105.p.ssafy.io/api/v1/auth`
+  const USERS_API = `https://i13m105.p.ssafy.io/api/v1/users`
+  const FOLLOWS_API = `https://i13m105.p.ssafy.io/api/v1/persons`
+  const MOVIE_API = `https://i13m105.p.ssafy.io/api/v1/movies`
 
 
   const token = ref<string | null>(localStorage.getItem('token'))
@@ -526,7 +526,7 @@ const likeList = async (user_id:number) => {
       console.log('프로필 업데이트 요청 시작, 토큰:', token.value ? '존재함' : '없음')
 
       const response = await axios.put(
-        'https://i13m105.p.ssafy.io/api/v1/users/me/profile',
+        `${USERS_API}/me/profile`,
         formData,
         {
           headers: {
