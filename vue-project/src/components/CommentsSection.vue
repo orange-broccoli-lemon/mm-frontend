@@ -259,13 +259,12 @@ const formatDate = (dateString: string) => {
 
 /* 댓글 내용 */
 .comment-content {
-  margin-bottom: 12px;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
+  min-height: 0;       /* flex 안에서 스크롤 가능하려면 필요 */
+  overflow-y: auto;    /* ✅ 스크롤 허용 */
+  padding-right: 6px;  /* 스크롤바와 텍스트 간격 */
 }
+
 
 .spoiler-warning {
   padding: 8px 12px;
@@ -287,15 +286,15 @@ const formatDate = (dateString: string) => {
   line-height: 1.6;
   margin: 0;
   font-size: 0.95rem;
-  display: -webkit-box;
-  -webkit-line-clamp: 4;
-  line-clamp: 4;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-}
 
+  /* ✅ 기존 잘림 처리 제거 */
+  display: block;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  -webkit-box-orient: unset;
+  text-overflow: unset;
+  overflow: visible;
+}
 /* 댓글 푸터 */
 .comment-footer {
   display: flex;

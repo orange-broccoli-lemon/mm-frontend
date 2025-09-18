@@ -189,7 +189,7 @@ const commentLikeToggle = async (comment: MovieComment) => {
 // 댓글 작성 페이지 이동
 const goCreate = () => {
   router.push({ 
-    name: "create-review", 
+    name: "CreateReview", 
     query: { 
       movieId: route.params.id,
       movieTitle: movieDetail.value?.title || '영화',
