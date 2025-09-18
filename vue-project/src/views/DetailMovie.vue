@@ -13,7 +13,11 @@
         <div v-else class="poster no-image">이미지 없음</div>
         <span>평점 </span>
         <span>{{ movieDetail.average_rating }}</span>
+       
       </div>
+      
+      <!-- 코멘트 요약 -->
+
 
       <div class="movie-content1 animate-slide-in-right">
         <div class="header">
@@ -32,6 +36,20 @@
         <p>{{ movieDetail.overview || "줄거리가 아직 등록되지 않았습니다." }}</p>
       </div>
     </div>
+
+    <div
+  v-if="movieDetail.concise_review"
+  class="max-w-6xl mx-auto mt-10 px-4 animate-slide-up"
+>
+  <div
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6"
+  >
+    <span class="font-bold text-gray-900 dark:text-gray-100">| 코멘트 요약</span>
+    <p class="mt-2 text-gray-600 dark:text-gray-400 leading-relaxed">
+      {{ movieDetail.concise_review }}
+    </p>
+  </div>
+</div>
 
     <!-- 영화 댓글 섹션 -->
     <div class="animate-fade-in-delayed">

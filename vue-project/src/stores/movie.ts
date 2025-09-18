@@ -26,6 +26,7 @@ export interface DetailMovie {
   update_at: string
   is_liked: boolean
   is_in_watchlist: boolean
+  concise_review : string
 }
 
 export interface MovieComment {
