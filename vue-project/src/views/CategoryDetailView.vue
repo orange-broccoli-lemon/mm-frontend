@@ -39,7 +39,6 @@
           </div>
           <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">영화를 불러올 수 없습니다</h3>
           <p class="text-gray-500 dark:text-gray-400 mb-4">{{ error }}</p>
-
         </div>
 
         <!-- Empty State -->
@@ -69,7 +68,7 @@
           </RouterLink>
         </div>
 
-        <!-- Load More Button (옵션) -->
+        <!-- Load More Button -->
         <div v-if="!isLoading && movies.length > 0 && hasMore" class="text-center mt-8">
           <button 
             @click="loadMore"
@@ -87,12 +86,12 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
-import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useCategoryStore } from '@/stores/category'
 import MovieCard from '@/components/MovieCard.vue'
 
-const route = useRoute()
 const router = useRouter()
+const route = useRoute()
 const categoryStore = useCategoryStore()
 
 const isLoading = ref(true)
@@ -101,41 +100,30 @@ const error = ref<string | null>(null)
 const hasMore = ref(false)
 const currentPage = ref(1)
 
-// 현재 장르 ID
-const genreId = computed(() => Number(route.params.genreId))
+// route.params에서 genreId를 가져오고 안전하게 숫자로 변환
+const genreId = computed(() => parseInt(route.params.genreId as string, 10) || 0)
 
-// 현재 선택된 장르 정보
-const selectedGenre = computed(() => {
-  return categoryStore.getGenreById(genreId.value)
-})
+// 선택된 장르
+const selectedGenre = computed(() => categoryStore.getGenreById(genreId.value))
 
-// 현재 장르의 영화 목록
-const movies = computed(() => {
-  return categoryStore.getMoviesByGenre(genreId.value)
-})
+// 영화 목록
+const movies = computed(() => categoryStore.getMoviesByGenre(genreId.value))
 
 // 장르별 영화 가져오기
-const fetchMoviesByGenre = async (page: number = 1) => {
+const fetchMoviesByGenre = async (page = 1) => {
+  if (!genreId.value || genreId.value <= 0) return
+
+  if (page === 1) isLoading.value = true
+  else isLoadingMore.value = true
+
+  error.value = null
+
   try {
-    if (!genreId.value) {
-      throw new Error('올바르지 않은 장르 ID입니다.')
-    }
-
-    if (page === 1) {
-      isLoading.value = true
-    } else {
-      isLoadingMore.value = true
-    }
-
-    error.value = null
-
     const response = await categoryStore.fetchMoviesByGenre(genreId.value, page)
     hasMore.value = response.hasMore || false
     currentPage.value = page
-
   } catch (err) {
     error.value = err instanceof Error ? err.message : '알 수 없는 오류가 발생했습니다.'
-    console.error('장르별 영화 불러오기 실패:', err)
   } finally {
     isLoading.value = false
     isLoadingMore.value = false
@@ -148,25 +136,19 @@ const loadMore = () => {
   }
 }
 
-const goBack = () => {
-  router.back()
-}
+const goBack = () => router.back()
 
-// 라우트 파라미터 변경 감지
-watch(() => route.params.genreId, (newGenreId) => {
-  if (newGenreId) {
-    currentPage.value = 1
-    hasMore.value = false
-    fetchMoviesByGenre()
-  }
+// route.params.genreId 변경 감지
+watch(() => route.params.genreId, () => {
+  currentPage.value = 1
+  hasMore.value = false
+  fetchMoviesByGenre()
 })
 
 onMounted(async () => {
-  // 장르 데이터가 없으면 먼저 로드
-  if (categoryStore.popularGenres.length === 0) {
+  if (!categoryStore.isPopularGenresLoaded) {
     await categoryStore.fetchPopularGenres()
   }
-  
   fetchMoviesByGenre()
 })
 </script>

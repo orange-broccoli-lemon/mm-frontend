@@ -82,19 +82,11 @@ const router = createRouter({
       component: () => import('@/views/Category.vue'),
     },
     {
-      path: '/Category/:id',   // ✅ 동적 라우트 추가
-      name: 'CategoryMovies',
+      path: '/Category/:genreId',   // ✅ 동적 라우트 추가
+      name: 'CategoryDetailView',
       component: CategoryDetailView,
       props: true, // params.id → props.id 로 받을 수 있음
     },
-
-    {
-      path: '/CategoryDetailView',
-      name: 'CategoryDetailView',
-      component: CategoryDetailView,
-    },
-
-     
     {
       path: '/actors',
       name: 'AllActors',
