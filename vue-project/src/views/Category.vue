@@ -80,16 +80,16 @@ onMounted(async () => {
 .genre-button {
   background: white;
   border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 24px 20px;
+  border-radius: 8px;
+  padding: 12px 16px;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  height: 120px;
+  gap: 4px;
+  height: 80px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 .genre-button:hover {
@@ -101,7 +101,7 @@ onMounted(async () => {
   transform: translateY(0);
 }
 .genre-name {
-  font-size: 18px;
+  font-size: 14px;
   font-weight: 600;
   color: #1f2937;
   text-align: center;
@@ -138,9 +138,9 @@ onMounted(async () => {
 .skeleton-genre-button {
   background: white;
   border: 2px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 24px 20px;
-  height: 120px;
+  border-radius: 8px;
+  padding: 12px 16px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -149,7 +149,7 @@ onMounted(async () => {
 
 .skeleton-genre-text {
   width: 60%;
-  height: 20px;
+  height: 16px;
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
   background-size: 200px 100%;
   animation: shimmer 1.5s infinite;
