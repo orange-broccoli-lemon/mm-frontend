@@ -31,14 +31,18 @@ export const useCategoryStore = defineStore('category', () => {
   const genreMovies = ref<{ [genreId: number]: Movie[] }>({})
   const genreMoviesLoading = ref<{ [genreId: number]: boolean }>({})
 
+  // 스크롤 맨 위로 올리는 유틸 (SSR 안전)
+  const safeScrollTop = () => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
   const fetchPopularGenres = async function() {
     if (isPopularGenresLoaded.value && popularGenres.value.length > 0) return
-
-    // 이미 로딩 중이면 중복 호출 방지
     if (isLoadingPopularGenres.value) return
 
     isLoadingPopularGenres.value = true
-
     try {
       const res = await axios.get<Genre[]>(`${BASE_API}v1/genres/popular`)
       popularGenres.value = res.data ?? []
@@ -55,19 +59,15 @@ export const useCategoryStore = defineStore('category', () => {
   const fetchMoviesByGenre = async function(genreId: number, page: number = 1) {
     if (!genreId || genreId <= 0) throw new Error('올바르지 않은 장르 ID입니다.')
 
-    if (page === 1) {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
+    // 첫 페이지면 스크롤 위로
+    if (page === 1) safeScrollTop()
+
     try {
       genreMoviesLoading.value[genreId] = true
 
-     const res = await axios.get<GenreMoviesResponse>(
-  `${BASE_API}v1/genres/${genreId}/movies?page=${page}`
-  
-  
-)
-
-
+      const res = await axios.get<GenreMoviesResponse>(
+        `${BASE_API}v1/genres/${genreId}/movies?page=${page}`
+      )
       const responseData = res.data ?? { movies: [], total: 0, page: 1, hasMore: false }
 
       if (page === 1) {
@@ -87,6 +87,19 @@ export const useCategoryStore = defineStore('category', () => {
     }
   }
 
+  // 모든 인기 장르의 첫 페이지 영화 불러오기 + 스크롤 위로
+  const fetchAllGenresFirstPage = async function() {
+    safeScrollTop()
+
+    if (!isPopularGenresLoaded.value || popularGenres.value.length === 0) {
+      await fetchPopularGenres()
+    }
+
+    await Promise.all(
+      popularGenres.value.map(g => fetchMoviesByGenre(g.genre_id, 1))
+    )
+  }
+
   const getMoviesByGenre = (genreId: number): Movie[] => genreMovies.value[genreId] ?? []
 
   const isGenreMoviesLoading = (genreId: number): boolean => genreMoviesLoading.value[genreId] ?? false
@@ -101,6 +114,7 @@ export const useCategoryStore = defineStore('category', () => {
     isLoadingPopularGenres,
     fetchPopularGenres,
     fetchMoviesByGenre,
+    fetchAllGenresFirstPage,
     getMoviesByGenre,
     isGenreMoviesLoading,
     getGenreById

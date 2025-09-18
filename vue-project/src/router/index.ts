@@ -53,6 +53,7 @@ const router = createRouter({
       path: '/Category',
       name: 'Category',
       component: () => import('@/views/Category.vue'),
+      
     },
     {
       path: '/Category/:genreId',   // ✅ 동적 라우트 추가
