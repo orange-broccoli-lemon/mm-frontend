@@ -38,7 +38,7 @@
     <div v-else class="comments-grid">
       <div v-for="comment in comments" :key="comment.comment_id" class="comment-item">
         <div class="comment-header">
-          <img :src="comment.user_profile_image || defaultImage" :alt="comment.user_name" class="user-avatar" />
+          <img :src="getProfileImageUrl(comment.user_profile_image)" :alt="comment.user_name" class="user-avatar" />
           <div class="user-info">
             <h4>{{ comment.user_name }}</h4>
             <div class="comment-meta">
@@ -87,6 +87,20 @@ defineEmits<{
   toggleSpoilers: []
   commentLikeToggle: [comment: MovieComment]
 }>()
+
+// 프로필 이미지 URL을 절대 경로로 변환
+const getProfileImageUrl = (url?: string) => {
+  if (!url) return defaultImage
+  
+  // 이미 절대 URL인 경우 (http:// 또는 https://로 시작)
+  if (url.startsWith('http://') || url.startsWith('https://')) {
+    return url
+  }
+  
+  // 상대 경로인 경우 서버 주소 추가
+  const baseUrl = 'https://i13m105.p.ssafy.io'
+  return `${baseUrl}${url}`
+}
 
 // 날짜 포맷팅
 const formatDate = (dateString: string) => {
