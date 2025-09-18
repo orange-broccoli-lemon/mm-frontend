@@ -16,9 +16,16 @@
         </div>
 
         <!-- 로딩 상태 -->
-        <div v-if="loading" class="flex justify-center items-center py-12">
-          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
-          <span class="ml-3 text-gray-600 dark:text-gray-400">영상을 불러오는 중...</span>
+        <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div v-for="n in 3" :key="n" class="bg-gray-50 dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+            <div class="skeleton-thumbnail"></div>
+            <div class="p-4 space-y-3">
+              <div class="skeleton-title"></div>
+              <div class="skeleton-channel"></div>
+              <div class="skeleton-description"></div>
+              <div class="skeleton-button"></div>
+            </div>
+          </div>
         </div>
 
         <!-- 에러 상태 -->
@@ -126,5 +133,69 @@ onMounted(() => {
   line-clamp: 2; /* Standard property for compatibility */
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Skeleton Styles */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton-thumbnail {
+  width: 100%;
+  height: 192px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-title {
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-channel {
+  width: 60%;
+  height: 16px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-description {
+  width: 100%;
+  height: 16px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-button {
+  width: 120px;
+  height: 32px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+
+/* Dark mode skeleton styles */
+.dark .skeleton-thumbnail,
+.dark .skeleton-title,
+.dark .skeleton-channel,
+.dark .skeleton-description,
+.dark .skeleton-button {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200px 100%;
 }
 </style>

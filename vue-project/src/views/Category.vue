@@ -22,10 +22,15 @@
           </RouterLink>
         </div>
 
-        <!-- Loading State -->
-        <div v-if="isLoading" class="flex justify-center items-center py-8">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
-          <span class="ml-2 text-gray-600 dark:text-gray-400">장르를 불러오는 중...</span>
+        <!-- Loading State with Skeleton -->
+        <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div 
+            v-for="n in 5" 
+            :key="n" 
+            class="skeleton-genre-button"
+          >
+            <div class="skeleton-genre-text"></div>
+          </div>
         </div>
 
         <!-- Genre Buttons -->
@@ -45,14 +50,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { RouterLink } from 'vue-router'
 import { useCategoryStore } from '@/stores/category'
 
 const categoryStore = useCategoryStore()
 const router = useRouter()
-const isLoading = ref(true)
+
+// store의 로딩 상태를 computed로 사용
+const isLoading = computed(() => categoryStore.isLoadingPopularGenres)
 
 // 상위 5개 장르만 표시
 const displayGenres = computed(() => categoryStore.popularGenres.slice(0, 5))
@@ -64,11 +71,7 @@ const handleGenreClick = (genre: any) => {
 
 // 마운트 시 인기 장르 데이터 로드
 onMounted(async () => {
-  try {
-    await categoryStore.fetchPopularGenres()
-  } finally {
-    isLoading.value = false
-  }
+  await categoryStore.fetchPopularGenres()
 })
 </script>
 
@@ -119,5 +122,46 @@ onMounted(async () => {
 }
 .dark .genre-button:hover {
   border-color: #6b7280;
+}
+
+/* Skeleton Styles */
+@keyframes shimmer {
+  0% {
+    background-position: -200px 0;
+  }
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton-genre-button {
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px 20px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.skeleton-genre-text {
+  width: 60%;
+  height: 20px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.dark .skeleton-genre-button {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+.dark .skeleton-genre-text {
+  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+  background-size: 200px 100%;
 }
 </style>

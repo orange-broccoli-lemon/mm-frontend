@@ -51,6 +51,7 @@ export const useMovieStore = defineStore('counter', () => {
   const movieList = ref<MovieList[]>([])
   const popularMovies = ref<MovieList[]>([])
   const isPopularMoviesLoaded = ref(false)
+  const isLoadingPopularMovies = ref(false)
 
   const movie = ref<DetailMovie | null>(null)
 
@@ -93,6 +94,14 @@ export const useMovieStore = defineStore('counter', () => {
       return
     }
 
+    // 이미 로딩 중이면 중복 호출 방지
+    if (isLoadingPopularMovies.value) {
+      console.log('인기 영화 로딩 중, 중복 호출 방지')
+      return
+    }
+
+    isLoadingPopularMovies.value = true
+
     try {
       console.log('인기 영화 API 호출 시작...')
       const res = await axios.get<MovieList[]>(`${BASE_API}/v1/movies/popular`)
@@ -118,6 +127,8 @@ export const useMovieStore = defineStore('counter', () => {
       }
     } catch (err) {
       console.error('인기영화 불러오기 실패', err)
+    } finally {
+      isLoadingPopularMovies.value = false
     }
   }
 
@@ -143,5 +154,5 @@ const fetchMovieComments = async (movieId: number, includeSpoilers = false) => {
   }
 }
 
-  return { allMovies, movieList, detailMovie, popularMovies, fetchPopularMovies, fetchMovieComments, isPopularMoviesLoaded , movie}
+  return { allMovies, movieList, detailMovie, popularMovies, fetchPopularMovies, fetchMovieComments, isPopularMoviesLoaded, isLoadingPopularMovies, movie}
 })

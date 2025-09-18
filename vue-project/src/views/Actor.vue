@@ -23,10 +23,9 @@
           </RouterLink>
         </div>
         
-        <!-- Loading State -->
-        <div v-if="isLoading" class="flex flex-col items-center justify-center py-12">
-          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500"></div>
-          <span class="mt-3 text-sm font-medium text-gray-600 dark:text-gray-400">인기 배우를 불러오는 중...</span>
+        <!-- Loading State with Skeleton -->
+        <div v-if="isLoading">
+          <SkeletonLoader type="grid" :count="6" />
         </div>
         
         <!-- Actors Grid -->
@@ -45,20 +44,19 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { computed, onMounted } from 'vue';
 import { RouterLink } from 'vue-router';
 import { useActorStore } from '@/stores/actor';
 import ActorCard from '../components/ActorCard.vue';
+import SkeletonLoader from '../components/common/SkeletonLoader.vue';
 
 const actorStore = useActorStore();
-const isLoading = ref(true);
+
+// store의 로딩 상태를 computed로 사용
+const isLoading = computed(() => !actorStore.isActorListLoaded && actorStore.actorList.length === 0)
 
 onMounted(async () => {
-  try {
-    await actorStore.allActors()
-  } finally {
-    isLoading.value = false
-  }
+  await actorStore.allActors()
 })
 </script>
 

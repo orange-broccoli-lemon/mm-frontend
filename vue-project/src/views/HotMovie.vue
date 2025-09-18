@@ -22,10 +22,9 @@
           </RouterLink>
         </div>
         
-        <!-- Loading State -->
-        <div v-if="isLoading" class="flex flex-col items-center justify-center py-12">
-          <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-red-500"></div>
-          <span class="mt-3 text-sm font-medium text-gray-600 dark:text-gray-400">인기 영화를 불러오는 중...</span>
+        <!-- Loading State with Skeleton -->
+        <div v-if="isLoading">
+          <SkeletonLoader type="grid" :count="5" />
         </div>
         
         <!-- Movies Grid -->
@@ -49,20 +48,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { computed, onMounted } from "vue"
 import { useMovieStore } from "../stores/movie.ts"
 import MovieCard from "../components/MovieCard.vue"
+import SkeletonLoader from "../components/common/SkeletonLoader.vue"
 import { RouterLink } from "vue-router"
 
 const movieStore = useMovieStore()
-const isLoading = ref(true)
+
+// store의 로딩 상태를 computed로 사용
+const isLoading = computed(() => movieStore.isLoadingPopularMovies)
 
 onMounted(async () => {
-  try {
-    await movieStore.fetchPopularMovies()
-  } finally {
-    isLoading.value = false
-  }
+  await movieStore.fetchPopularMovies()
 })
 
 </script>

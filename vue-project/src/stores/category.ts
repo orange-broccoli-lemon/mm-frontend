@@ -26,12 +26,18 @@ export const useCategoryStore = defineStore('category', () => {
   const BASE_API = `https://i13m105.p.ssafy.io/api/`
   const popularGenres = ref<Genre[]>([])
   const isPopularGenresLoaded = ref(false)
+  const isLoadingPopularGenres = ref(false)
   
   const genreMovies = ref<{ [genreId: number]: Movie[] }>({})
   const genreMoviesLoading = ref<{ [genreId: number]: boolean }>({})
 
   const fetchPopularGenres = async function() {
     if (isPopularGenresLoaded.value && popularGenres.value.length > 0) return
+
+    // 이미 로딩 중이면 중복 호출 방지
+    if (isLoadingPopularGenres.value) return
+
+    isLoadingPopularGenres.value = true
 
     try {
       const res = await axios.get<Genre[]>(`${BASE_API}v1/genres/popular`)
@@ -41,6 +47,8 @@ export const useCategoryStore = defineStore('category', () => {
       const error = err as AxiosError
       console.error('인기 장르 불러오기 실패', error.response?.data || error.message)
       throw error
+    } finally {
+      isLoadingPopularGenres.value = false
     }
   }
 
@@ -84,7 +92,8 @@ export const useCategoryStore = defineStore('category', () => {
   return { 
     BASE_API,
     popularGenres, 
-    isPopularGenresLoaded, 
+    isPopularGenresLoaded,
+    isLoadingPopularGenres,
     fetchPopularGenres,
     fetchMoviesByGenre,
     getMoviesByGenre,
