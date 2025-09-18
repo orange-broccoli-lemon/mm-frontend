@@ -125,7 +125,7 @@ const toggleMenu = () => (showMenu.value = !showMenu.value)
 // 영화 디테일 페이지로 이동
 const goToMovieDetail = () => {
   router.push({
-    name: 'BookDetail', // 실제 라우터 이름 맞게 수정
+    name: 'movie-detail', // 실제 라우터 이름 맞게 수정
     params: { id: props.movie_id }
   })
 }
