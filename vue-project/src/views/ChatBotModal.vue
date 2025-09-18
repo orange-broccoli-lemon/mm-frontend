@@ -212,7 +212,7 @@ const sendMessage = async () => {
 
       // movie_id가 있으면 보러가기 링크 추가
       if (botStore.answer.movie_id) {
-        botText += `<br/><br/>👉 <a href="/movie/movieDetail/${botStore.answer.movie_id}" class="text-blue-600 hover:underline">보러가기</a>`
+        botText += `<br/><br/>👉 <a href="/movie/movie-detail/${botStore.answer.movie_id}" class="text-blue-600 hover:underline">보러가기</a>`
         console.log("여기아이디왔어요~~~~~ ",botStore.answer.movie_id)
       }
 
