@@ -142,7 +142,7 @@
             <button
               v-if="lastPathSegment === 'mypage' && user.user_id !== currentUserId"
               @click="toggleFollow(user.user_id)"
-              class="px-3 py-1 text-xs rounded-lg font-medium bg-blue-100 hover:bg-blue-200 text-blue-800 shadow-sm hover:shadow-md transition-all duration-200 border border-blue-300 hover:border-blue-400"
+              class="px-3 py-1 text-xs rounded-lg font-medium bg-blue-100 hover:bg-blue-200 text-blue-800 dark:bg-white dark:hover:bg-gray-100 dark:text-black shadow-sm hover:shadow-md transition-all duration-200 border border-blue-300 hover:border-blue-400 dark:border-gray-300"
             >
               팔로잉
             </button>

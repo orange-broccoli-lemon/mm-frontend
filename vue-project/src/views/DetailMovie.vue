@@ -1,5 +1,5 @@
 <template>
-  <div v-if="movieDetail" class="movie-detail">
+  <div v-if="movieDetail" class="movie-detail min-h-screen bg-white dark:bg-gray-900">
     <!-- 영화 배경 -->
     <div class="movie-hero">
       <img v-if="movieDetail.backdrop_url" :src="movieDetail.backdrop_url" class="backdrop" />
@@ -40,10 +40,25 @@
         <span>{{ movieComments.length }}개의 리뷰</span>
 
         <!-- 스포일러 토글 -->
-        <label class="ml-4 flex items-center gap-2 text-sm">
-          <input type="checkbox" v-model="showSpoilers" @change="loadMovieComments" />
-          스포일러 포함 보기
-        </label>
+        <div class="ml-4 flex items-center gap-2 text-sm">
+          <span class="text-gray-600 dark:text-gray-300"></span>
+          <button 
+            @click="toggleSpoilers"
+            :class="[
+              'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+              showSpoilers ? 'bg-blue-600' : 'bg-gray-200 dark:bg-gray-700'
+            ]"
+          >
+            <span
+              :class="[
+                'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
+                showSpoilers ? 'translate-x-6' : 'translate-x-1'
+              ]"
+            />
+          </button>
+          <img src="/src/assets/spotti.png" alt="스포띠빠이" class="w-7 h-7 inline-block" />
+          <span class="text-gray-500 dark:text-gray-400 text-base font-medium">스포띠빠이</span>
+        </div>
       </div>
 
       <div v-if="isLoadingComments" class="loading">
@@ -62,7 +77,7 @@
             <div class="user-info">
               <h4>{{ comment.user_name }}</h4>
               <div class="comment-meta">
-                <span>⭐ {{ comment.rating }}/9</span>
+                <span>⭐ {{ (comment.rating / 2).toFixed(1) }}/5</span>
                 <span>{{ formatDate(comment.create_at || comment.update_at || comment.watched_date || '') }}</span>
               </div>
             </div>
@@ -110,7 +125,7 @@ const isLoadingComments = ref(false)
 
 const isLike = ref(false)
 const isWatch = ref(false)
-const showSpoilers = ref(false) // ✅ 스포일러 토글 상태
+const showSpoilers = ref(true) // ✅ 스포일러 토글 상태
 
 // 영화 정보와 댓글 불러오기
 onMounted(async () => {
@@ -168,11 +183,17 @@ const toggleWatch = async () => {
   }
 }
 
+// 스포일러 토글 함수
+const toggleSpoilers = () => {
+  showSpoilers.value = !showSpoilers.value
+  loadMovieComments()
+}
+
 // 댓글 로드 함수 (스포일러 포함 여부 반영)
 const loadMovieComments = async () => {
   isLoadingComments.value = true
   try {
-    const comments = await userMovie.fetchMovieComments(id, showSpoilers.value)
+    const comments = await userMovie.fetchMovieComments(id, !showSpoilers.value)
     movieComments.value = comments
   } catch (error) {
     console.error('댓글 로드 실패:', error)
@@ -226,11 +247,16 @@ const goCreate = () => {
 
 <style scoped>
 .movie-detail {
-  /* display: flex; */
-  position: absolute;
+  position: relative;
   width: 100%;
+  min-height: 100vh;
   flex-direction: column;
   font-family: "Noto Sans KR", sans-serif;
+  background-color: #ffffff; /* white */
+}
+
+.dark .movie-detail {
+  background-color: #111827; /* gray-900 */
 }
 
 .movie-hero {
@@ -392,6 +418,13 @@ const goCreate = () => {
   max-width: 1380px;
   margin: 40px auto 0;
   padding: 0 20px 40px;
+  background-color: #ffffff; /* white */
+  color: #111827; /* gray-900 */
+}
+
+.dark .comments-section {
+  background-color: #111827; /* gray-900 */
+  color: white;
 }
 
 .comments-header {
@@ -400,7 +433,13 @@ const goCreate = () => {
   justify-content: space-between;
   margin-bottom: 24px;
   padding-bottom: 16px;
-  border-bottom: 2px solid;
+  border-bottom: 2px solid #e5e7eb; /* gray-200 */
+  color: #111827; /* gray-900 */
+}
+
+.dark .comments-header {
+  border-bottom: 2px solid #374151; /* gray-700 */
+  color: white;
 }
 
 .comments-header h2 {
@@ -460,15 +499,24 @@ const goCreate = () => {
 
 /* 댓글 아이템 */
 .comment-item {
-  border: 1px solid;
+  border: 1px solid #e5e7eb; /* gray-200 */
   border-radius: 12px;
   padding: 20px;
+  background-color: #ffffff; /* white */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   height: 200px; /* 고정 높이 */
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  color: #111827; /* gray-900 */
+}
+
+.dark .comment-item {
+  border: 1px solid #374151; /* gray-700 */
+  background-color: #1f2937; /* gray-800 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  color: white;
 }
 
 .comment-item:hover {
@@ -548,9 +596,13 @@ const goCreate = () => {
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
-  border-top: 1px solid;
+  border-top: 1px solid #e5e7eb; /* gray-200 */
   flex-shrink: 0; /* 크기 고정 */
   margin-top: auto; /* 하단에 고정 */
+}
+
+.dark .comment-footer {
+  border-top: 1px solid #374151; /* gray-700 */
 }
 
 .comment-stats {
@@ -615,5 +667,44 @@ const goCreate = () => {
     align-items: flex-start;
     gap: 4px;
   }
+}
+
+/* 다크모드 전용 배경색 강제 설정 */
+.dark .movie-detail {
+  background-color: #111827 !important; /* gray-900 */
+}
+
+.dark .movie-detail .comments-section {
+  background-color: #111827 !important; /* gray-900 */
+}
+
+.dark .movie-detail .comment-item {
+  background-color: #1f2937 !important; /* gray-800 */
+}
+
+/* 다크모드에서 전체 페이지 배경색 일관성 보장 */
+.dark .movie-detail::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #111827; /* gray-900 */
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* 화이트모드에서 전체 페이지 배경색 일관성 보장 */
+.movie-detail::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #ffffff; /* white */
+  z-index: -1;
+  pointer-events: none;
 }
 </style>
