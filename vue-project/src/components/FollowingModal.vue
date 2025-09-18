@@ -72,7 +72,7 @@
             :key="follower.user_id"
             class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
           >
-            <!-- 프로필 이미지 (클릭 가능) -->
+            <!-- 프로필 이미지 -->
             <img
               :src="follower.profile_image_url || defaultProfileImage"
               :alt="follower.name || follower.username || '사용자'"
@@ -90,9 +90,9 @@
               </p>
             </div>
 
-            <!-- 팔로우 버튼 (토글식) -->
+            <!-- 팔로우 버튼 (주소 끝이 mypage일 때만 보임) -->
             <button
-              v-if="follower.user_id !== currentUserId"
+              v-if="lastPathSegment === 'mypage' && follower.user_id !== currentUserId"
               @click="toggleFollow(follower.user_id)"
               :class="[
                 'px-3 py-1 text-xs rounded-full font-medium transition-colors duration-200',
@@ -109,9 +109,6 @@
           <div class="text-4xl mb-4">👥</div>
           <h4 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">팔로워가 없습니다</h4>
           <p class="text-gray-600 dark:text-gray-400 text-sm">아직 나를 팔로우하는 사용자가 없습니다.</p>
-          <p class="text-xs text-gray-500 dark:text-gray-500 mt-2">
-            (API 데이터: {{ followers.length }}개, 사용자 정보: {{ accountStore.user?.followers_count || 0 }}개)
-          </p>
         </div>
       </div>
 
@@ -123,7 +120,7 @@
             :key="user.user_id"
             class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
           >
-            <!-- 프로필 이미지 (클릭 가능) -->
+            <!-- 프로필 이미지 -->
             <img
               :src="user.profile_image_url || defaultProfileImage"
               :alt="user.name || user.username || '사용자'"
@@ -141,9 +138,9 @@
               </p>
             </div>
 
-            <!-- 언팔로우 버튼 -->
+            <!-- 언팔로우 버튼 (주소 끝이 mypage일 때만 보임) -->
             <button
-              v-if="user.user_id !== currentUserId"
+              v-if="lastPathSegment === 'mypage' && user.user_id !== currentUserId"
               @click="toggleFollow(user.user_id)"
               class="px-3 py-1 text-xs rounded-full font-medium bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200 hover:bg-red-200 dark:hover:bg-red-800 transition-colors duration-200"
             >
@@ -155,9 +152,6 @@
           <div class="text-4xl mb-4">👤</div>
           <h4 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">팔로잉이 없습니다</h4>
           <p class="text-gray-600 dark:text-gray-400 text-sm">아직 팔로우하는 사용자가 없습니다.</p>
-          <p class="text-xs text-gray-500 dark:text-gray-500 mt-2">
-            (API 데이터: {{ following.length }}개, 사용자 정보: {{ accountStore.user?.following_count || 0 }}개)
-          </p>
         </div>
       </div>
     </div>
@@ -165,8 +159,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, watch, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAccountStore } from '@/stores/user'
 import defaultProfileImage from '@/assets/spotti.png'
 
@@ -181,7 +175,7 @@ interface User {
 
 const props = defineProps<{
   isOpen: boolean
-  targetUserId?: number // 특정 유저의 팔로워/팔로잉을 보여줄 때 사용
+  targetUserId?: number
 }>()
 
 const emit = defineEmits<{
@@ -189,12 +183,17 @@ const emit = defineEmits<{
 }>()
 
 const router = useRouter()
+const route = useRoute()
 const accountStore = useAccountStore()
+
 const activeTab = ref<'followers' | 'following'>('followers')
 const followers = ref<User[]>([])
 const following = ref<User[]>([])
 const loading = ref(false)
 const currentUserId = ref(accountStore.userId)
+
+// 주소 맨 끝 segment (예: /mypage → 'mypage', /mypage/123 → '123')
+const lastPathSegment = route.fullPath.split('/').pop()
 
 // 드래그 관련 상태
 const modalRef = ref<HTMLElement>()
@@ -202,71 +201,55 @@ const position = ref({ x: 0, y: 0 })
 const isDragging = ref(false)
 const dragStart = ref({ x: 0, y: 0 })
 
-// 드래그 시작
 const startDrag = (e: MouseEvent) => {
-  // 헤더 영역에서만 드래그 가능
   const target = e.target as HTMLElement
   if (!target.closest('.modal-header')) return
-  
   isDragging.value = true
   dragStart.value = {
     x: e.clientX - position.value.x,
     y: e.clientY - position.value.y
   }
-  
   document.addEventListener('mousemove', onDrag)
   document.addEventListener('mouseup', stopDrag)
   e.preventDefault()
 }
 
-// 드래그 중
 const onDrag = (e: MouseEvent) => {
   if (!isDragging.value) return
-  
   position.value = {
     x: e.clientX - dragStart.value.x,
     y: e.clientY - dragStart.value.y
   }
 }
 
-// 드래그 종료
 const stopDrag = () => {
   isDragging.value = false
   document.removeEventListener('mousemove', onDrag)
   document.removeEventListener('mouseup', stopDrag)
 }
 
-// 컴포넌트 언마운트 시 이벤트 리스너 정리
-onUnmounted(() => {
+onUnmounted(async () => {
   document.removeEventListener('mousemove', onDrag)
   document.removeEventListener('mouseup', stopDrag)
+
+  await accountStore.getUserInfo()
+  await loadData()
 })
 
-// 모달이 열릴 때 데이터 로드 및 위치 초기화
 watch(() => props.isOpen, async (isOpen) => {
   if (isOpen) {
-    // 위치 초기화
     position.value = { x: 0, y: 0 }
-    // 먼저 사용자 정보를 새로고침하여 최신 팔로워/팔로잉 수를 가져옴
     await accountStore.getUserInfo()
     await loadData()
   }
 })
 
 const loadData = async () => {
-  // targetUserId가 있으면 해당 유저의 데이터를, 없으면 현재 사용자의 데이터를 로드
   const userId = props.targetUserId || accountStore.user?.user_id
-  if (!userId) {
-    return
-  }
-  
+  if (!userId) return
   loading.value = true
   try {
-    // 팔로워와 팔로잉 데이터를 병렬로 로드
-    await Promise.all([
-      loadFollowers(userId),
-      loadFollowing(userId)
-    ])
+    await Promise.all([loadFollowers(userId), loadFollowing(userId)])
   } finally {
     loading.value = false
   }
@@ -275,54 +258,29 @@ const loadData = async () => {
 const loadFollowers = async (userId: number) => {
   try {
     const data = await accountStore.getFollowers(userId)
-    
-    // 데이터가 배열인지 확인하고 처리
     if (Array.isArray(data)) {
       followers.value = data
     } else if (data && typeof data === 'object') {
-      // 객체인 경우 배열로 변환 시도
-      if (data.users && Array.isArray(data.users)) {
-        followers.value = data.users
-      } else if (data.followers && Array.isArray(data.followers)) {
-        followers.value = data.followers
-      } else if (data.results && Array.isArray(data.results)) {
-        followers.value = data.results
-      } else {
-        followers.value = []
-      }
+      followers.value = data.users || data.followers || data.results || []
     } else {
       followers.value = []
     }
-  } catch (error) {
-    console.error('팔로워 로드 실패:', error)
+  } catch {
     followers.value = []
   }
 }
 
 const loadFollowing = async (userId: number) => {
   try {
-    // 팔로잉 목록을 API에서 직접 가져오기
     const data = await accountStore.getFollowing(userId)
-    
-    // 데이터가 배열인지 확인하고 처리
     if (Array.isArray(data)) {
       following.value = data
     } else if (data && typeof data === 'object') {
-      // 객체인 경우 배열로 변환 시도
-      if (data.users && Array.isArray(data.users)) {
-        following.value = data.users
-      } else if (data.following && Array.isArray(data.following)) {
-        following.value = data.following
-      } else if (data.results && Array.isArray(data.results)) {
-        following.value = data.results
-      } else {
-        following.value = []
-      }
+      following.value = data.users || data.following || data.results || []
     } else {
       following.value = []
     }
-  } catch (error) {
-    console.error('팔로잉 로드 실패:', error)
+  } catch {
     following.value = []
   }
 }
@@ -331,19 +289,28 @@ const closeModal = () => {
   emit('close')
 }
 
-// 사용자 프로필 페이지로 이동
 const goToUserProfile = (userId: number) => {
-  // 모달을 닫고 사용자 프로필 페이지로 이동
   closeModal()
-  router.push({ name: 'UserProfile', params: { userId: userId.toString() } })
+
+  if(userId == accountStore.user?.user_id)
+  {
+      router.push('/mypage')
+  }
+  else{
+    router.push({ name: 'UserProfile', params: { userId: userId.toString() } })
+  }
 }
+
+watch(() => route.fullPath, () => {
+  window.location.href = route.fullPath  
+})
+
 
 const toggleFollow = async (targetUserId: number) => {
   try {
     if (activeTab.value === 'followers') {
       const follower = followers.value.find(f => f.user_id === targetUserId)
       if (!follower) return
-
       if (follower.is_following) {
         await accountStore.unFollowUser(targetUserId)
         follower.is_following = false
@@ -351,19 +318,12 @@ const toggleFollow = async (targetUserId: number) => {
         await accountStore.followUser(targetUserId)
         follower.is_following = true
       }
-      
-      // 팔로우/언팔로우 후 사용자 정보 새로고침
       await accountStore.getUserInfo()
       const userId = props.targetUserId || accountStore.user?.user_id
-      if (userId) {
-        await loadFollowing(userId)
-      }
+      if (userId) await loadFollowing(userId)
     } else {
-      // 팔로잉 탭에서는 언팔로우만 가능
       await accountStore.unFollowUser(targetUserId)
       following.value = following.value.filter(u => u.user_id !== targetUserId)
-      
-      // 언팔로우 후 사용자 정보 새로고침
       await accountStore.getUserInfo()
     }
   } catch (error) {
