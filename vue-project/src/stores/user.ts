@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios, { AxiosError } from 'axios'
 import router from '@/router'
+import { useBotStore } from './bot'
 
 export interface User {
   user_id: number
@@ -226,6 +227,11 @@ export const useAccountStore = defineStore('account', () => {
     like_list.value = null
     localStorage.removeItem('token')
     localStorage.removeItem('userId')
+    
+    // 챗봇 채팅 기록 초기화
+    const botStore = useBotStore()
+    botStore.clearMessages()
+    
     console.log('로그아웃 완료')
     router.push('/')
   }
