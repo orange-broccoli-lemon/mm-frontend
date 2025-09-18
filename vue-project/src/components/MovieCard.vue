@@ -6,7 +6,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="movie-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden group cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+  <div class="movie-card bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden group cursor-pointer transition-all duration-300 hover:-translate-y-1">
     <!-- Image Container -->
     <div class="aspect-[2/3] overflow-hidden relative">
       <img
@@ -45,13 +45,6 @@ defineProps<{
 }
 
 /* Enhanced hover effects */
-.movie-card:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.dark .movie-card:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-}
 
 /* Enhanced line clamp for better text truncation */
 .line-clamp-2 {

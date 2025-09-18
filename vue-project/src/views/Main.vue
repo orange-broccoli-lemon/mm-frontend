@@ -18,9 +18,9 @@
       @click="toggleBotModal"
     >
       <img src="@/assets/spotti.png" alt="Spotti" class="w-10 h-10 object-contain group-hover:scale-110 transition-transform duration-300" />
-      <div class="absolute -top-12 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap shadow-lg">
+      <div class="absolute -top-12 right-0 transform translate-x-2 bg-gray-900 text-white text-xs px-3 py-2 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap shadow-lg">
         {{ showBotModal ? '챗봇 닫기' : 'Spotti와 채팅하기' }}
-        <div class="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+        <div class="absolute top-full right-12 transform w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
       </div>
     </button>
 

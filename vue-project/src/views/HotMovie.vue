@@ -86,13 +86,6 @@ onMounted(async () => {
 }
 
 /* Enhanced hover effects */
-.movie-card:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-.dark .movie-card:hover {
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-}
 
 /* Section header animation */
 .movie-card:nth-child(1) {

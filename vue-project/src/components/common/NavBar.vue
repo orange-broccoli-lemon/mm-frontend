@@ -42,14 +42,20 @@
           <div class="relative">
             <button 
               @click="toggleProfileDropdown"
-              class="flex items-center space-x-2 hover:opacity-80 transition-opacity duration-200 focus:outline-none"
+              class="flex items-center space-x-2 hover:opacity-80 transition-all duration-300 focus:outline-none group"
             >
-              <img 
-                :src="getProfileImageUrl(accountStore.user?.profile_image_url)" 
-                :alt="accountStore.user?.name || 'User'"
-                class="w-8 h-8 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600"
-                @error="handleImageError"
-              />
+              <div class="relative overflow-hidden rounded-full">
+                <img 
+                  :src="getProfileImageUrl(accountStore.user?.profile_image_url)" 
+                  :alt="accountStore.user?.name || 'User'"
+                  class="w-8 h-8 rounded-full object-cover border-2 border-gray-300 dark:border-gray-600 transition-all duration-300 group-hover:scale-110 group-hover:border-blue-400 dark:group-hover:border-blue-500"
+                  @error="handleImageError"
+                />
+                <!-- Hover Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-blue-500/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></div>
+                <!-- Shine Effect -->
+                <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500 rounded-full"></div>
+              </div>
             </button>
             
             <!-- Dropdown Menu -->

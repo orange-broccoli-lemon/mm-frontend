@@ -4,37 +4,51 @@
     @click="goToMovieDetail"
   >
     <!-- ⋯ 버튼 -->
-    <div class="absolute top-2 right-2 z-20" v-if = "lastPathSegment === 'mypage'">
-     <button
-  @click.stop="toggleMenu"
-  class="p-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
->
-  ⋯
-</button>
-      <!-- 드롭다운 메뉴 -->
-      <div
-        v-if="showMenu"
-        class="absolute right-0 mt-2 w-28 bg-white dark:bg-gray-700 rounded-lg shadow-lg border border-gray-200 dark:border-gray-600 z-30"
+    <div class="absolute top-3 right-3 z-20 dropdown-container" v-if="lastPathSegment === 'mypage'">
+      <button
+        @click.stop="toggleMenu"
+        class="p-2 rounded-full bg-white/90 dark:bg-gray-800/90 hover:bg-gray-50 dark:hover:bg-gray-700/90 backdrop-blur-sm shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 border border-gray-200/50 dark:border-gray-600/50"
       >
-        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
-          <li>
+        <svg class="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"></path>
+        </svg>
+      </button>
+      
+      <!-- 드롭다운 메뉴 -->
+      <Transition
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0 scale-95 translate-y-1"
+        enter-to-class="opacity-100 scale-100 translate-y-0"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100 scale-100 translate-y-0"
+        leave-to-class="opacity-0 scale-95 translate-y-1"
+      >
+        <div
+          v-if="showMenu"
+          class="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200/50 dark:border-gray-600/50 z-30 backdrop-blur-sm transform origin-top-right"
+        >
+          <div class="py-2">
             <button
               @click.stop="goToUpdate"
-              class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+              class="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 group"
             >
+              <svg class="w-4 h-4 mr-3 text-gray-500 dark:text-gray-400 group-hover:text-blue-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+              </svg>
               수정
             </button>
-          </li>
-          <li>
             <button
               @click.stop="deleteReview"
-              class="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600"
+              class="flex items-center w-full px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200 group"
             >
+              <svg class="w-4 h-4 mr-3 text-gray-500 dark:text-gray-400 group-hover:text-red-500 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
               삭제
             </button>
-          </li>
-        </ul>
-      </div>
+          </div>
+        </div>
+      </Transition>
     </div>
 
     <!-- Top Image Section -->
@@ -93,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, Transition, onUnmounted } from 'vue'
 import { useRouter , useRoute} from 'vue-router'
 import fitty from 'fitty'
 import spottiImage from '@/assets/spotti.png'
@@ -122,6 +136,22 @@ const contentRef = ref<HTMLElement>()
 // 메뉴 상태
 const showMenu = ref(false)
 const toggleMenu = () => (showMenu.value = !showMenu.value)
+
+// 외부 클릭 시 메뉴 닫기
+const closeMenuOnOutsideClick = (event: Event) => {
+  const target = event.target as HTMLElement
+  if (!target.closest('.dropdown-container')) {
+    showMenu.value = false
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', closeMenuOnOutsideClick)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeMenuOnOutsideClick)
+})
 
 // 영화 디테일 페이지로 이동
 const goToMovieDetail = () => {
