@@ -59,18 +59,6 @@
         <div v-if="errors.password2" class="error-message">{{ errors.password2 }}</div>
       </div>
 
-      <div class="form-group">
-        <label for="image">이미지 URL</label>
-        <input
-          id="image"
-          v-model="image"
-          type="text"
-          placeholder="이미지 URL 입력 (선택사항)"
-          @blur="validateImageUrl"
-        />
-        <div v-if="errors.image" class="error-message">{{ errors.image }}</div>
-      </div>
-
         <button type="submit" :disabled="!isFormValid" class="submit-button">
           회원가입
         </button>
