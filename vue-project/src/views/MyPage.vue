@@ -158,6 +158,16 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    <!-- 액션 버튼 섹션 -->
+    <div class="py-6 px-4">
+      <div class="max-w-4xl mx-auto">
+        <button class="w-full bg-gray-800 dark:bg-white hover:bg-gray-900 dark:hover:bg-gray-100 text-white dark:text-gray-900 py-3 px-4 rounded-md font-medium transition-colors duration-200 flex items-center justify-center" @click="goToHotMovies">
+          <img src="@/assets/spotti.png" alt="스포띠" class="w-6 h-6 mr-2">
+          스포띠빠이와 함께 리뷰쓰러가기
+        </button>
+      </div>
+    </div>
+
 
     <!-- 통계 카드 -->
     <div class="py-6 px-4 animate-slide-up">
