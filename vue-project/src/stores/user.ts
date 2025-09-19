@@ -348,6 +348,20 @@ export const useAccountStore = defineStore('account', () => {
         return false
       }
       
+      // 500 서버 에러인 경우 토큰을 유효한 것으로 간주 (서버 문제)
+      if (error.response?.status === 500) {
+        console.log('서버 오류로 토큰 검증 실패. 토큰을 유효한 것으로 간주합니다.')
+        lastTokenValidation.value = now
+        return true
+      }
+      
+      // 네트워크 오류나 기타 에러인 경우 토큰을 유효한 것으로 간주
+      if (!error.response) {
+        console.log('네트워크 오류로 토큰 검증 실패. 토큰을 유효한 것으로 간주합니다.')
+        lastTokenValidation.value = now
+        return true
+      }
+      
       return false
     } finally {
       isTokenValidating.value = false
