@@ -16,7 +16,8 @@ import SignUpView from '@/views/SignUp.vue'
 import MyPage from '@/views/MyPage.vue'
 import HotMovieDetailView from '@/views/HotMovieDetailView.vue'
 import CategoryDetailView from '@/views/CategoryDetailView.vue'
-import CategoryAll from '@/views/CategoryAll.vue'
+
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -60,11 +61,6 @@ const router = createRouter({
       name: 'category-detail',
       component: CategoryDetailView,
       props: true, // params.id → props.id 로 받을 수 있음
-    },
-    {
-      path: '/category-all',
-      name: 'category-all',
-      component: CategoryAll,
     },
     {
       path: '/select-movie',

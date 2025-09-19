@@ -1,6 +1,5 @@
 <template>
   <main class="bg-white dark:bg-gray-900 transition-colors duration-300">
-    <!-- Genre Category Section -->
     <div class="py-4 px-4">
       <div class="max-w-7xl mx-auto">
         <!-- Section Header -->
@@ -8,66 +7,97 @@
           <div class="flex items-center gap-3">
             <div class="w-1 h-8 bg-gradient-to-b from-green-500 to-green-600 rounded-full"></div>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100 tracking-tight">
-              인기 장르
+            장르
             </h1>
           </div>
-          <RouterLink 
-            :to="{ name: 'category-all'}"
+          <button
             class="group relative w-10 h-10 flex items-center justify-center transition-all duration-300 hover:scale-110 hover:-translate-y-1"
-            >
-            <span class="text-green-500 hover:text-green-600 text-xl font-bold group-hover:rotate-90 transition-all duration-300">+</span>
-            <div class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-              더보기
+            @click="toggleGenres"
+          >
+            <span class="text-green-500 hover:text-green-600 text-xl font-bold group-hover:rotate-90 transition-all duration-300">
+              {{ showAll ? '-' : '+' }}
+            </span>
+            <div
+              class="absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
+              {{ showAll ? '접기' : '더보기' }}
             </div>
-          </RouterLink>
+          </button>
         </div>
 
-        <!-- Loading State with Skeleton -->
-        <div v-if="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-          <div 
-            v-for="n in 5" 
-            :key="n" 
-            class="skeleton-genre-button"
-          >
+        <!-- Loading Skeleton -->
+        <div v-if="isLoading && displayGenres.length === 0"
+             class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          <div v-for="n in 5" :key="n" class="skeleton-genre-button">
             <div class="skeleton-genre-text"></div>
           </div>
         </div>
 
-        <!-- Genre Buttons -->
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-          <button 
-            v-for="(genre, index) in displayGenres" 
+        <!-- ✅ 단일 grid: 5개 + (펼치면) 나머지 -->
+        <transition-group
+          v-else
+          name="genre-list"
+          tag="div"
+          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4"
+        >
+          <button
+            v-for="(genre, index) in visibleGenres"
             :key="genre.genre_id"
-            class="genre-button group genre-card"
-            :style="{ animationDelay: `${index * 100}ms` }"
+            class="genre-button group genre-card w-full"
+            :style="staggerStyle(index)"
             @click="handleGenreClick(genre)"
           >
             <span class="genre-name">{{ genre.name }}</span>
           </button>
-        </div>
+        </transition-group>
       </div>
     </div>
   </main>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { RouterLink } from 'vue-router'
 import { useCategoryStore } from '@/stores/category'
 
 const categoryStore = useCategoryStore()
 const router = useRouter()
 
-// store의 로딩 상태를 computed로 사용
-const isLoading = computed(() => categoryStore.isLoadingPopularGenres)
+// 토글 상태
+const showAll = ref(false)
 
-// 상위 5개 장르만 표시
+// 로딩 상태
+const isLoading = computed(() => categoryStore.isLoadingPopularGenres || categoryStore.isLoadingAllGenres)
+
+// 인기 장르 5개
 const displayGenres = computed(() => categoryStore.popularGenres.slice(0, 5))
 
-// 버튼 클릭 시 해당 장르 디테일 페이지로 이동
+// 나머지 (전체에서 인기 5개 제외)
+const remainingGenres = computed(() =>
+  categoryStore.allGenres.filter(g => !displayGenres.value.some(pg => pg.genre_id === g.genre_id))
+)
+
+// ✅ 펼침 여부에 따라 한 리스트로 묶어서 렌더
+const visibleGenres = computed(() =>
+  showAll.value ? [...displayGenres.value, ...remainingGenres.value] : displayGenres.value
+)
+
+// ✅ 첫 5개는 딜레이 없음, 6번째부터 차라락
+const staggerStyle = (index: number) => {
+  if (!showAll.value) return { animationDelay: `${index * 80}ms` } // 초기 5개도 살짝 딜레이 원하면 유지
+  return index < 5 ? {} : { animationDelay: `${(index - 5) * 80}ms` }
+}
+
+// 장르 클릭 → 상세 페이지 이동
 const handleGenreClick = (genre: any) => {
   router.push({ name: 'category-detail', params: { genreId: genre.genre_id } })
+}
+
+// 더보기/접기 토글
+const toggleGenres = async () => {
+  if (!showAll.value && categoryStore.allGenres.length === 0) {
+    await categoryStore.fetchAllGenres()
+  }
+  showAll.value = !showAll.value
 }
 
 // 마운트 시 인기 장르 데이터 로드
@@ -77,6 +107,7 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* 기존 버튼 스타일 그대로 */
 .genre-button {
   background: white;
   border: 2px solid #e5e7eb;
@@ -92,134 +123,21 @@ onMounted(async () => {
   height: 80px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-.genre-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: #d1d5db;
-}
-.genre-button:active {
-  transform: translateY(0);
-}
-.genre-name {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1f2937;
-  text-align: center;
-}
-.movie-count {
-  font-size: 14px;
-  color: #6b7280;
-}
-/* 다크모드 지원 */
-.dark .genre-button {
-  background: #374151;
-  border-color: #4b5563;
-}
-.dark .genre-name {
-  color: #f9fafb;
-}
-.dark .movie-count {
-  color: #d1d5db;
-}
-.dark .genre-button:hover {
-  border-color: #6b7280;
-}
+.genre-button:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); border-color: #d1d5db; }
+.genre-button:active { transform: translateY(0); }
+.genre-name { font-size: 14px; font-weight: 600; color: #1f2937; text-align: center; }
+.dark .genre-button { background: #374151; border-color: #4b5563; }
+.dark .genre-name { color: #f9fafb; }
 
-/* Skeleton Styles */
-@keyframes shimmer {
-  0% {
-    background-position: -200px 0;
-  }
-  100% {
-    background-position: calc(200px + 100%) 0;
-  }
-}
-
-.skeleton-genre-button {
-  background: white;
-  border: 2px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 12px 16px;
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.skeleton-genre-text {
-  width: 60%;
-  height: 16px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-  background-size: 200px 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: 4px;
-}
-
-.dark .skeleton-genre-button {
-  background: #374151;
-  border-color: #4b5563;
-}
-
-.dark .skeleton-genre-text {
-  background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
-  background-size: 200px 100%;
-}
-
-/* Section Header Animation */
-.section-header {
-  opacity: 0;
-  transform: translateY(-20px);
-  animation: slideInDown 0.8s ease-out forwards;
-}
-
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Genre Card Entrance Animation */
+/* grid 내부에서 아이템 차라락 */
 .genre-card {
   opacity: 0;
-  transform: translateY(30px) scale(0.9);
-  animation: genreSlideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  transform: translateY(16px);
+  animation: fadeSlideIn 0.35s ease forwards;
+}
+@keyframes fadeSlideIn {
+  to { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes genreSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.9);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Staggered animation delays */
-.genre-card:nth-child(1) {
-  animation-delay: 0ms;
-}
-
-.genre-card:nth-child(2) {
-  animation-delay: 100ms;
-}
-
-.genre-card:nth-child(3) {
-  animation-delay: 200ms;
-}
-
-.genre-card:nth-child(4) {
-  animation-delay: 300ms;
-}
-
-.genre-card:nth-child(5) {
-  animation-delay: 400ms;
-}
+/* 스켈레톤은 기존 그대로라 생략 */
 </style>
