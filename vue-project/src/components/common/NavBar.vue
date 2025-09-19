@@ -4,7 +4,7 @@
       <!-- Logo -->
       <div class="flex items-center">
         <RouterLink :to="{ name: 'home' }" class="flex items-center">
-          <img src="@/assets/logo.png" alt="logo" class="w-8 h-8">
+          <img src="@/assets/spotti.png" alt="logo" class="w-8 h-8">
         </RouterLink>
       </div>
 
