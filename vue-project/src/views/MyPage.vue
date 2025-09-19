@@ -18,7 +18,7 @@ const showFollowingModal = ref(false)
 const showEditProfileModal = ref(false)
 
 const goFollowing = () => showFollowingModal.value = true
-const goToHotMovies = () => router.push('/select-movie')
+const goToHotMovies = () => router.push({ name: 'select-movie' })
 const goToEditProfile = () => {
   showEditProfileModal.value = true
 }
@@ -158,6 +158,16 @@ onMounted(async () => {
         </div>
       </div>
     </div>
+    <!-- 액션 버튼 섹션 -->
+    <div class="py-6 px-4 animate-slide-up-delayed">
+      <div class="max-w-4xl mx-auto">
+        <button class="w-full bg-gray-800 dark:bg-white hover:bg-gray-900 dark:hover:bg-gray-100 text-white dark:text-gray-900 py-3 px-4 rounded-md font-medium transition-all duration-300 flex items-center justify-center animate-bounce-in hover:scale-105 hover:shadow-lg" @click="goToHotMovies">
+          <img src="@/assets/spotti.png" alt="스포띠" class="w-6 h-6 mr-2">
+          스포띠빠이와 함께 리뷰쓰러가기
+        </button>
+      </div>
+    </div>
+
 
     <!-- 통계 카드 -->
     <div class="py-6 px-4 animate-slide-up">
@@ -345,6 +355,24 @@ onMounted(async () => {
   }
 }
 
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3) translateY(-50px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05) translateY(0);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 @keyframes scaleIn {
   from {
     opacity: 0;
@@ -417,5 +445,9 @@ onMounted(async () => {
 
 .animate-slide-up-delayed-3 {
   animation: slideUp 0.8s ease-out 1.4s both;
+}
+
+.animate-bounce-in {
+  animation: bounceIn 0.8s ease-out 0.6s both;
 }
 </style>

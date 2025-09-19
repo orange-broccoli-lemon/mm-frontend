@@ -97,12 +97,20 @@ export interface Watch{
   average_rating:string
   added_at:string
 }
+
+export interface RecommentMovie
+{ 
+  movie_id:number
+  title:string
+  poster_url:string
+
+}
 export const useAccountStore = defineStore('account', () => {
   const AUTH_API = `https://i13m105.p.ssafy.io/api/v1/auth`
   const USERS_API = `https://i13m105.p.ssafy.io/api/v1/users`
   const FOLLOWS_API = `https://i13m105.p.ssafy.io/api/v1/persons`
   const MOVIE_API = `https://i13m105.p.ssafy.io/api/v1/movies`
-
+  const RCOMMEND_API = `https://i13m105.p.ssafy.io/api/v1/recommendations/movies`
 
   const token = ref<string | null>(localStorage.getItem('token'))
   const userId = ref<number | null>(JSON.parse(localStorage.getItem('userId') || 'null'))
@@ -110,7 +118,7 @@ export const useAccountStore = defineStore('account', () => {
   const commentList = ref<UserComment[] | null>(null)
   const watch_list = ref<Watch[] | null>(null)
   const like_list = ref<Like[] | null>(null)
-  
+  const recommendedMovies = ref<RecommentMovie[] | null>(null)
   // 토큰 검증 상태 관리 (중복 API 호출 방지)
   const isTokenValidating = ref(false)
   const lastTokenValidation = ref<number>(0)
@@ -338,6 +346,20 @@ export const useAccountStore = defineStore('account', () => {
         console.log('토큰이 만료되었습니다. 자동 로그아웃합니다.')
         logOut()
         return false
+      }
+      
+      // 500 서버 에러인 경우 토큰을 유효한 것으로 간주 (서버 문제)
+      if (error.response?.status === 500) {
+        console.log('서버 오류로 토큰 검증 실패. 토큰을 유효한 것으로 간주합니다.')
+        lastTokenValidation.value = now
+        return true
+      }
+      
+      // 네트워크 오류나 기타 에러인 경우 토큰을 유효한 것으로 간주
+      if (!error.response) {
+        console.log('네트워크 오류로 토큰 검증 실패. 토큰을 유효한 것으로 간주합니다.')
+        lastTokenValidation.value = now
+        return true
       }
       
       return false
@@ -643,6 +665,22 @@ const likeList = async (user_id:number) => {
     }
   }
 
+
+   async function getRecommendedMovie() {
+    if (!token.value) return
+    try {
+      const res = await axios.get(RCOMMEND_API, {
+        headers: { Authorization: `Bearer ${token.value}` }
+      })
+      console.log("RCOMMEND_API:", RCOMMEND_API)
+      recommendedMovies.value = res.data.recommendations
+      return res.data
+    } catch (err: unknown) {
+      const error = err as AxiosError
+      console.error('팔로워 가져오기 실패:', error.response?.data || error.message)
+    }
+  }
+
   return {
     signUp,
     login,
@@ -668,7 +706,9 @@ const likeList = async (user_id:number) => {
     like_list,
     watch_list,
     googleLogin,
-    updateProfile
+    updateProfile,
+    getRecommendedMovie,
+    recommendedMovies
 
   }
 })

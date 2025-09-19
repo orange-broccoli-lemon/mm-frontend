@@ -110,13 +110,6 @@ const router = createRouter({
       component: () => import('@/views/UserProfileView.vue'),
     },
 
-    {
-      path: '/create-thread/:id',
-      name: 'create-thread',
-      component: () => import('@/views/CreateThread.vue'),
-      props: true,
-      meta: { requiresAuth: true }
-    },
   ],
 })
 
@@ -143,8 +136,17 @@ router.beforeEach(async (to, from, next) => {
         next({ name: 'login' })
         return
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('토큰 검증 중 오류:', error)
+      
+      // 서버 오류(500)나 네트워크 오류인 경우 토큰을 유효한 것으로 간주
+      if (error.response?.status === 500 || !error.response) {
+        console.log('서버/네트워크 오류로 토큰 검증 실패. 계속 진행합니다.')
+        next()
+        return
+      }
+      
+      // 기타 에러는 로그인 페이지로 리다이렉트
       next({ name: 'login' })
       return
     }

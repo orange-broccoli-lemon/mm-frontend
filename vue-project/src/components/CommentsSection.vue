@@ -59,18 +59,21 @@
         :key="comment.comment_id"
         class="comment-item transition-all duration-300 ease-in-out hover-expandable bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-600 shadow-sm dark:shadow-gray-900 hover:shadow-lg dark:hover:shadow-gray-800"
       >
-        <!-- 헤더 -->
-        <div class="comment-header">
-          <img :src="getProfileImageUrl(comment.user_profile_image)" :alt="comment.user_name" class="user-avatar" />
-          <div class="user-info">
-            <h4 class="text-gray-900 dark:text-gray-100">{{ comment.user_name }}</h4>
-            <div class="comment-meta">
-              <span class="text-gray-600 dark:text-gray-400">⭐ {{ (comment.rating / 2).toFixed(1) }}/5</span>
-              <span class="text-gray-500 dark:text-gray-500">{{ formatDate(comment.create_at || comment.update_at || comment.watched_date || '') }}</span>
-            </div>
+      <!-- 헤더 -->
+      <div class="comment-header cursor-pointer" @click="goUserProfile(comment.user_id)">
+        <img 
+          :src="getProfileImageUrl(comment.user_profile_image)" 
+          :alt="comment.user_name" 
+          class="user-avatar" 
+        />
+        <div class="user-info">
+          <h4 class="text-gray-900 dark:text-gray-100">{{ comment.user_name }}</h4>
+          <div class="comment-meta">
+            <span class="text-gray-600 dark:text-gray-400">⭐ {{ (comment.rating / 2).toFixed(1) }}/5</span>
+            <span class="text-gray-500 dark:text-gray-500">{{ formatDate(comment.create_at || comment.update_at || comment.watched_date || '') }}</span>
           </div>
         </div>
-
+      </div>
         <!-- 내용 -->
         <div class="comment-content">
          <p
@@ -109,7 +112,9 @@
 import { ref, onMounted, onUpdated, nextTick, onUnmounted, watch } from 'vue'
 import type { MovieComment } from '@/stores/movie'
 import defaultImage from '@/assets/spotti.png'
+import { useRouter } from 'vue-router';
 
+const router = useRouter()
 /** Props / Emits */
 const props = defineProps<{
   comments: MovieComment[]
@@ -121,6 +126,13 @@ defineEmits<{
   toggleSpoilers: []
   commentLikeToggle: [comment: MovieComment]
 }>()
+
+const goUserProfile = (userId: number) => {
+  router.push({ 
+    name: 'user-profile', 
+    params: { userId } 
+  })
+}
 
 /** 펼침 상태 (호버용) */
 const expandedComments = ref<number[]>([])
@@ -254,7 +266,7 @@ watch(() => props.comments, async () => {
 
 .comments-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-top: 20px;
   align-items: start;
@@ -415,7 +427,7 @@ watch(() => props.comments, async () => {
 /* 반응형 */
 @media (max-width: 1024px) {
   .comments-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 @media (max-width: 640px) {

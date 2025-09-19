@@ -1,5 +1,8 @@
 <template>
   <div class="main-container bg-white dark:bg-gray-900 transition-colors duration-300">
+    <div v-if ="userStore.user"class="main-section" style="animation-delay: 0ms;">
+      <RecommentView />
+    </div>
     <div class="main-section" style="animation-delay: 0ms;">
       <HotMovie />
     </div>
@@ -30,12 +33,15 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import RecommentView from './RecommentView.vue'
 import HotMovie from '@/views/HotMovie.vue'
 import Actor from '@/views/Actor.vue'
 import Category from '@/views/Category.vue'
 import ChatBotModal from '@/views/ChatBotModal.vue'
 import YouTubeVideos from '@/components/YouTubeVideos.vue' 
+import { useAccountStore } from '@/stores/user'
 
+const userStore = useAccountStore()
 const showBotModal = ref(false)
 
 const toggleBotModal = () => {
