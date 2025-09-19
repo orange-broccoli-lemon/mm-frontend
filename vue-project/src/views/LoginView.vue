@@ -76,9 +76,6 @@ const showManualButton = ref(false)
 // Google Client ID - 환경변수에서 가져오거나 기본값 사용
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID'
 
-// 디버깅을 위한 로그
-console.log('현재 Google Client ID:', googleClientId)
-console.log('환경변수 VITE_GOOGLE_CLIENT_ID:', import.meta.env.VITE_GOOGLE_CLIENT_ID)
 
 // 리디렉션 URI - 환경변수에서 가져오거나 기본값 사용
 const redirectUri = import.meta.env.VITE_GOOGLE_REDIRECT_URI || window.location.origin
