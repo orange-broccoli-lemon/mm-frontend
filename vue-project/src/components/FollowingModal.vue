@@ -97,7 +97,7 @@
               :class="[
                 'px-3 py-1 text-xs rounded-lg font-medium shadow-sm hover:shadow-md transition-all duration-200 border',
                 follower.is_following 
-                  ? 'bg-blue-100 hover:bg-blue-200 text-blue-800 border-blue-300 hover:border-blue-400'
+                  ? 'bg-blue-100 hover:bg-blue-200 text-blue-800 dark:bg-white dark:hover:bg-gray-100 dark:text-black border-blue-300 hover:border-blue-400 dark:border-gray-300'
                   : 'bg-blue-500 hover:bg-blue-600 text-white border-blue-600 hover:border-blue-700'
               ]"
             >
