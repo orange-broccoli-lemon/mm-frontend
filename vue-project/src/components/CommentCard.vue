@@ -161,9 +161,9 @@ const goToMovieDetail = () => {
   })
 }
 
-// 수정 버튼 → /update-review/:id 이동
+// 수정 버튼 → update-review 라우트로 이동
 const goToUpdate = () => {
-  router.push(`/update-review/${props.comment_id}`)
+  router.push({ name: 'update-review', params: { id: props.comment_id } })
   showMenu.value = false
 }
 

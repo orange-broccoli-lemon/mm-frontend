@@ -18,7 +18,7 @@ const showFollowingModal = ref(false)
 const showEditProfileModal = ref(false)
 
 const goFollowing = () => showFollowingModal.value = true
-const goToHotMovies = () => router.push('/select-movie')
+const goToHotMovies = () => router.push({ name: 'select-movie' })
 const goToEditProfile = () => {
   showEditProfileModal.value = true
 }

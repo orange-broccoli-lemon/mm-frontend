@@ -110,13 +110,6 @@ const router = createRouter({
       component: () => import('@/views/UserProfileView.vue'),
     },
 
-    {
-      path: '/create-thread/:id',
-      name: 'create-thread',
-      component: () => import('@/views/CreateThread.vue'),
-      props: true,
-      meta: { requiresAuth: true }
-    },
   ],
 })
 

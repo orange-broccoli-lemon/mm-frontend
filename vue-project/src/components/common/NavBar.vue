@@ -3,7 +3,7 @@
     <div class="max-w-7xl mx-auto px-4 h-full flex items-center justify-between">
       <!-- Logo -->
       <div class="flex items-center">
-        <RouterLink to="/" class="flex items-center">
+        <RouterLink :to="{ name: 'home' }" class="flex items-center">
           <img src="@/assets/logo.png" alt="logo" class="w-8 h-8">
         </RouterLink>
       </div>
@@ -31,7 +31,7 @@
         
         <div v-if="!accountStore.user" class="flex items-center space-x-3">
           <RouterLink 
-            to="/login" 
+            :to="{ name: 'login' }" 
             class="bg-gray-800 dark:bg-gray-700 hover:bg-gray-900 dark:hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors duration-200"
           >
             로그인
