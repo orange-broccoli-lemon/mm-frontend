@@ -97,12 +97,20 @@ export interface Watch{
   average_rating:string
   added_at:string
 }
+
+export interface RecommentMovie
+{ 
+  movie_id:number
+  title:string
+  poster_url:string
+
+}
 export const useAccountStore = defineStore('account', () => {
   const AUTH_API = `https://i13m105.p.ssafy.io/api/v1/auth`
   const USERS_API = `https://i13m105.p.ssafy.io/api/v1/users`
   const FOLLOWS_API = `https://i13m105.p.ssafy.io/api/v1/persons`
   const MOVIE_API = `https://i13m105.p.ssafy.io/api/v1/movies`
-
+  const RCOMMEND_API = `https://i13m105.p.ssafy.io/api/v1/recommendations/movies`
 
   const token = ref<string | null>(localStorage.getItem('token'))
   const userId = ref<number | null>(JSON.parse(localStorage.getItem('userId') || 'null'))
@@ -110,7 +118,7 @@ export const useAccountStore = defineStore('account', () => {
   const commentList = ref<UserComment[] | null>(null)
   const watch_list = ref<Watch[] | null>(null)
   const like_list = ref<Like[] | null>(null)
-  
+  const recommendedMovies = ref<RecommentMovie[] | null>(null)
   // 토큰 검증 상태 관리 (중복 API 호출 방지)
   const isTokenValidating = ref(false)
   const lastTokenValidation = ref<number>(0)
@@ -643,6 +651,22 @@ const likeList = async (user_id:number) => {
     }
   }
 
+
+   async function getRecommendedMovie() {
+    if (!token.value) return
+    try {
+      const res = await axios.get(RCOMMEND_API, {
+        headers: { Authorization: `Bearer ${token.value}` }
+      })
+      console.log("RCOMMEND_API:", RCOMMEND_API)
+      recommendedMovies.value = res.data.recommendations
+      return res.data
+    } catch (err: unknown) {
+      const error = err as AxiosError
+      console.error('팔로워 가져오기 실패:', error.response?.data || error.message)
+    }
+  }
+
   return {
     signUp,
     login,
@@ -668,7 +692,9 @@ const likeList = async (user_id:number) => {
     like_list,
     watch_list,
     googleLogin,
-    updateProfile
+    updateProfile,
+    getRecommendedMovie,
+    recommendedMovies
 
   }
 })
