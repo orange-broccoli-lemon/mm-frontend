@@ -266,7 +266,7 @@ watch(() => props.comments, async () => {
 
 .comments-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   margin-top: 20px;
   align-items: start;
@@ -427,7 +427,7 @@ watch(() => props.comments, async () => {
 /* 반응형 */
 @media (max-width: 1024px) {
   .comments-grid {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 @media (max-width: 640px) {

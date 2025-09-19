@@ -5,6 +5,7 @@
       <div class="flex items-center">
         <RouterLink :to="{ name: 'home' }" class="flex items-center">
           <img src="@/assets/spotti.png" alt="logo" class="w-8 h-8">
+          <span class="text-xl font-bold">   딸깍</span>
         </RouterLink>
       </div>
 
